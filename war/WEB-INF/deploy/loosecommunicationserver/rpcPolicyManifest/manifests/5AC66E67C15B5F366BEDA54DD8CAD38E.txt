@@ -1,0 +1,2 @@
+serviceClass: com.mame.lcom.client.GreetingService
+path: 6B33FC62D8F8F6FFE1C96BD267F1BF97.gwt.rpc
