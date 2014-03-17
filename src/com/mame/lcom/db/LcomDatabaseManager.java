@@ -393,26 +393,26 @@ public class LcomDatabaseManager {
 		log.log(Level.WARNING, "getNewMessagesWithTargetUser");
 
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
-		List<LcomNewMessageData> messagesFromMe = null;
+//		List<LcomNewMessageData> messagesFromMe = null;
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
 		// query messages its sender user is me
-		String query = "select from " + LcomNewMessageData.class.getName()
-				+ " where mUserId == " + userId;
-		messagesFromMe = (List<LcomNewMessageData>) pm.newQuery(query)
-				.execute();
+//		String query = "select from " + LcomNewMessageData.class.getName()
+//				+ " where mUserId == " + userId;
+//		messagesFromMe = (List<LcomNewMessageData>) pm.newQuery(query)
+//				.execute();
+//
+//		for (LcomNewMessageData dataMe : messagesFromMe) {
+//			if (dataMe != null) {
+//				int targetId1 = dataMe.getTargetUserId();
+//				if (targetId1 == targetUserId) {
+//					result.add(dataMe);
+//				}
+//			}
+//		}
 
-		for (LcomNewMessageData dataMe : messagesFromMe) {
-			if (dataMe != null) {
-				int targetId1 = dataMe.getTargetUserId();
-				if (targetId1 == targetUserId) {
-					result.add(dataMe);
-				}
-			}
-		}
-
-		log.log(Level.WARNING, "messagesFromMe size: " + messagesFromMe.size());
+//		log.log(Level.WARNING, "messagesFromMe size: " + messagesFromMe.size());
 
 		// query messages its target user is me
 		List<LcomNewMessageData> messagesFromOthers = null;
