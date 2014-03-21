@@ -5,6 +5,7 @@
 	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
 
 	<!-- Servlets -->
+	<!-- 
 	<servlet>
 		<servlet-name>greetServlet</servlet-name>
 		<servlet-class>com.mame.lcom.server.GreetingServiceImpl</servlet-class>
@@ -14,7 +15,7 @@
 		<servlet-name>greetServlet</servlet-name>
 		<url-pattern>/loosecommunicationserver/greet</url-pattern>
 	</servlet-mapping>
-
+ -->
 	<servlet>
 		<servlet-name>login</servlet-name>
 		<servlet-class>com.mame.lcom.LcomLoginServlet</servlet-class>
@@ -162,7 +163,7 @@
 
 	<!-- Default page to serve -->
 	<welcome-file-list>
-		<welcome-file>LooseCommunicationServer.html</welcome-file>
+		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 
 </web-app>

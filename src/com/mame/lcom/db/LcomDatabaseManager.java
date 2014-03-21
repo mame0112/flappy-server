@@ -42,6 +42,7 @@ public class LcomDatabaseManager {
 	}
 
 	public static boolean isUserNameAlreadyExist(String userName) {
+
 		Key key = KeyFactory.createKey(LcomUserData.class.getSimpleName(),
 				userName);
 		if (key != null) {
@@ -56,6 +57,7 @@ public class LcomDatabaseManager {
 	}
 
 	public int getUserIdByNameAndPassword(String userName, String password) {
+
 		int userId = LcomConst.NO_USER;
 		if (userName != null && password != null) {
 			PersistenceManager pm = LcomPersistenceManagerFactory.get()
@@ -119,6 +121,7 @@ public class LcomDatabaseManager {
 	public synchronized int addNewUserData(LcomUserData data) {
 		log.log(Level.INFO, "addNewUserData");
 		int userId = LcomConst.NO_USER;
+
 		if (data != null) {
 			PersistenceManager pm = LcomPersistenceManagerFactory.get()
 					.getPersistenceManager();
@@ -153,6 +156,11 @@ public class LcomDatabaseManager {
 				try {
 					pm.makePersistent(data);
 					pm.makePersistent(totalData);
+
+					// Store data to memcache
+					LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+					helper.putUserDataToMemCache(data);
+
 				} finally {
 					pm.close();
 				}
@@ -160,39 +168,6 @@ public class LcomDatabaseManager {
 		}
 		return userId;
 	}
-
-	// public synchronized void updateUserData(LcomUserData data) {
-	// if (data != null) {
-	// PersistenceManager pm = LcomPersistenceManagerFactory.get()
-	// .getPersistenceManager();
-	// Query query = pm.newQuery(LcomAllUserData.class);
-	// List<LcomUserData> datas = (List<LcomUserData>) query.execute();
-	// if (datas != null && datas.size() != 0) {
-	// LcomUserData targetData = datas.get(0);
-	//
-	// String userName = data.getUserName();
-	// if (userName != null) {
-	// targetData.setUserName(userName);
-	// }
-	//
-	// String mailAddress = data.getMailAddress();
-	// if (mailAddress != null) {
-	// targetData.setMailAddress(mailAddress);
-	// }
-	//
-	// String password = data.getPassword();
-	// if (password != null) {
-	// targetData.setPassword(password);
-	// }
-	//
-	// try {
-	// pm.makePersistent(data);
-	// } finally {
-	// pm.close();
-	// }
-	// }
-	// }
-	// }
 
 	/**
 	 * Update user data. Key is userId.
@@ -275,36 +250,27 @@ public class LcomDatabaseManager {
 	public synchronized int getNumOfUserId() {
 		log.log(Level.INFO, "getNumOfUserId");
 		int userNum = 0;
-
-		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
-		@SuppressWarnings("unchecked")
-		List<LcomAllUserData> latestDatas = (List<LcomAllUserData>) memcacheService
-				.get(LcomAllUserData.class + LcomConst.MEMCACHE_SEPARATOR
-						+ LcomConst.NUM_OF_USER);
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		int userNumCached = helper.getTotalNumberOfUser();
 		// If cache exist
-		if (latestDatas != null && latestDatas.size() != 0) {
-			LcomAllUserData latestUser = latestDatas.get(0);
-			userNum = latestUser.getTotalUserNum();
+		if (userNumCached != LcomConst.NO_USER) {
+			userNum = Integer.valueOf(userNumCached);
 			log.log(Level.WARNING, "getNumOfUserId memcache: " + userNum);
-			return userNum;
 		} else {
 			log.log(Level.WARNING, "getNumOfUserId Not memcache: " + userNum);
 			PersistenceManager pm = LcomPersistenceManagerFactory.get()
 					.getPersistenceManager();
 
-			// TODO May need to chanage this logic later on.
 			Query query = pm.newQuery(LcomAllUserData.class);
-			latestDatas = (List<LcomAllUserData>) query.execute();
+			List<LcomAllUserData> latestDatas = (List<LcomAllUserData>) query
+					.execute();
 
 			if (latestDatas != null && latestDatas.size() != 0) {
 				userNum = latestDatas.get(0).getTotalUserNum();
-				log.log(Level.WARNING, "getNumOfUserId memcache: " + userNum);
+				log.log(Level.WARNING, "getNumOfUserId from Datastore: "
+						+ userNum);
+				helper.putTotalNumberOfUser(userNum);
 			}
-
-			memcacheService.put(LcomAllUserData.class
-					+ LcomConst.MEMCACHE_SEPARATOR + LcomConst.NUM_OF_USER,
-					String.valueOf(userNum), null);
 
 			pm.close();
 		}
@@ -359,31 +325,6 @@ public class LcomDatabaseManager {
 		result.addAll(messagesFromOthers);
 
 		return result;
-
-		// if (messagesFromMe != null && messagesFromMe.size() != 0) {
-		// if (messagesFromOthers != null && messagesFromOthers.size() != 0) {
-		// messagesFromMe.addAll(messagesFromOthers);
-		// }
-		// return messagesFromMe;
-		// } else {
-		// if (messagesFromOthers != null && messagesFromOthers.size() != 0) {
-		// return messagesFromOthers;
-		// } else {
-		// return null;
-		// }
-		// }
-		// TODO
-		// Date currentDate = new Date();
-		// Calendar cal = Calendar.getInstance();
-		// cal.getTimeInMillis();
-
-		// long time = currentDate.getTime();
-		// for (LcomNewMessageData message : messages) {
-		// Date expireTime = message.getExpireDate();
-		//
-		// }
-
-		// }
 	}
 
 	public synchronized List<LcomNewMessageData> getNewMessagesWithTargetUser(
@@ -394,24 +335,6 @@ public class LcomDatabaseManager {
 		// List<LcomNewMessageData> messagesFromMe = null;
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
-
-		// query messages its sender user is me
-		// String query = "select from " + LcomNewMessageData.class.getName()
-		// + " where mUserId == " + userId;
-		// messagesFromMe = (List<LcomNewMessageData>) pm.newQuery(query)
-		// .execute();
-		//
-		// for (LcomNewMessageData dataMe : messagesFromMe) {
-		// if (dataMe != null) {
-		// int targetId1 = dataMe.getTargetUserId();
-		// if (targetId1 == targetUserId) {
-		// result.add(dataMe);
-		// }
-		// }
-		// }
-
-		// log.log(Level.WARNING, "messagesFromMe size: " +
-		// messagesFromMe.size());
 
 		// query messages its target user is me
 		List<LcomNewMessageData> messagesFromOthers = null;
@@ -488,21 +411,27 @@ public class LcomDatabaseManager {
 	public synchronized LcomUserData getUserData(int userId) {
 		LcomUserData result = null;
 
-		// LcomMemcacheHelper mcHelper = new LcomMemcacheHelper();
-		// List<LcomUserData> users = (List<LcomUserData>) mcHelper.getMemcache(
-		// LcomUserData.class, userId);
-		// if (users == null) {
-		PersistenceManager pm = LcomPersistenceManagerFactory.get()
-				.getPersistenceManager();
-		String query = "select from " + LcomUserData.class.getName()
-				+ " where mUserId == " + userId + "";
-		List<LcomUserData> users = (List<LcomUserData>) pm.newQuery(query)
-				.execute();
-		if (users != null && users.size() != 0) {
-			result = users.get(0);
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		LcomUserData data = helper.getUserDataFromMemcache(userId);
+		if (data != null) {
+			log.log(Level.WARNING, "getUserData from cache");
+			return data;
+		} else {
+			log.log(Level.WARNING, "getUserData from Datastore");
+			PersistenceManager pm = LcomPersistenceManagerFactory.get()
+					.getPersistenceManager();
+			String query = "select from " + LcomUserData.class.getName()
+					+ " where mUserId == " + userId + "";
+			List<LcomUserData> users = (List<LcomUserData>) pm.newQuery(query)
+					.execute();
+			if (users != null && users.size() != 0) {
+				result = users.get(0);
+				helper.putUserDataToMemCache(result);
+			}
+			pm.close();
+
 		}
-		pm.close();
-		// }
+
 		return result;
 	}
 
