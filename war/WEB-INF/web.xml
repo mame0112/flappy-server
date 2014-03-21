@@ -88,6 +88,15 @@
 	</servlet-mapping>
 	
 		<servlet>
+		<servlet-name>friend_thumbnails</servlet-name>
+		<servlet-class>com.mame.lcom.LcomRequestFriendsThumbnailServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>friend_thumbnails</servlet-name>
+		<url-pattern>/friend_thumbnails</url-pattern>
+	</servlet-mapping>
+	
+		<servlet>
 		<servlet-name>debug_servlet</servlet-name>
 		<servlet-class>com.mame.lcom.LcomDebugServlet</servlet-class>
 	</servlet>

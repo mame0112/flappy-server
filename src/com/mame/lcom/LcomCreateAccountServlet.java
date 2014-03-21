@@ -47,6 +47,10 @@ public class LcomCreateAccountServlet extends HttpServlet {
 
 			if (thumb != null) {
 				thumbnail = DatastoreUtil.transcodeString2Blob(thumb);
+				if (thumbnail != null) {
+					log.log(Level.WARNING,
+							"thumbnail size: " + thumbnail.getBytes().length);
+				}
 			}
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();

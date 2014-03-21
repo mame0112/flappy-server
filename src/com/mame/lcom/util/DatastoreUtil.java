@@ -1,23 +1,47 @@
 package com.mame.lcom.util;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Blob;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomNewMessageData;
+import com.mame.lcom.db.LcomDatabaseManager;
 
 public class DatastoreUtil {
 
+	private final static Logger log = Logger.getLogger(DatastoreUtil.class
+			.getName());
+
 	public static Blob transcodeString2Blob(String origin) {
-		// TODO need to add.
-		Blob blob = null;
-		return blob;
+		if (origin != null) {
+			try {
+				byte[] bytes = origin.getBytes("UTF-8");
+				return new Blob(bytes);
+			} catch (UnsupportedEncodingException e) {
+				log.log(Level.WARNING,
+						"UnsupportedEncodingException: " + e.getMessage());
+			}
+		}
+		return null;
 	}
 
 	public static String transcodeBlob2String(Blob origin) {
 		// TODO need to add.
-		String str = null;
-		return str;
+		if (origin != null) {
+			byte[] bytes = origin.getBytes();
+			if (bytes != null) {
+				try {
+					return new String(bytes, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					log.log(Level.WARNING,
+							"UnsupportedEncodingException: " + e.getMessage());
+				}
+			}
+		}
+		return null;
 	}
 
 	public static String parseNewMessageList(

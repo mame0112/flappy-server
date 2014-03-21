@@ -1,28 +1,25 @@
 package com.mame.lcom.db;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.mame.lcom.LcomLoginServlet;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomAllUserData;
 import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
+import com.mame.lcom.util.DatastoreUtil;
 import com.mame.lcom.util.TimeUtil;
 
 public class LcomDatabaseManager {
@@ -332,17 +329,18 @@ public class LcomDatabaseManager {
 		// if (messages == null) {
 
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
-//		List<LcomNewMessageData> messagesFromMe = null;
+		// List<LcomNewMessageData> messagesFromMe = null;
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
 		// query messages its sender user is me
-//		String query = "select from " + LcomNewMessageData.class.getName()
-//				+ " where mUserId == " + userId;
-//		messagesFromMe = (List<LcomNewMessageData>) pm.newQuery(query)
-//				.execute();
+		// String query = "select from " + LcomNewMessageData.class.getName()
+		// + " where mUserId == " + userId;
+		// messagesFromMe = (List<LcomNewMessageData>) pm.newQuery(query)
+		// .execute();
 
-//		log.log(Level.WARNING, "messagesFromMe size: " + messagesFromMe.size());
+		// log.log(Level.WARNING, "messagesFromMe size: " +
+		// messagesFromMe.size());
 
 		// query messages its target user is me
 		List<LcomNewMessageData> messagesFromOthers = null;
@@ -357,7 +355,7 @@ public class LcomDatabaseManager {
 
 		pm.close();
 
-		//		result.addAll(messagesFromMe);
+		// result.addAll(messagesFromMe);
 		result.addAll(messagesFromOthers);
 
 		return result;
@@ -393,26 +391,27 @@ public class LcomDatabaseManager {
 		log.log(Level.WARNING, "getNewMessagesWithTargetUser");
 
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
-//		List<LcomNewMessageData> messagesFromMe = null;
+		// List<LcomNewMessageData> messagesFromMe = null;
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
 		// query messages its sender user is me
-//		String query = "select from " + LcomNewMessageData.class.getName()
-//				+ " where mUserId == " + userId;
-//		messagesFromMe = (List<LcomNewMessageData>) pm.newQuery(query)
-//				.execute();
-//
-//		for (LcomNewMessageData dataMe : messagesFromMe) {
-//			if (dataMe != null) {
-//				int targetId1 = dataMe.getTargetUserId();
-//				if (targetId1 == targetUserId) {
-//					result.add(dataMe);
-//				}
-//			}
-//		}
+		// String query = "select from " + LcomNewMessageData.class.getName()
+		// + " where mUserId == " + userId;
+		// messagesFromMe = (List<LcomNewMessageData>) pm.newQuery(query)
+		// .execute();
+		//
+		// for (LcomNewMessageData dataMe : messagesFromMe) {
+		// if (dataMe != null) {
+		// int targetId1 = dataMe.getTargetUserId();
+		// if (targetId1 == targetUserId) {
+		// result.add(dataMe);
+		// }
+		// }
+		// }
 
-//		log.log(Level.WARNING, "messagesFromMe size: " + messagesFromMe.size());
+		// log.log(Level.WARNING, "messagesFromMe size: " +
+		// messagesFromMe.size());
 
 		// query messages its target user is me
 		List<LcomNewMessageData> messagesFromOthers = null;
@@ -559,6 +558,39 @@ public class LcomDatabaseManager {
 		}
 
 		pm.close();
+	}
+
+	/**
+	 * Get friends thumbnail data. It should be returned as Hashmap. Integer for
+	 * friend userId. And String for thubmanil data itself.
+	 * 
+	 * @param friendsId
+	 * @return
+	 */
+	public synchronized HashMap<Integer, String> getFriendThubmnails(
+			List<String> friendsId) {
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		HashMap<Integer, String> result = new HashMap<Integer, String>();
+
+		if (friendsId != null && friendsId.size() != 0) {
+			for (String id : friendsId) {
+				String query = "select from " + LcomUserData.class.getName()
+						+ " where mUserId == " + id;
+				List<LcomUserData> users = (List<LcomUserData>) pm.newQuery(
+						query).execute();
+				LcomUserData data = users.get(0);
+				Blob thumbnail = data.getThumbnail();
+				if (thumbnail != null) {
+					String thumbStr = DatastoreUtil
+							.transcodeBlob2String(thumbnail);
+					result.put(Integer.valueOf(id), thumbStr);
+				}
+			}
+		}
+
+		return result;
 	}
 
 }
