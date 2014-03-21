@@ -5,4 +5,9 @@
 		<description>Clean up sessions</description>
 		<schedule>every 12 hours</schedule>
 	</cron>
+	<cron>
+		<url>/cron/cleanmessage</url>
+		<description>Clean out obsolete messages</description>
+		<schedule>every 15 minutes</schedule>
+	</cron>
 </cronentries>
