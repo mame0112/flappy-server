@@ -38,6 +38,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
 		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
 		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
+		String language = req.getParameter(LcomConst.SERVLET_LANGUAGE);
 		String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
 		String targetUserId = req
 				.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
@@ -106,7 +107,8 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 							+ "/ userName: " + userName + "/ message: "
 							+ message);
 					LcomMail mail = new LcomMail();
-					mail.sendInvitationMail(mailAddress, userName, message);
+					mail.sendInvitationMail(mailAddress, userName, message,
+							language);
 					// If target user been registered
 					// manager.updateUserData(Integer.valueOf(targetUserId),
 					// targetUserName, null, mailAddress);

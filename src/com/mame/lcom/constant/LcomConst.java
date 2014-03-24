@@ -25,6 +25,8 @@ public class LcomConst {
 
 	public final static String SERVLET_MAILADDRESS = "servet_mailAddress";
 
+	public final static String SERVLET_LANGUAGE = "servet_language";
+
 	public final static String SERVLET_MESSAGE_BODY = "servlet_message_body";
 
 	public final static String SERVLET_MESSAGE_DATE = "servlet_message_date";
@@ -35,7 +37,8 @@ public class LcomConst {
 
 	public final static String SERVLET_ORIGIN = "servlet_origin";
 
-//	public final static String SERVLET_CONTEXT_IDENTIFIER = "servlet_identifier";
+	// public final static String SERVLET_CONTEXT_IDENTIFIER =
+	// "servlet_identifier";
 
 	/**
 	 * Login constants
@@ -106,5 +109,12 @@ public class LcomConst {
 	public final static String NUM_OF_USER = "num_of_user";
 
 	public final static String USER_ID_BY_MAIL_ADDRESS = "userid_by_mail_address";
+
+	/**
+	 * Constants for locale
+	 */
+	public static enum LOCALE_SETTING {
+		ENGLISH, JAPANESE
+	};
 
 }

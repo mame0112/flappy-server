@@ -7,12 +7,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
-import com.google.appengine.api.mail.MailServiceFactory;
 import com.google.appengine.api.mail.MailService.Message;
+import com.google.appengine.api.mail.MailServiceFactory;
+import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.util.TimeUtil;
 
 public class LcomMail {
@@ -25,23 +23,72 @@ public class LcomMail {
 	}
 
 	public void sendInvitationMail(String address, String fromUserName,
-			String message) throws UnsupportedEncodingException {
+			String message, String language)
+			throws UnsupportedEncodingException {
 		log.log(Level.INFO, "sendInvitationMail" + TimeUtil.calcResponse());
 		if (address != null) {
 			Properties props = new Properties();
 			Session session = Session.getDefaultInstance(props, null);
-			String msgBody = "Welcome to Loose communication!\n\n"
-					+ "You are hereby invited by " + fromUserName
-					+ " to this service.";
+
+			String msgBody = null;
+
+			String msgEng = "Welcome to Loose communication!\n\n"
+					+ "You are hereby invited by "
+					+ fromUserName
+					+ " to this service."
+					+ "This service is a stress-less communication tool by to be disappeard message."
+					+ "For more details, please see below link:\n\n"
+					+ "http://loosecommunication.appspot.com/\n\n"
+					+ "And if you have any comment or question on this service, please send an e-mail to us from below link.\n"
+					+ "flappy.communication@gmail.com\n\n" + "---\n"
+					+ "2014 flappyÂ¥nÂ¥nÂ¥n";
+
+			String msgJpn = "flappyã«ã‚ˆã†ã“ã!Â¥nÂ¥n" + "ã‚ãªãŸã¯" + fromUserName
+					+ " ã•ã‚“ã«ã“ã®ã‚µãƒ¼ãƒ“ã‚¹ã«æ‹›å¾…ã•ã‚Œã¾ã—ãŸã€‚Â¥n"
+					+ "ã“ã®ã‚µãƒ¼ãƒ“ã‚¹ã¯ã€è‡ªç„¶ã«æ¶ˆãˆã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«ã‚ˆã‚‹ã‚¹ãƒˆãƒ¬ã‚¹ãƒ•ãƒªãƒ¼ã®ã‚³ãƒŸãƒ¥ãƒ‹ã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãƒ„ãƒ¼ãƒ«ã§ã™ã€‚Â¥n"
+					+ "ã‚ˆã‚Šè©³ç´°ã¯ã€ä¸‹è¨˜ã®ãƒªãƒ³ã‚¯ã‚ˆã‚Šã”ç¢ºèªãã ã•ã„ã€‚\n\n"
+					+ "http://loosecommunication.appspot.com/Â¥nÂ¥n"
+					+ "ã¾ãŸã€ã‚‚ã—ä½•ã‹ç–‘å•ã‚„ä¸æ˜Žç‚¹ãªã©ã”ã–ã„ã¾ã—ãŸã‚‰ã€ä¸‹è¨˜ã®é€£çµ¡å…ˆã¸ã”é€£çµ¡ãã ã•ã„Â¥n"
+					+ "flappy.communication@gmail.com\n\n" + "---\n"
+					+ "2014 flappy";
+			// If language is not null
+			if (language != null) {
+				// And if language is japanese
+				if (language.equals(LcomConst.LOCALE_SETTING.JAPANESE)) {
+					if (message != null && !message.equals(LcomConst.NULL)) {
+						msgBody = message + "Â¥nÂ¥n" + "---" + "Â¥nÂ¥n" + msgJpn
+								+ msgEng;
+					} else {
+						msgBody = msgJpn + msgEng;
+					}
+				} else {
+					// Otherwise (In this case, local is English and others)
+					if (message != null && !message.equals(LcomConst.NULL)) {
+						msgBody = message + "Â¥nÂ¥n" + "---" + "Â¥nÂ¥n" + msgEng
+								+ msgJpn;
+					} else {
+						msgBody = msgEng + msgJpn;
+					}
+
+				}
+			} else {
+				// If language is null
+				if (message != null && !message.equals(LcomConst.NULL)) {
+					msgBody = message + "Â¥nÂ¥n" + "---" + "Â¥nÂ¥n" + msgEng
+							+ msgJpn;
+				} else {
+					msgBody = msgEng + msgJpn;
+				}
+			}
 
 			Message msg = new Message();
-			msg.setSender("mame0112@gmail.com");
+			msg.setSender("flappy.communication@gmail.com");
 			msg.setTo(address);
-			msg.setSubject("Test");
+			msg.setSubject("flappy");
 			msg.setTextBody(msgBody);
 			try {
 				MailServiceFactory.getMailService().send(msg);
-			} catch (IOException e){
+			} catch (IOException e) {
 				log.log(Level.WARNING, "Mail exception: " + e.getMessage());
 			}
 			// message.setsend
@@ -67,52 +114,4 @@ public class LcomMail {
 			// Transport.send(msg);
 		}
 	}
-
-//	public void sendWelcomeMail(String userName, String mailAddress)
-//			throws UnsupportedEncodingException, MessagingException {
-//		log.log(Level.INFO, "sendWelcomeMail" + TimeUtil.calcResponse());
-//		if (mailAddress != null) {
-//			Properties props = new Properties();
-//			Session session = Session.getDefaultInstance(props, null);
-//			// String msgBody = "Welcome to My Fan Club!";
-//
-//			String msgBody = userName
-//					+ "‚³‚ñAuƒ}ƒCƒtƒ@ƒ“ƒNƒ‰ƒuv‚ð‚²—˜—p‚¢‚½‚¾‚«‚ ‚è‚ª‚Æ‚¤‚²‚´‚¢‚Ü‚·I\n\n"
-//					+ "uƒ}ƒCƒtƒ@ƒ“ƒNƒ‰ƒuv‚ÍA‚ ‚È‚½‚ª•’i‹C‚É‚È‚Á‚Ä‚¢‚él‚É‚»‚Ì‹CŽ‚¿‚ð“`‚¦‚½‚èAŽÀ‚Í‚ ‚È‚½‚Ìƒtƒ@ƒ“‚¾‚Á‚½l‚©‚çƒtƒ@ƒ“ƒƒbƒZ[ƒW‚ðŽó‚¯Žæ‚Á‚½‚è‚·‚é‚±‚Æ‚ª‚Å‚«‚éAƒ\[ƒVƒƒƒ‹ƒtƒ@ƒ“ƒNƒ‰ƒuƒT[ƒrƒX‚Å‚·B\n\n"
-//					+ "http://mame0112.appspot.com/\n\n"
-//					+ "‚à‚µ•s–¾“_‚â‚²ˆÓŒ©‚È‚Ç‚ ‚è‚Ü‚µ‚½‚çA‰º‹L‚Ìƒ[ƒ‹ƒAƒhƒŒƒX‚©‚ç‚²˜A—‚­‚¾‚³‚¢"
-//					+ "\nmyfanclub.committee@gmail.com\n\n"
-//					+ "‚Ü‚½A–{ƒT[ƒrƒX‚ð‚²—˜—p‚É‚È‚éÛ‚Ì’ÊM”ï‚ÍA‚¨‹q—l‚²Ž©g‚Ì‚²•‰’S‚Æ‚È‚è‚Ü‚·‚Ì‚ÅA‚ ‚ç‚©‚¶‚ß‚²—¹³‚­‚¾‚³‚¢\n\n"
-//					+ "---\n\n"
-//					+ userName
-//					+ ", thank you for using \"My Fan Club\".\n\n"
-//					+ "In \"My Fan CLub\" is a social fan clbu service that enable you to find person that you are interested in and someone who are interested in you will come to your fan.\nLet's find out such person each other with your friends and enjoy!\n\n"
-//					+ "if you have friend interested in, how about to contact them via E-mail or Twitter from this service "
-//					+ "http://mame0112.appspot.com/\n\n"
-//					+ "If you have any question or comment on the service, you can contact us by using below e-mail.\nmyfanclub.committee@gmail.com\n\n"
-//					+ "Please not that data traffic charge is your responsibility.\n\n"
-//					+ "----------\n\n2013 ƒ}ƒCƒtƒ@ƒ“ƒNƒ‰ƒu(My Fan Club)";
-//
-//			// + objRb.getString("str.welcome_mail_body1")
-//			// + objRb.getString("str.welcome_mail_body2")
-//			// + objRb.getString("str.welcome_mail_body3")
-//			// + objRb.getString("str.welcome_mail_body4")
-//			// + objRb.getString("str.welcome_mail_body5")
-//			// + objRb.getString("str.welcome_mail_body6");
-//
-//			Message msg = new MimeMessage(session);
-//			msg.setContent("My Fan club - Inquery1", "text/html;charset=UTF-8");
-//			msg.setHeader("Content-Transfer-Encoding", "7bit");
-//			msg.setFrom(new InternetAddress("myfanclub.committee@gmail.com"));
-//
-//			msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-//					mailAddress, "My Fan Club"));
-//			// msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-//			// "aka_copaco_ao_copaco_ki_copaco@docomo.ne.jp", "Mr. User"));
-//			String subject = "ƒ}ƒCƒtƒ@ƒ“ƒNƒ‰ƒu‚É‚æ‚¤‚±‚» - Welcome to My Fan Club!";
-//			((MimeMessage) msg).setSubject(subject, "UTF-8");
-//			msg.setText(msgBody);
-//			Transport.send(msg);
-//		}
-//	}
 }
