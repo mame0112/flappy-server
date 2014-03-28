@@ -16,6 +16,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomAllUserData;
+import com.mame.lcom.data.LcomExpiredMessageData;
 import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
@@ -24,8 +25,8 @@ import com.mame.lcom.util.TimeUtil;
 
 public class LcomDatabaseManager {
 
-	private final Logger log = Logger.getLogger(LcomDatabaseManager.class
-			.getName());
+	private final static Logger log = Logger
+			.getLogger(LcomDatabaseManager.class.getName());
 
 	private static LcomDatabaseManager sDatabaseManager = new LcomDatabaseManager();
 
@@ -520,6 +521,52 @@ public class LcomDatabaseManager {
 		}
 
 		return result;
+	}
+
+	public static synchronized void backupOldMessageData(long currentTime) {
+		log.log(Level.WARNING, "backupOldMessageData");
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		String query = "select from " + LcomNewMessageData.class.getName()
+				+ " where mExpireTime <= " + currentTime;
+		List<LcomNewMessageData> oldMessages = (List<LcomNewMessageData>) pm
+				.newQuery(query).execute();
+		if (oldMessages != null && oldMessages.size() != 0) {
+			List<LcomExpiredMessageData> expiredMessage = backupToExpiredTable(oldMessages);
+
+			try {
+				pm.makePersistentAll(expiredMessage);
+			} finally {
+				pm.close();
+			}
+
+			pm.close();
+		}
+
+	}
+
+	private static synchronized List<LcomExpiredMessageData> backupToExpiredTable(
+			List<LcomNewMessageData> oldMessages) {
+
+		if (oldMessages != null) {
+
+			List<LcomExpiredMessageData> expiredMessages = new ArrayList<LcomExpiredMessageData>();
+
+			for (LcomNewMessageData oldMessage : oldMessages) {
+				int userId = oldMessage.getUserId();
+				int targetUserId = oldMessage.getTargetUserId();
+				String message = oldMessage.getMessage();
+				long postedDate = oldMessage.getPostedDate();
+				LcomExpiredMessageData expireNessage = new LcomExpiredMessageData(
+						userId, targetUserId, message, postedDate);
+
+				expiredMessages.add(expireNessage);
+
+			}
+			return expiredMessages;
+		}
+		return null;
 	}
 
 }
