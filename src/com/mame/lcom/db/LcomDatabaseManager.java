@@ -536,12 +536,12 @@ public class LcomDatabaseManager {
 			List<LcomExpiredMessageData> expiredMessage = backupToExpiredTable(oldMessages);
 
 			try {
+				pm.deletePersistentAll(oldMessages);
 				pm.makePersistentAll(expiredMessage);
 			} finally {
 				pm.close();
 			}
 
-			pm.close();
 		}
 
 	}
