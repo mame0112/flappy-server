@@ -281,49 +281,45 @@ public class LcomDatabaseManager {
 
 	public synchronized List<LcomNewMessageData> getNewMessages(int userId) {
 		log.log(Level.WARNING, "getNewMessages");
-		// MemcacheService memcacheService = MemcacheServiceFactory
-		// .getMemcacheService();
-		// @SuppressWarnings("unchecked")
-		// List<LcomNewMessageData> messages = (List<LcomNewMessageData>)
-		// memcacheService
-		// .get(LcomNewMessageData.class + LcomConst.MEMCACHE_SEPARATOR
-		// + userId);
-
-		// LcomMemcacheHelper<List<LcomNewMessageData>> helper =
-		// LcomMemcacheHelper.getMemcacheHelper();
-		// List<LcomNewMessageData> messages = (List<LcomNewMessageData>) helper
-		// .getMemcache(LcomNewMessageData.class, userId);
-		// if (messages == null) {
 
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
-		// List<LcomNewMessageData> messagesFromMe = null;
-		PersistenceManager pm = LcomPersistenceManagerFactory.get()
-				.getPersistenceManager();
 
-		// query messages its sender user is me
-		// String query = "select from " + LcomNewMessageData.class.getName()
-		// + " where mUserId == " + userId;
-		// messagesFromMe = (List<LcomNewMessageData>) pm.newQuery(query)
-		// .execute();
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		try {
+			result = helper.getNewMessageFromMemcache(userId);
+		} catch (LcomMemcacheException e) {
+			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
+		}
 
-		// log.log(Level.WARNING, "messagesFromMe size: " +
-		// messagesFromMe.size());
+		// If we can't get message from memcache, we try to get it from
+		// datastore
+		// TODO we may be able to datastore chceck if we can change get logic
+		// from memcache
+		if (result == null || result.size() == 0) {
+			log.log(Level.INFO, "Data from datastore");
+			PersistenceManager pm = LcomPersistenceManagerFactory.get()
+					.getPersistenceManager();
 
-		// query messages its target user is me
-		List<LcomNewMessageData> messagesFromOthers = null;
-		String queryFromOthers = "select from "
-				+ LcomNewMessageData.class.getName()
-				+ " where mTargetUserId == " + userId;
-		messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
-				queryFromOthers).execute();
+			// query messages its target user is me
+			String queryFromOthers = "select from "
+					+ LcomNewMessageData.class.getName()
+					+ " where mTargetUserId == " + userId;
+			result = (List<LcomNewMessageData>) pm.newQuery(queryFromOthers)
+					.execute();
 
-		log.log(Level.WARNING,
-				"messagesFromOthers size: " + messagesFromOthers.size());
+			pm.close();
 
-		pm.close();
+			// Store message to memcache
+			try {
+				helper.putNewMessagesToMemCache(result);
+			} catch (LcomMemcacheException e) {
+				log.log(Level.WARNING,
+						"LcomMemcacheException: " + e.getMessage());
+			}
 
-		// result.addAll(messagesFromMe);
-		result.addAll(messagesFromOthers);
+		} else {
+			log.log(Level.INFO, "Data from memcache. size: " + result.size());
+		}
 
 		return result;
 	}
@@ -332,33 +328,72 @@ public class LcomDatabaseManager {
 			int userId, int targetUserId) {
 		log.log(Level.WARNING, "getNewMessagesWithTargetUser");
 
+		// List<LcomNewMessageData> messagesInMemcache
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
-		// List<LcomNewMessageData> messagesFromMe = null;
-		PersistenceManager pm = LcomPersistenceManagerFactory.get()
-				.getPersistenceManager();
 
-		// query messages its target user is me
-		List<LcomNewMessageData> messagesFromOthers = null;
-		String queryFromOthers = "select from "
-				+ LcomNewMessageData.class.getName()
-				+ " where mTargetUserId == " + userId;
-		messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
-				queryFromOthers).execute();
-
-		for (LcomNewMessageData dataTarget : messagesFromOthers) {
-			if (dataTarget != null) {
-				int targetId = dataTarget.getUserId();
-				if (targetId == targetUserId) {
-					result.add(dataTarget);
-				}
-			}
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		try {
+			List<LcomNewMessageData> messagesInMemcache = new ArrayList<LcomNewMessageData>();
+			messagesInMemcache = helper.getNewMessageFromMemcache(userId);
+			result = getMessageForTargetUser(targetUserId, messagesInMemcache);
+		} catch (LcomMemcacheException e) {
+			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
 		}
 
-		log.log(Level.WARNING, "messagesFromOthers size: " + result.size());
+		// If there is no message in memcache
+		if (result == null) {
+			log.log(Level.INFO, "Data from datastore");
+			PersistenceManager pm = LcomPersistenceManagerFactory.get()
+					.getPersistenceManager();
 
-		pm.close();
+			// query messages its target user is me
+			List<LcomNewMessageData> messagesFromOthers = null;
+			String queryFromOthers = "select from "
+					+ LcomNewMessageData.class.getName()
+					+ " where mTargetUserId == " + userId;
+			messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
+					queryFromOthers).execute();
+
+			result = getMessageForTargetUser(targetUserId, messagesFromOthers);
+
+			if (result != null && result.size() != 0) {
+				log.log(Level.WARNING,
+						"messagesFromOthers size: " + result.size());
+
+				// Try to put latest message data to memcache
+				try {
+					helper.putNewMessagesToMemCache(result);
+				} catch (LcomMemcacheException e) {
+					log.log(Level.WARNING,
+							"LcomMemcacheException: " + e.getMessage());
+				}
+			}
+
+			pm.close();
+
+		} else {
+			log.log(Level.INFO, "Data from memcache");
+		}
 
 		return result;
+	}
+
+	private List<LcomNewMessageData> getMessageForTargetUser(int targetUserId,
+			List<LcomNewMessageData> original) {
+		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
+
+		if (targetUserId != LcomConst.NO_USER && original != null) {
+			for (LcomNewMessageData message : original) {
+				if (message != null) {
+					int targetId = message.getUserId();
+					if (targetId == targetUserId) {
+						result.add(message);
+					}
+				}
+			}
+			return result;
+		}
+		return null;
 	}
 
 	public synchronized int getUserIdByMailAddress(String address) {
@@ -459,11 +494,27 @@ public class LcomDatabaseManager {
 
 		LcomNewMessageData data = new LcomNewMessageData(userId, targetUserId,
 				userName, targetUserName, message, currentDate, expireDate);
-		try {
-			pm.makePersistent(data);
-		} finally {
-			pm.close();
+
+		if (data != null) {
+
+			// Put the data to datastore
+			try {
+				pm.makePersistent(data);
+			} finally {
+				pm.close();
+			}
+
+			// Put it to memache
+			LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+			try {
+				helper.putNewMessageToMemCache(data);
+			} catch (LcomMemcacheException e) {
+				log.log(Level.WARNING,
+						"LcomMemcacheException: " + e.getMessage());
+			}
+
 		}
+
 	}
 
 	/**
@@ -524,22 +575,66 @@ public class LcomDatabaseManager {
 	}
 
 	public static synchronized void backupOldMessageData(long currentTime) {
-		log.log(Level.WARNING, "backupOldMessageData");
+		log.log(Level.INFO, "backupOldMessageData");
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
-		String query = "select from " + LcomNewMessageData.class.getName()
-				+ " where mExpireTime <= " + currentTime;
-		List<LcomNewMessageData> oldMessages = (List<LcomNewMessageData>) pm
-				.newQuery(query).execute();
-		if (oldMessages != null && oldMessages.size() != 0) {
-			List<LcomExpiredMessageData> expiredMessage = backupToExpiredTable(oldMessages);
+		String query = "select from " + LcomNewMessageData.class.getName();
 
+		List<LcomNewMessageData> allMessages = (List<LcomNewMessageData>) pm
+				.newQuery(query).execute();
+		if (allMessages != null && allMessages.size() != 0) {
+
+			// Clear memcache
+			LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 			try {
-				pm.deletePersistentAll(oldMessages);
-				pm.makePersistentAll(expiredMessage);
-			} finally {
-				pm.close();
+				helper.deleteAllNewMessages();
+			} catch (LcomMemcacheException e) {
+				log.log(Level.WARNING,
+						"LcomMemcacheException: " + e.getMessage());
+			}
+
+			// List for old messages
+			@SuppressWarnings("unchecked")
+			List<LcomNewMessageData> oldMessages = (List<LcomNewMessageData>) pm
+					.newQuery(query).execute();
+
+			// List for not expired (valid) messages
+			@SuppressWarnings("unchecked")
+			List<LcomNewMessageData> validMessages = (List<LcomNewMessageData>) pm
+					.newQuery(query).execute();
+
+			for (LcomNewMessageData message : allMessages) {
+				long expireTime = message.getExpireDate();
+
+				// If the target message is already expired
+				if (currentTime > expireTime) {
+					oldMessages.add(message);
+				} else {
+					validMessages.add(message);
+				}
+			}
+
+			// Backuo old messages
+			if (oldMessages != null && oldMessages.size() != 0) {
+				List<LcomExpiredMessageData> expiredMessage = backupToExpiredTable(oldMessages);
+
+				try {
+					pm.deletePersistentAll(oldMessages);
+					pm.makePersistentAll(expiredMessage);
+				} finally {
+					pm.close();
+				}
+			}
+
+			// Put valid message to memcache
+			if (validMessages != null && validMessages.size() != 0) {
+				try {
+					helper.putNewMessagesToMemCache(validMessages);
+				} catch (LcomMemcacheException e) {
+					log.log(Level.WARNING,
+							"LcomMemcacheException: " + e.getMessage());
+				}
 			}
 
 		}

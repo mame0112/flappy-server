@@ -13,8 +13,8 @@ public class LcomMemcacheHelper<T> {
 
 	}
 
-	public synchronized static LcomMemcacheHelper getMemcacheHelper() {
-		LcomMemcacheHelper helper = new LcomMemcacheHelper();
+	public synchronized static LcomMemcacheHelper<?> getMemcacheHelper() {
+		LcomMemcacheHelper<?> helper = new LcomMemcacheHelper();
 		return helper;
 	}
 
