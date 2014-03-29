@@ -22,13 +22,11 @@ import com.mame.lcom.util.TimeUtil;
  * Servlet for return whetner the inputted mail address user is registerd or
  * not.
  * 
- * @author 22707125
- * 
  */
 public class LcomNewInvitationServlet extends HttpServlet {
 
-	private final Logger log = Logger
-			.getLogger(LcomNewInvitationServlet.class.getName());
+	private final Logger log = Logger.getLogger(LcomNewInvitationServlet.class
+			.getName());
 
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -63,6 +61,9 @@ public class LcomNewInvitationServlet extends HttpServlet {
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 			int targetUserId = manager.getUserIdByMailAddress(mailAddress);
+
+			log.log(Level.INFO, "id from mail address:" + targetUserId);
+
 			// If target mail address is not registered yet
 			if (targetUserId == LcomConst.NO_USER) {
 				result = LcomConst.INVITATION_NEW_USER_RESULT_OK;

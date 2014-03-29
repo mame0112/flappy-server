@@ -21,8 +21,6 @@ import com.mame.lcom.util.TimeUtil;
 /**
  * Send invitation message servlet
  * 
- * @author 22707125
- * 
  */
 
 public class LcomSendConfirmMessageServlet extends HttpServlet {
@@ -33,6 +31,11 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
+
+		// In case of new user, target user name and target user id is null
+		// If tbe targetuser mail address is registerd, target user name is null
+		// (target user id is not null)
+
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
 		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
@@ -58,11 +61,14 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 			list.add(userId);
 			list.add(userName);
 
-			// If target user has been already been registered (= New user)
-			if (targetUserId != null && targetUserName != null
-					&& !targetUserId.equals("") && !targetUserName.equals("")) {
+			// If target user has been already been registered
+			if (targetUserId != null && !targetUserId.equals("")
+					&& !targetUserId.equals(LcomConst.NULL)) {
 				log.log(Level.WARNING, "targetUserId: " + targetUserId);
-				log.log(Level.WARNING, "targetUserName: " + targetUserName);
+				if (targetUserName != null) {
+					log.log(Level.WARNING, "targetUserName: " + targetUserName);
+				}
+
 				// LcomMail mail = new LcomMail();
 				// mail.sendInvitationMail(mailAddress, userName, message);
 
@@ -101,7 +107,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 				list.add(mailAddress);
 
 			} else {
-				// If the target user has NOT been registered.
+				// If the target user has NOT been registered. (= new user)
 				try {
 					log.log(Level.WARNING, "mailAddress: " + mailAddress
 							+ "/ userName: " + userName + "/ message: "
@@ -116,8 +122,13 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 					LcomUserData data = new LcomUserData(LcomConst.NO_USER,
 							null, null, mailAddress, null);
 					int newUserId = manager.addNewUserData(data);
-					manager.addNewFriendshipInfo(Integer.valueOf(userId),
-							newUserId);
+
+					// If user and targer user is not friend yet.
+					if (!manager.isUsersAreFriend(Integer.valueOf(userId),
+							newUserId)) {
+						manager.addNewFriendshipInfo(Integer.valueOf(userId),
+								newUserId);
+					}
 
 					long currentDate = TimeUtil.getCurrentDate();
 

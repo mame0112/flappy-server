@@ -126,7 +126,7 @@ public class LcomDatabaseManager {
 		if (data != null) {
 			PersistenceManager pm = LcomPersistenceManagerFactory.get()
 					.getPersistenceManager();
-			// TODO Need to modify LcomTotalUserData table as well.
+
 			Query query = pm.newQuery(LcomAllUserData.class);
 			List<LcomAllUserData> totalDatas = (List<LcomAllUserData>) query
 					.execute();
@@ -475,6 +475,7 @@ public class LcomDatabaseManager {
 			int secondUserId) {
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
+
 		LcomFriendshipData data = new LcomFriendshipData(firstUserId,
 				secondUserId);
 		try {
@@ -482,6 +483,57 @@ public class LcomDatabaseManager {
 		} finally {
 			pm.close();
 		}
+	}
+
+	public synchronized boolean isUsersAreFriend(int userId, int targetUserId) {
+
+		boolean result = false;
+
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		// First, from user to friend
+		String queryFirst = "select from " + LcomFriendshipData.class.getName()
+				+ " where mFirstUserId == " + userId + "";
+		List<LcomFriendshipData> firstUsers = (List<LcomFriendshipData>) pm
+				.newQuery(queryFirst).execute();
+		if (firstUsers != null && firstUsers.size() != 0) {
+			for (LcomFriendshipData data : firstUsers) {
+				if (data != null) {
+					int friendId = data.getSecondUserId();
+					if (targetUserId == friendId) {
+						// If already friend
+						result = true;
+						break;
+					}
+				}
+			}
+		}
+
+		// If result is still false, we continue to check
+		if (result == false) {
+			// Second, friend to user
+			String querySecond = "select from "
+					+ LcomFriendshipData.class.getName()
+					+ " where mSecondUserId == " + userId + "";
+			List<LcomFriendshipData> secondUsers = (List<LcomFriendshipData>) pm
+					.newQuery(queryFirst).execute();
+			if (secondUsers != null && secondUsers.size() != 0) {
+				for (LcomFriendshipData data : secondUsers) {
+					if (data != null) {
+						int friendId = data.getFirstUserId();
+						if (targetUserId == friendId) {
+							// If already friend
+							result = true;
+							break;
+						}
+					}
+				}
+			}
+
+		}
+
+		return result;
 	}
 
 	public synchronized void addNewMessageInfo(int userId, int targetUserId,
