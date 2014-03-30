@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
+import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.data.LcomNewMessageData;
+import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.util.DatastoreUtil;
 import com.mame.lcom.util.TimeUtil;
@@ -36,11 +38,46 @@ public class LcomNewMessageServlet extends HttpServlet {
 
 		if (userId != null) {
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
-			List<LcomNewMessageData> newMessages = manager
-					.getNewMessages(Integer.valueOf(userId));
+			List<LcomFriendshipData> friendListData = manager
+					.getFriendListData(Integer.valueOf(userId));
 
-			if (newMessages != null && newMessages.size() != 0) {
-				String result = DatastoreUtil.parseNewMessageList(newMessages);
+			if (friendListData != null && friendListData.size() != 0) {
+
+				// If user name is not available, we use mail address instead.
+				for (LcomFriendshipData data : friendListData) {
+					int firstUserId = data.getFirstUserId();
+
+					// If first user is user himself (meaning friend is second
+					// user)
+					if (firstUserId == Integer.valueOf(userId)) {
+						String friendName = data.getSecondUserName();
+						if (friendName == null || friendName.equals("")
+								|| friendName.equals(LcomConst.NULL)) {
+							log.log(Level.INFO, "data.getSecondUserId():"
+									+ data.getSecondUserId());
+							LcomUserData friendData = manager.getUserData(data
+									.getSecondUserId());
+							data.setSecondUserName(friendData.getMailAddress());
+						}
+					} else {
+						// If second user is user (meaning friend is first user)
+						String friendName = data.getFirstUserName();
+						if (friendName == null || friendName.equals("")
+								|| friendName.equals(LcomConst.NULL)) {
+							log.log(Level.INFO,
+									"data.getFirstUserId():"
+											+ data.getFirstUserId());
+							LcomUserData friendData = manager.getUserData(data
+									.getFirstUserId());
+							data.setSecondUserName(friendData.getMailAddress());
+						}
+					}
+				}
+
+				String result = DatastoreUtil.parseFriendListData(
+						Integer.valueOf(userId), friendListData);
+
+				log.log(Level.INFO, "result::" + result);
 				list.add(result);
 			}
 		}

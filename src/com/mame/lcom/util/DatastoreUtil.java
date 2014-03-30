@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Blob;
 import com.mame.lcom.constant.LcomConst;
+import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.db.LcomDatabaseManager;
 
@@ -59,6 +60,31 @@ public class DatastoreUtil {
 					result = result + parseNewMessage(data)
 							+ LcomConst.ITEM_SEPARATOR;
 				}
+				log.log(Level.WARNING, "result: " + result);
+			}
+		}
+		// Remove last separator
+		result = result.substring(0,
+				result.length() - LcomConst.ITEM_SEPARATOR.length());
+		return result;
+	}
+
+	public static String parseFriendListData(int userId,
+			List<LcomFriendshipData> friendListData) {
+		String result = null;
+		boolean isFirstTime = true;
+		for (LcomFriendshipData data : friendListData) {
+			// log.log(Level.INFO, "parseNewMessage(data):"
+			// + parseNewMessage(data));
+			if (data != null) {
+				if (isFirstTime) {
+					result = parseNewMessage(userId, data)
+							+ LcomConst.ITEM_SEPARATOR;
+					isFirstTime = false;
+				} else {
+					result = result + parseNewMessage(userId, data)
+							+ LcomConst.ITEM_SEPARATOR;
+				}
 			}
 		}
 		// Remove last separator
@@ -94,11 +120,47 @@ public class DatastoreUtil {
 				+ targetUserId + LcomConst.SEPARATOR + targetUserName
 				+ LcomConst.SEPARATOR + message + LcomConst.SEPARATOR
 				+ String.valueOf(postDate);
-		// parsed = userId + LcomConst.SEPARATOR + userName +
-		// LcomConst.SEPARATOR
-		// + targetUserId + LcomConst.SEPARATOR + targetUserName
-		// + LcomConst.SEPARATOR + message + LcomConst.SEPARATOR
-		// + postDate.toString();
+		return parsed;
+	}
+
+	public static String parseNewMessage(int userId, LcomFriendshipData data) {
+		String parsed = null;
+		int firstUserId = data.getFirstUserId();
+		String firstUserName = data.getFirstUserName();
+		int secondUserId = data.getSecondUserId();
+		String secondUserName = data.getSecondUserName();
+		String message = data.getLatestMessage();
+		long postDate = 0;
+		int numOfMessage = data.getNumOfNewMessage();
+
+		if (firstUserName == null) {
+			firstUserName = "unknown";
+		}
+		if (secondUserName == null) {
+			secondUserName = "unknown";
+		}
+		if (message == null) {
+			message = "unknown";
+		}
+
+		if (postDate == 0L) {
+			postDate = TimeUtil.getCurrentDate();
+		}
+
+		if (userId == firstUserId) {
+			parsed = firstUserId + LcomConst.SEPARATOR + firstUserName
+					+ LcomConst.SEPARATOR + secondUserId + LcomConst.SEPARATOR
+					+ secondUserName + LcomConst.SEPARATOR + message
+					+ LcomConst.SEPARATOR + String.valueOf(postDate)
+					+ LcomConst.SEPARATOR + numOfMessage;
+		} else {
+			parsed = secondUserId + LcomConst.SEPARATOR + secondUserName
+					+ LcomConst.SEPARATOR + firstUserId + LcomConst.SEPARATOR
+					+ firstUserName + LcomConst.SEPARATOR + message
+					+ LcomConst.SEPARATOR + String.valueOf(postDate)
+					+ LcomConst.SEPARATOR + numOfMessage;
+		}
+
 		return parsed;
 	}
 }

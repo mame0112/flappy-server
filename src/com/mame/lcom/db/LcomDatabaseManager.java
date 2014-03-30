@@ -279,7 +279,7 @@ public class LcomDatabaseManager {
 		return userNum;
 	}
 
-	public synchronized List<LcomNewMessageData> getNewMessages(int userId) {
+	private synchronized List<LcomNewMessageData> getNewMessages(int userId) {
 		log.log(Level.WARNING, "getNewMessages");
 
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
@@ -472,12 +472,18 @@ public class LcomDatabaseManager {
 	}
 
 	public synchronized void addNewFriendshipInfo(int firstUserId,
-			int secondUserId) {
+			String firstUserName, int secondUserId, String secondUserName,
+			String lastMessage, long time, int numOfNewMessage) {
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
+		// int firstUserId, String firstUserName,
+		// int secondUserId, String secondUserName, String lastMessage,
+		// long time, int numOfNewMessage
+
 		LcomFriendshipData data = new LcomFriendshipData(firstUserId,
-				secondUserId);
+				firstUserName, secondUserId, secondUserName, lastMessage, time,
+				numOfNewMessage);
 		try {
 			pm.makePersistent(data);
 		} finally {
@@ -534,6 +540,122 @@ public class LcomDatabaseManager {
 		}
 
 		return result;
+	}
+
+	public synchronized List<LcomFriendshipData> getFriendListData(int userId) {
+		log.log(Level.INFO, "getFriendListData");
+
+		List<LcomFriendshipData> friendList = getFriendshipDataForUser(userId);
+
+		// Debug
+		for (LcomFriendshipData data : friendList) {
+			if (data != null) {
+				log.log(Level.INFO, "firstUserName: " + data.getFirstUserName());
+				log.log(Level.INFO,
+						"secondUserName: " + data.getSecondUserName());
+				log.log(Level.INFO,
+						"latest message: " + data.getLatestMessage());
+			}
+		}
+
+		if (friendList != null && friendList.size() != 0) {
+			log.log(Level.WARNING, "friendList is not null");
+			PersistenceManager pm = LcomPersistenceManagerFactory.get()
+					.getPersistenceManager();
+
+			List<LcomNewMessageData> newMessages = getNewMessages(Integer
+					.valueOf(userId));
+
+			if (newMessages != null && newMessages.size() != 0) {
+				log.log(Level.WARNING, "newmessage is not null. size: "
+						+ newMessages.size());
+				// Check the number of new messages.
+				HashMap<Integer, Integer> messageNum = new HashMap<Integer, Integer>();
+
+				for (LcomNewMessageData message : newMessages) {
+					int targetUserId = message.getTargetUserId();
+
+					// If the target user infomration is not in Hashmap
+					if (messageNum.get(targetUserId) == null) {
+						messageNum.put(targetUserId, 1);
+					} else {
+						// Otherwise (meaning target user infomration is already
+						// been in hashmap),
+						// Update it (+1)
+						int num = messageNum.get(targetUserId);
+						int newNum = num + 1;
+						messageNum.put(targetUserId, newNum);
+					}
+				}
+
+				// Then, we merge FriendListData and the number of message
+				for (LcomFriendshipData data : friendList) {
+					if (data != null) {
+						int firstUserId = data.getFirstUserId();
+						int secondUserId = data.getSecondUserId();
+
+						// If first user is user himself
+						if (messageNum.containsKey(firstUserId)) {
+							int firstNumMessage = messageNum.get(firstUserId);
+							data.setNumOfNewMessage(firstNumMessage);
+						} else {
+							int secondNumMessage = messageNum.get(secondUserId);
+							data.setNumOfNewMessage(secondNumMessage);
+						}
+					}
+				}
+
+			} else {
+				log.log(Level.WARNING, "newmessage is null");
+			}
+
+			pm.close();
+
+			return friendList;
+		} else {
+			log.log(Level.WARNING, "friendList is null");
+		}
+
+		return null;
+	}
+
+	private synchronized List<LcomFriendshipData> getFriendshipDataForUser(
+			int userId) {
+		log.log(Level.INFO, "getFriendshipDataForUser");
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		// Get friendship data.
+		// First, user is first.
+		String queryFirst = "select from " + LcomFriendshipData.class.getName()
+				+ " where mFirstUserId == " + userId;
+		List<LcomFriendshipData> firstFriendship = (List<LcomFriendshipData>) pm
+				.newQuery(queryFirst).execute();
+
+		if (firstFriendship != null) {
+			log.log(Level.INFO,
+					"firstFriendship size: " + firstFriendship.size());
+		}
+
+		// First, user is second.
+		String querySecond = "select from "
+				+ LcomFriendshipData.class.getName()
+				+ " where mSecondUserId == " + userId;
+		List<LcomFriendshipData> secondFriendship = (List<LcomFriendshipData>) pm
+				.newQuery(querySecond).execute();
+
+		if (secondFriendship != null) {
+			log.log(Level.INFO,
+					"secondFriendship size: " + secondFriendship.size());
+		}
+
+		// Combine two List
+		if (firstFriendship != null && secondFriendship != null) {
+			firstFriendship.addAll(secondFriendship);
+		}
+		pm.close();
+
+		return firstFriendship;
 	}
 
 	public synchronized void addNewMessageInfo(int userId, int targetUserId,

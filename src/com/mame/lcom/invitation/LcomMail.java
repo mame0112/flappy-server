@@ -25,7 +25,7 @@ public class LcomMail {
 	public void sendInvitationMail(String address, String fromUserName,
 			String message, String language)
 			throws UnsupportedEncodingException {
-		log.log(Level.INFO, "sendInvitationMail" + TimeUtil.calcResponse());
+		log.log(Level.INFO, "sendInvitationMail");
 		if (address != null) {
 			Properties props = new Properties();
 			Session session = Session.getDefaultInstance(props, null);

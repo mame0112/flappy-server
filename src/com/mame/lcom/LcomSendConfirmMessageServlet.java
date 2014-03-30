@@ -73,14 +73,12 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 				// mail.sendInvitationMail(mailAddress, userName, message);
 
 				// TODO SEND Notification (Not e-mail)
+				
+				long currentTime = TimeUtil.getCurrentDate();
 
-				// int userId = manager.getNumOfUserId();
-				// newUserId = newUserId + 1;
-				// LcomUserData data = new LcomUserData(LcomConst.NO_USER,
-				// null, null, mailAddress);
-				// int newUserId = manager.addNewUserData(data);
-				manager.addNewFriendshipInfo(Integer.valueOf(userId),
-						Integer.valueOf(targetUserId));
+				manager.addNewFriendshipInfo(Integer.valueOf(userId), userName,
+						Integer.valueOf(targetUserId), targetUserName, message,
+						currentTime, 0);
 
 				long currentDate = TimeUtil.getCurrentDate();
 				manager.addNewMessageInfo(Integer.valueOf(userId),
@@ -126,8 +124,15 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 					// If user and targer user is not friend yet.
 					if (!manager.isUsersAreFriend(Integer.valueOf(userId),
 							newUserId)) {
+						// manager.addNewFriendshipInfo(Integer.valueOf(userId),
+						// newUserId);
+
+						long currentTime = TimeUtil.getCurrentDate();
+
 						manager.addNewFriendshipInfo(Integer.valueOf(userId),
-								newUserId);
+								userName, Integer.valueOf(targetUserId),
+								targetUserName, message, currentTime, 0);
+
 					}
 
 					long currentDate = TimeUtil.getCurrentDate();
