@@ -5,5 +5,6 @@
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/kosukeEndo/Documents/workspace2/LooseCommunicationServer/war/WEB-INF/lib/gson-2.2.2.jar"/>
+	<classpathentry kind="lib" path="/Users/kosukeEndo/Documents/workspace/server/gcm/flappy-server/war/WEB-INF/lib/gcm-server.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

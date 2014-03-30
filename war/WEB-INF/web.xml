@@ -98,6 +98,15 @@
 	</servlet-mapping>
 	
 	<servlet>
+		<servlet-name>message_push</servlet-name>
+		<servlet-class>com.mame.lcom.LcomMessagePushServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>message_push</servlet-name>
+		<url-pattern>/message_push</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
 		<servlet-name>messageclean</servlet-name>
 		<servlet-class>com.mame.lcom.LcomCleanOldMessagesServlet</servlet-class>
 	</servlet>
