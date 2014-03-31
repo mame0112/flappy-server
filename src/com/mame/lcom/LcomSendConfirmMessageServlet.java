@@ -63,7 +63,9 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 
 			// If target user has been already been registered
 			if (targetUserId != null && !targetUserId.equals("")
-					&& !targetUserId.equals(LcomConst.NULL)) {
+					&& !targetUserId.equals(LcomConst.NULL)
+					&& targetUserName != null && !targetUserName.equals("")
+					&& !targetUserName.equals(LcomConst.NULL)) {
 				log.log(Level.WARNING, "targetUserId: " + targetUserId);
 				if (targetUserName != null) {
 					log.log(Level.WARNING, "targetUserName: " + targetUserName);
@@ -73,7 +75,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 				// mail.sendInvitationMail(mailAddress, userName, message);
 
 				// TODO SEND Notification (Not e-mail)
-				
+
 				long currentTime = TimeUtil.getCurrentDate();
 
 				manager.addNewFriendshipInfo(Integer.valueOf(userId), userName,
@@ -106,20 +108,24 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 
 			} else {
 				// If the target user has NOT been registered. (= new user)
-				try {
-					log.log(Level.WARNING, "mailAddress: " + mailAddress
-							+ "/ userName: " + userName + "/ message: "
-							+ message);
-					LcomMail mail = new LcomMail();
-					mail.sendInvitationMail(mailAddress, userName, message,
-							language);
+				log.log(Level.WARNING, "mailAddress: " + mailAddress
+						+ "/ userName: " + userName + "/ message: " + message);
+				LcomMail mail = new LcomMail();
+				boolean mailResult = mail.sendInvitationMail(mailAddress,
+						userName, message, language);
+
+				long currentTime = TimeUtil.getCurrentDate();
+				int newUserId = LcomConst.NO_USER;
+
+				if (mailResult) {
+					result = LcomConst.INVITATION_CONFIRMED_RESULT_OK;
 					// If target user been registered
 					// manager.updateUserData(Integer.valueOf(targetUserId),
 					// targetUserName, null, mailAddress);
 
 					LcomUserData data = new LcomUserData(LcomConst.NO_USER,
 							null, null, mailAddress, null);
-					int newUserId = manager.addNewUserData(data);
+					newUserId = manager.addNewUserData(data);
 
 					// If user and targer user is not friend yet.
 					if (!manager.isUsersAreFriend(Integer.valueOf(userId),
@@ -127,42 +133,39 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 						// manager.addNewFriendshipInfo(Integer.valueOf(userId),
 						// newUserId);
 
-						long currentTime = TimeUtil.getCurrentDate();
-
 						manager.addNewFriendshipInfo(Integer.valueOf(userId),
-								userName, Integer.valueOf(targetUserId),
+								userName, Integer.valueOf(newUserId),
 								targetUserName, message, currentTime, 0);
 
 					}
 
-					long currentDate = TimeUtil.getCurrentDate();
-
 					manager.addNewMessageInfo(Integer.valueOf(userId),
-							newUserId, userName, null, message, currentDate);
-
-					// Send back targetUserId
-					list.add(String.valueOf(newUserId));
-
-					// Send back userName
-					list.add(null);
-
-					// Send back message
-					list.add(message);
-
-					// Send back date info
-					list.add(String.valueOf(currentDate));
-
-					// Set result
-					list.add(String.valueOf(result));
-
-					// Send back mail address (to be shown before the target
-					// user
-					// set his/her user name)
-					list.add(mailAddress);
-
-				} catch (Exception e) {
-					log.log(Level.WARNING, "Mail exception: " + e.getMessage());
+							newUserId, userName, null, message, currentTime);
 				}
+
+				// Send back targetUserId
+				list.add(String.valueOf(newUserId));
+
+				// Send back userName
+				list.add(LcomConst.NULL);
+
+				// Send back message
+				list.add(message);
+
+				// Send back date info
+				list.add(String.valueOf(currentTime));
+
+				// Set result
+				list.add(String.valueOf(result));
+
+				// Send back mail address (to be shown before the target
+				// user
+				// set his/her user name)
+				list.add(mailAddress);
+
+				// } catch (Exception e) {
+				// log.log(Level.WARNING, "Mail exception: " + e.getMessage());
+				// }
 			}
 
 			// try {

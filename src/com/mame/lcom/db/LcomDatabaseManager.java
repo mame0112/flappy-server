@@ -625,6 +625,8 @@ public class LcomDatabaseManager {
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
+		List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
+
 		// Get friendship data.
 		// First, user is first.
 		String queryFirst = "select from " + LcomFriendshipData.class.getName()
@@ -632,9 +634,10 @@ public class LcomDatabaseManager {
 		List<LcomFriendshipData> firstFriendship = (List<LcomFriendshipData>) pm
 				.newQuery(queryFirst).execute();
 
-		if (firstFriendship != null) {
+		if (firstFriendship != null && firstFriendship.size() != 0) {
 			log.log(Level.INFO,
 					"firstFriendship size: " + firstFriendship.size());
+			result.addAll(firstFriendship);
 		}
 
 		// First, user is second.
@@ -650,12 +653,12 @@ public class LcomDatabaseManager {
 		}
 
 		// Combine two List
-		if (firstFriendship != null && secondFriendship != null) {
-			firstFriendship.addAll(secondFriendship);
+		if (secondFriendship != null && secondFriendship.size() != 0) {
+			result.addAll(secondFriendship);
 		}
 		pm.close();
 
-		return firstFriendship;
+		return result;
 	}
 
 	public synchronized void addNewMessageInfo(int userId, int targetUserId,
