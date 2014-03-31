@@ -86,11 +86,11 @@ public class LcomMail {
 			msg.setTo(address);
 			msg.setSubject("flappy");
 			msg.setTextBody(msgBody);
-			try {
-				MailServiceFactory.getMailService().send(msg);
-			} catch (IOException e) {
-				log.log(Level.WARNING, "Mail exception: " + e.getMessage());
-			}
+//			try {
+//				MailServiceFactory.getMailService().send(msg);
+//			} catch (IOException e) {
+//				log.log(Level.WARNING, "Mail exception: " + e.getMessage());
+//			}
 			// message.setsend
 
 			// Message msg = new MimeMessage(session);
