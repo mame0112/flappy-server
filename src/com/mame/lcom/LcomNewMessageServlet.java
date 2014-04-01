@@ -37,6 +37,7 @@ public class LcomNewMessageServlet extends HttpServlet {
 		list.add(origin);
 
 		if (userId != null) {
+			log.log(Level.INFO, "userId:" + userId);
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 			List<LcomFriendshipData> friendListData = manager
 					.getFriendListData(Integer.valueOf(userId));

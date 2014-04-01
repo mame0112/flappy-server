@@ -647,13 +647,10 @@ public class LcomDatabaseManager {
 		List<LcomFriendshipData> secondFriendship = (List<LcomFriendshipData>) pm
 				.newQuery(querySecond).execute();
 
-		if (secondFriendship != null) {
-			log.log(Level.INFO,
-					"secondFriendship size: " + secondFriendship.size());
-		}
-
 		// Combine two List
 		if (secondFriendship != null && secondFriendship.size() != 0) {
+			log.log(Level.INFO,
+					"secondFriendship size: " + secondFriendship.size());
 			result.addAll(secondFriendship);
 		}
 		pm.close();

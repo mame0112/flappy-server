@@ -9,6 +9,8 @@ public class LcomConst {
 	// public final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	public final static String DATE_PATTERN = "dd-MM-yy:HH:mm:SS";
 
+	public final static String BASE_URL = "http://loosecommunication.appspot.com/";
+
 	public final static String MEMCACHE_SEPARATOR = "#@#";
 
 	public final static String NULL = "null";
