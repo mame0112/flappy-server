@@ -39,6 +39,8 @@ public class LcomConst {
 
 	public final static String SERVLET_ORIGIN = "servlet_origin";
 
+	public final static String SERVLET_DEVICE_ID = "servlet_device_id";
+
 	// public final static String SERVLET_CONTEXT_IDENTIFIER =
 	// "servlet_identifier";
 

@@ -18,6 +18,7 @@ import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomAllUserData;
 import com.mame.lcom.data.LcomExpiredMessageData;
 import com.mame.lcom.data.LcomFriendshipData;
+import com.mame.lcom.data.LcomMessageDeviceId;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.util.DatastoreUtil;
@@ -838,4 +839,59 @@ public class LcomDatabaseManager {
 		return null;
 	}
 
+	public synchronized void setDeviceIdForMessagePush(int userId,
+			String deviceId) {
+		log.log(Level.INFO, "setDeviceIdForMessagePush");
+
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		// First, we check if the target device id is already registerd or not.
+		String query = "select from " + LcomMessageDeviceId.class.getName()
+				+ " where mUserId == " + userId;
+
+		List<LcomMessageDeviceId> deviceIds = (List<LcomMessageDeviceId>) pm
+				.newQuery(query).execute();
+
+		if (deviceIds != null && deviceIds.size() != 0) {
+			LcomMessageDeviceId id = deviceIds.get(0);
+			if (id != null) {
+				String registeredId = id.getDeviceId();
+				// If device id has not been registered, put new device id to
+				// DB.
+				if (registeredId == null) {
+					id.setDeviceId(deviceId);
+					try {
+						pm.makePersistentAll(id);
+					} finally {
+						pm.close();
+					}
+
+				}
+			} else {
+				// If deviceId object has not been registered yet (This should
+				// not happen, though...)
+				LcomMessageDeviceId newId = new LcomMessageDeviceId(userId,
+						deviceId);
+				deviceIds.add(newId);
+				try {
+					pm.makePersistentAll(newId);
+				} finally {
+					pm.close();
+				}
+
+			}
+
+		} else {
+			// If device id has not been registered
+			LcomMessageDeviceId newId = new LcomMessageDeviceId(userId,
+					deviceId);
+			deviceIds.add(newId);
+			try {
+				pm.makePersistentAll(newId);
+			} finally {
+				pm.close();
+			}
+		}
+	}
 }

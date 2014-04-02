@@ -105,6 +105,15 @@
 		<servlet-name>message_push</servlet-name>
 		<url-pattern>/message_push</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>deviceid_register</servlet-name>
+		<servlet-class>com.mame.lcom.LcomPushDeviceIdRegistrationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>deviceid_register</servlet-name>
+		<url-pattern>/deviceid_register</url-pattern>
+	</servlet-mapping>
 	
 	<servlet>
 		<servlet-name>messageclean</servlet-name>
