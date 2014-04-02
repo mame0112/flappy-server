@@ -62,8 +62,11 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 					message, Long.valueOf(date));
 			GCMIntentManager pushManager = new GCMIntentManager();
 			String regId = "APA91bG2j4wg-64_3CgK7xu8zjgQXQHIoP5w_SK0lNrUXeaX8kJhwueplHkeFeZjWcT9XxSzTVYI1ekiJ4AnpkexHmEzeJHM1cr3q4mH78S9FhxT79UaHXm9EDXDien66M14xbP71b-WlV6hwimkLC0yuTKsNzzp5w";
-			pushManager.pushGCMNotification(Integer.valueOf(userId),
-					"test here!", regId);
+			// pushManager.pushGCMNotification(Integer.valueOf(userId),
+			// "test here!", regId);
+
+			pushManager.pushGCMNotification2(resp, Integer.valueOf(userId),
+					message, regId);
 		} else {
 			log.log(Level.WARNING, "Some of parameters are null");
 			result = LcomConst.SEND_MESSAGE_UNKNOWN_ERROR;

@@ -60,7 +60,7 @@ public class LcomMessagePushServlet extends HttpServlet {
 
 			log.log(Level.WARNING, "send");
 
-			registrationId = deviceMap.get(userId);
+			// registrationId = deviceMap.get(userId);
 			Sender sender = new Sender(API_KEY);
 			Message message = new Message.Builder().addData("msg", msg).build();
 
@@ -81,6 +81,12 @@ public class LcomMessagePushServlet extends HttpServlet {
 		} else {
 			res.setStatus(500);
 		}
+	}
+
+	public void doPost(HttpServletRequest req, HttpServletResponse res)
+			throws IOException {
+		log.log(Level.WARNING, "doPost");
+		doGet(req, res);
 	}
 
 }
