@@ -13,6 +13,8 @@ public class LcomConst {
 
 	public final static String MEMCACHE_SEPARATOR = "#@#";
 
+	public final static String API_KEY = "AIzaSyBkrzyfBwaHQgjVphRiUNHusjEOjPQdOr4";
+
 	public final static String NULL = "null";
 
 	public final static String SERVLET_USER_ID = "servlet_userid";

@@ -893,4 +893,28 @@ public class LcomDatabaseManager {
 			}
 		}
 	}
+
+	public String getDeviceIdForGCMPush(int userId) {
+		if (userId == LcomConst.NO_USER) {
+			return null;
+		}
+
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		// First, we check if the target device id is already registerd or not.
+		String query = "select from " + LcomMessageDeviceId.class.getName()
+				+ " where mUserId == " + userId;
+
+		List<LcomMessageDeviceId> deviceIds = (List<LcomMessageDeviceId>) pm
+				.newQuery(query).execute();
+		if (deviceIds != null && deviceIds.size() != 0) {
+			LcomMessageDeviceId deviceId = deviceIds.get(0);
+			if (deviceId != null) {
+				return deviceId.getDeviceId();
+			}
+		}
+
+		return null;
+	}
 }
