@@ -856,26 +856,25 @@ public class LcomDatabaseManager {
 		if (deviceIds != null && deviceIds.size() != 0) {
 			LcomMessageDeviceId id = deviceIds.get(0);
 			if (id != null) {
+				log.log(Level.INFO, "udate1");
 				String registeredId = id.getDeviceId();
 				// If device id has not been registered, put new device id to
 				// DB.
-				if (registeredId == null) {
-					id.setDeviceId(deviceId);
-					try {
-						pm.makePersistentAll(id);
-					} finally {
-						pm.close();
-					}
-
+				id.setDeviceId(deviceId);
+				try {
+					pm.makePersistent(id);
+				} finally {
+					pm.close();
 				}
+
 			} else {
+				log.log(Level.INFO, "udate2");
 				// If deviceId object has not been registered yet (This should
 				// not happen, though...)
 				LcomMessageDeviceId newId = new LcomMessageDeviceId(userId,
 						deviceId);
-				deviceIds.add(newId);
 				try {
-					pm.makePersistentAll(newId);
+					pm.makePersistent(newId);
 				} finally {
 					pm.close();
 				}
@@ -883,12 +882,12 @@ public class LcomDatabaseManager {
 			}
 
 		} else {
+			log.log(Level.INFO, "new");
 			// If device id has not been registered
 			LcomMessageDeviceId newId = new LcomMessageDeviceId(userId,
 					deviceId);
-			deviceIds.add(newId);
 			try {
-				pm.makePersistentAll(newId);
+				pm.makePersistent(newId);
 			} finally {
 				pm.close();
 			}
