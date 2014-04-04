@@ -11,6 +11,7 @@ import com.google.appengine.api.memcache.MemcacheServiceException;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomAllUserData;
+import com.mame.lcom.data.LcomMessageDeviceId;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.util.LcomMemcacheUtil;
@@ -220,6 +221,59 @@ public class LcomDatabaseManagerHelper {
 
 			} else {
 				throw new LcomMemcacheException("messages is null");
+			}
+
+		} catch (IllegalArgumentException e) {
+			throw new LcomMemcacheException("IllegalArgumentException: "
+					+ e.getMessage());
+		} catch (MemcacheServiceException e) {
+			throw new LcomMemcacheException("MemcacheServiceException: "
+					+ e.getMessage());
+		}
+
+	}
+
+	public String getPushDevceIdToMemCache(int userId) {
+		log.log(Level.INFO, "getPushDevceIdToMemCache");
+
+		int userNum = LcomConst.NO_USER;
+
+		MemcacheService memcacheService = MemcacheServiceFactory
+				.getMemcacheService(LcomMessageDeviceId.class.getSimpleName());
+		@SuppressWarnings("unchecked")
+		String registrationId = (String) memcacheService.get(userId);
+		if (registrationId != null) {
+			log.log(Level.INFO, "registrationId is not null");
+			return registrationId;
+		}
+
+		return null;
+	}
+
+	public void putPushDevceIdToMemCache(int userId, String registrationId)
+			throws LcomMemcacheException {
+		log.log(Level.INFO, "putPushDevceIdToMemCache");
+
+		// Get memcache for push device id
+		MemcacheService memcacheService = MemcacheServiceFactory
+				.getMemcacheService(LcomMessageDeviceId.class.getSimpleName());
+
+		try {
+			if (userId != LcomConst.NO_USER && registrationId != null) {
+				String currentCache = (String) memcacheService.get(userId);
+				// Check if already cache is stored
+				if (currentCache != null) {
+					// If cache is already there
+					// Once delete memcache
+					log.log(Level.INFO, "delete memcache");
+					memcacheService.delete(userId);
+				}
+				// And insert memcache
+				log.log(Level.INFO, "put memcache");
+				memcacheService.put(userId, registrationId);
+
+			} else {
+				throw new LcomMemcacheException("device id is null");
 			}
 
 		} catch (IllegalArgumentException e) {

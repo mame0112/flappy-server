@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.mame.lcom.constant.LcomConst;
+import com.mame.lcom.data.LcomMessageDeviceId;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.db.LcomDatabaseManagerHelper;
 
@@ -101,5 +102,15 @@ public class LcomMemcacheUtil {
 			result = newMessage;
 		}
 		return result;
+	}
+
+	public String parsePushDeviceId2String(LcomMessageDeviceId deviceId) {
+		if (deviceId != null) {
+			String result = deviceId.getUserId() + LcomConst.SEPARATOR
+					+ deviceId.getDeviceId();
+			log.log(Level.WARNING, "result: " + result);
+			return result;
+		}
+		return null;
 	}
 }

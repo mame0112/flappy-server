@@ -846,31 +846,45 @@ public class LcomDatabaseManager {
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
-		// First, we check if the target device id is already registerd or not.
-		String query = "select from " + LcomMessageDeviceId.class.getName()
-				+ " where mUserId == " + userId;
+		if (userId != LcomConst.NO_USER && deviceId != null) {
+			// First, we check if the target device id is already registerd or
+			// not.
+			String query = "select from " + LcomMessageDeviceId.class.getName()
+					+ " where mUserId == " + userId;
 
-		List<LcomMessageDeviceId> deviceIds = (List<LcomMessageDeviceId>) pm
-				.newQuery(query).execute();
+			List<LcomMessageDeviceId> deviceIds = (List<LcomMessageDeviceId>) pm
+					.newQuery(query).execute();
 
-		if (deviceIds != null && deviceIds.size() != 0) {
-			LcomMessageDeviceId id = deviceIds.get(0);
-			if (id != null) {
-				log.log(Level.INFO, "udate1");
-				String registeredId = id.getDeviceId();
-				// If device id has not been registered, put new device id to
-				// DB.
-				id.setDeviceId(deviceId);
-				try {
-					pm.makePersistent(id);
-				} finally {
-					pm.close();
+			if (deviceIds != null && deviceIds.size() != 0) {
+				LcomMessageDeviceId id = deviceIds.get(0);
+				if (id != null) {
+					log.log(Level.INFO, "udate1");
+					String registeredId = id.getDeviceId();
+					// If device id has not been registered, put new device id
+					// to DB.
+					id.setDeviceId(deviceId);
+					try {
+						pm.makePersistent(id);
+					} finally {
+						pm.close();
+					}
+
+				} else {
+					log.log(Level.INFO, "udate2");
+					// If deviceId object has not been registered yet (This
+					// should
+					// not happen, though...)
+					LcomMessageDeviceId newId = new LcomMessageDeviceId(userId,
+							deviceId);
+					try {
+						pm.makePersistent(newId);
+					} finally {
+						pm.close();
+					}
 				}
-
 			} else {
-				log.log(Level.INFO, "udate2");
-				// If deviceId object has not been registered yet (This should
-				// not happen, though...)
+				log.log(Level.INFO, "new");
+				// If device id has not been registered
 				LcomMessageDeviceId newId = new LcomMessageDeviceId(userId,
 						deviceId);
 				try {
@@ -878,41 +892,63 @@ public class LcomDatabaseManager {
 				} finally {
 					pm.close();
 				}
-
 			}
 
-		} else {
-			log.log(Level.INFO, "new");
-			// If device id has not been registered
-			LcomMessageDeviceId newId = new LcomMessageDeviceId(userId,
-					deviceId);
+			// Try to set memcache
+			LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 			try {
-				pm.makePersistent(newId);
-			} finally {
-				pm.close();
+				helper.putPushDevceIdToMemCache(userId, deviceId);
+			} catch (LcomMemcacheException e) {
+				log.log(Level.INFO, "LcomMemcacheException: " + e.getMessage());
 			}
+
 		}
 	}
 
 	public String getDeviceIdForGCMPush(int userId) {
+		log.log(Level.INFO, "getDeviceIdForGCMPush");
 		if (userId == LcomConst.NO_USER) {
 			return null;
 		}
 
-		PersistenceManager pm = LcomPersistenceManagerFactory.get()
-				.getPersistenceManager();
+		// Tey to get device id from memcache at first
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		String registrationId = helper.getPushDevceIdToMemCache(userId);
 
-		// First, we check if the target device id is already registerd or not.
-		String query = "select from " + LcomMessageDeviceId.class.getName()
-				+ " where mUserId == " + userId;
+		// If no cache exist
+		if (registrationId == null) {
+			log.log(Level.INFO, "Registration Id from datastore");
+			PersistenceManager pm = LcomPersistenceManagerFactory.get()
+					.getPersistenceManager();
 
-		List<LcomMessageDeviceId> deviceIds = (List<LcomMessageDeviceId>) pm
-				.newQuery(query).execute();
-		if (deviceIds != null && deviceIds.size() != 0) {
-			LcomMessageDeviceId deviceId = deviceIds.get(0);
-			if (deviceId != null) {
-				return deviceId.getDeviceId();
+			// First, we check if the target device id is already registerd or
+			// not.
+			String query = "select from " + LcomMessageDeviceId.class.getName()
+					+ " where mUserId == " + userId;
+
+			List<LcomMessageDeviceId> deviceIds = (List<LcomMessageDeviceId>) pm
+					.newQuery(query).execute();
+			String result = null;
+			if (deviceIds != null && deviceIds.size() != 0) {
+				LcomMessageDeviceId deviceId = deviceIds.get(0);
+				if (deviceId != null) {
+					result = deviceId.getDeviceId();
+
+					// Try to put it to memcache
+					try {
+						helper.putPushDevceIdToMemCache(deviceId.getUserId(),
+								result);
+					} catch (LcomMemcacheException e) {
+						log.log(Level.INFO,
+								"LcomMemcacheException: " + e.getMessage());
+					}
+					return result;
+				}
 			}
+
+		} else {
+			log.log(Level.INFO, "Registration Id from memcache");
+			return registrationId;
 		}
 
 		return null;
