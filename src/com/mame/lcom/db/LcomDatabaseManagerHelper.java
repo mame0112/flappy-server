@@ -23,7 +23,7 @@ public class LcomDatabaseManagerHelper {
 
 	public void putUserDataToMemCache(LcomUserData data) {
 		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
+				.getMemcacheService(LcomUserData.class.getSimpleName());
 		if (data != null) {
 			int userId = data.getUserId();
 			String userName = data.getUserName();
@@ -34,17 +34,19 @@ public class LcomDatabaseManagerHelper {
 					+ LcomConst.SEPARATOR + password + LcomConst.SEPARATOR
 					+ mailAddress;
 
-			memcacheService.put(LcomUserData.class
-					+ LcomConst.MEMCACHE_SEPARATOR + userId, inputParams, null);
+			// Because there is no case we update user information at current
+			// specification, we don't cheeck user name and update it. But once
+			// we have such kind of function, we need to check and update user
+			// information
+			memcacheService.put(userId, inputParams);
 		}
 	}
 
 	public LcomUserData getUserDataFromMemcache(int userId) {
 		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
+				.getMemcacheService(LcomUserData.class.getSimpleName());
 		@SuppressWarnings("unchecked")
-		String params = (String) memcacheService.get(LcomUserData.class
-				+ LcomConst.MEMCACHE_SEPARATOR + userId);
+		String params = (String) memcacheService.get(userId);
 		if (params != null) {
 
 			try {
@@ -67,10 +69,17 @@ public class LcomDatabaseManagerHelper {
 
 	public void putTotalNumberOfUser(int numOfUser) {
 		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
-		memcacheService.put(LcomAllUserData.class
-				+ LcomConst.MEMCACHE_SEPARATOR + LcomConst.NUM_OF_USER,
-				String.valueOf(numOfUser), null);
+				.getMemcacheService(LcomAllUserData.class.getSimpleName());
+		try {
+			memcacheService.put(LcomConst.NUM_OF_USER,
+					String.valueOf(numOfUser));
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+		} catch (MemcacheServiceException e) {
+			log.log(Level.WARNING,
+					"MemcacheServiceException: " + e.getMessage());
+		}
 
 	}
 
@@ -78,20 +87,28 @@ public class LcomDatabaseManagerHelper {
 		int userNum = LcomConst.NO_USER;
 
 		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
-		@SuppressWarnings("unchecked")
-		String userNumCached = (String) memcacheService
-				.get(LcomAllUserData.class + LcomConst.MEMCACHE_SEPARATOR
-						+ LcomConst.NUM_OF_USER);
-		if (userNumCached != null) {
-			try {
-				userNum = Integer.valueOf(userNumCached);
-				return userNum;
-			} catch (NumberFormatException e) {
-				log.log(Level.WARNING,
-						"NumberFormatException: " + e.getMessage());
-				return LcomConst.NO_USER;
+				.getMemcacheService(LcomAllUserData.class.getSimpleName());
+
+		try {
+			@SuppressWarnings("unchecked")
+			String userNumCached = (String) memcacheService
+					.get(LcomConst.NUM_OF_USER);
+			if (userNumCached != null) {
+				try {
+					userNum = Integer.valueOf(userNumCached);
+					return userNum;
+				} catch (NumberFormatException e) {
+					log.log(Level.WARNING,
+							"NumberFormatException: " + e.getMessage());
+					return LcomConst.NO_USER;
+				}
 			}
+
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+		} catch (InvalidValueException e) {
+			log.log(Level.WARNING, "InvalidValueException: " + e.getMessage());
 		}
 
 		return LcomConst.NO_USER;
@@ -100,13 +117,12 @@ public class LcomDatabaseManagerHelper {
 	public List<LcomNewMessageData> getNewMessageFromMemcache(int userId)
 			throws LcomMemcacheException {
 		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
+				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
 		try {
 			if (userId != LcomConst.NO_USER) {
 
 				@SuppressWarnings("unchecked")
-				String cachedMessage = (String) memcacheService
-						.get(LcomNewMessageData.class.getSimpleName());
+				String cachedMessage = (String) memcacheService.get(userId);
 				if (cachedMessage != null) {
 					log.log(Level.INFO, "cachedMessage length: "
 							+ cachedMessage.length());
@@ -118,29 +134,35 @@ public class LcomDatabaseManagerHelper {
 					// Parse cached message to Messsage data list
 					List<LcomNewMessageData> messages = util
 							.parseCachedMessageToList(cachedMessage);
+					return messages;
 
-					if (messages != null && messages.size() != 0) {
-						List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
+					// if (messages != null && messages.size() != 0) {
+					// List<LcomNewMessageData> result = new
+					// ArrayList<LcomNewMessageData>();
 
-						for (LcomNewMessageData message : messages) {
-							int id = message.getTargetUserId();
-							if (userId == id) {
-								result.add(message);
-							}
-						}
-						return result;
-					} else {
-						return null;
-					}
+					// for (LcomNewMessageData message : messages) {
+					// int id = message.getTargetUserId();
+					// if (userId == id) {
+					// result.add(message);
+					// }
+					// }
+					// return result;
+					// } else {
+					// return null;
+					// }
 				}
 
 			} else {
+				log.log(Level.WARNING, "LcomMemcacheException illega userId");
 				throw new LcomMemcacheException("illegal userId");
 			}
 		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
 			throw new LcomMemcacheException("IllegalArgumentException: "
 					+ e.getMessage());
 		} catch (InvalidValueException e) {
+			log.log(Level.WARNING, "InvalidValueException: " + e.getMessage());
 			throw new LcomMemcacheException("InvalidValueException: "
 					+ e.getMessage());
 		}
@@ -151,36 +173,45 @@ public class LcomDatabaseManagerHelper {
 	public void putNewMessageToMemCache(LcomNewMessageData message)
 			throws LcomMemcacheException {
 		log.log(Level.INFO, "putNewMessageToMemCache");
-		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
 
 		try {
 			if (message != null) {
+
+				MemcacheService memcacheService = MemcacheServiceFactory
+						.getMemcacheService(LcomNewMessageData.class
+								.getSimpleName());
+
 				LcomMemcacheUtil util = new LcomMemcacheUtil();
 				String result = util.parseMessageData2String(message);
 
 				if (result != null) {
+					// Memcache always needs to be stored key by using Target
+					// user Id because only friend (=target user) shall use this
+					// cache
+					int targetUserId = message.getTargetUserId();
 					String currentMessage = (String) memcacheService
-							.get(LcomNewMessageData.class.getSimpleName());
+							.get(targetUserId);
 					String updatedMessage = util.createNewMssageToMemcache(
 							currentMessage, result);
 
 					// Update new message memcache
-					memcacheService.delete(LcomNewMessageData.class
-							.getSimpleName());
-					memcacheService.put(
-							LcomNewMessageData.class.getSimpleName(),
-							updatedMessage);
+					memcacheService.delete(targetUserId);
+					memcacheService.put(targetUserId, updatedMessage);
 				}
-
 			} else {
+				log.log(Level.WARNING,
+						"LcomMemcacheException: messages is null");
 				throw new LcomMemcacheException("messages is null");
 			}
 
 		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
 			throw new LcomMemcacheException("IllegalArgumentException: "
 					+ e.getMessage());
 		} catch (MemcacheServiceException e) {
+			log.log(Level.WARNING,
+					"MemcacheServiceException: " + e.getMessage());
 			throw new LcomMemcacheException("MemcacheServiceException: "
 					+ e.getMessage());
 		}
@@ -220,31 +251,41 @@ public class LcomDatabaseManagerHelper {
 				}
 
 			} else {
+				log.log(Level.WARNING, "LcomMemcacheException message is null");
 				throw new LcomMemcacheException("messages is null");
 			}
 
 		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
 			throw new LcomMemcacheException("IllegalArgumentException: "
 					+ e.getMessage());
 		} catch (MemcacheServiceException e) {
+			log.log(Level.WARNING,
+					"MemcacheServiceException: " + e.getMessage());
 			throw new LcomMemcacheException("MemcacheServiceException: "
 					+ e.getMessage());
 		}
-
 	}
 
 	public String getPushDevceIdToMemCache(int userId) {
 		log.log(Level.INFO, "getPushDevceIdToMemCache");
 
-		int userNum = LcomConst.NO_USER;
-
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomMessageDeviceId.class.getSimpleName());
-		@SuppressWarnings("unchecked")
-		String registrationId = (String) memcacheService.get(userId);
-		if (registrationId != null) {
-			log.log(Level.INFO, "registrationId is not null");
-			return registrationId;
+
+		try {
+			@SuppressWarnings("unchecked")
+			String registrationId = (String) memcacheService.get(userId);
+			if (registrationId != null) {
+				log.log(Level.INFO, "registrationId is not null");
+				return registrationId;
+			}
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+		} catch (InvalidValueException e) {
+			log.log(Level.WARNING, "InvalidValueException: " + e.getMessage());
 		}
 
 		return null;
@@ -277,23 +318,33 @@ public class LcomDatabaseManagerHelper {
 			}
 
 		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
 			throw new LcomMemcacheException("IllegalArgumentException: "
 					+ e.getMessage());
 		} catch (MemcacheServiceException e) {
+			log.log(Level.WARNING,
+					"MemcacheServiceException: " + e.getMessage());
 			throw new LcomMemcacheException("MemcacheServiceException: "
 					+ e.getMessage());
 		}
 
 	}
 
-	public void deleteAllNewMessages() throws LcomMemcacheException {
+	public synchronized void deleteAllNewMessages(
+			ArrayList<Integer> registeredIds) throws LcomMemcacheException {
+		log.log(Level.INFO, "deleteAllNewMessages");
 		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
+				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
 
 		try {
 			// Remove new message
-			memcacheService.delete(LcomNewMessageData.class);
+			if (registeredIds != null && registeredIds.size() != 0) {
+				memcacheService.deleteAll(registeredIds);
+			}
 		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
 			throw new LcomMemcacheException("IllegalArgumentException: "
 					+ e.getMessage());
 		}

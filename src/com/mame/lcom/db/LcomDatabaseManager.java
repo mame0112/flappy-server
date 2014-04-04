@@ -760,10 +760,18 @@ public class LcomDatabaseManager {
 				.newQuery(query).execute();
 		if (allMessages != null && allMessages.size() != 0) {
 
+			ArrayList<Integer> registeredIds = new ArrayList<Integer>();
+
+			for (LcomNewMessageData message : allMessages) {
+				if (message != null) {
+					registeredIds.add(message.getUserId());
+				}
+			}
+
 			// Clear memcache
 			LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 			try {
-				helper.deleteAllNewMessages();
+				helper.deleteAllNewMessages(registeredIds);
 			} catch (LcomMemcacheException e) {
 				log.log(Level.WARNING,
 						"LcomMemcacheException: " + e.getMessage());

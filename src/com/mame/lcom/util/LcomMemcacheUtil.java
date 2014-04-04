@@ -94,13 +94,19 @@ public class LcomMemcacheUtil {
 	public String createNewMssageToMemcache(String currentMessage,
 			String newMessage) {
 		String result = null;
-		if (currentMessage != null) {
-			// If new message is update (meaning current message is in memcache)
-			result = currentMessage + LcomConst.ITEM_SEPARATOR + newMessage;
+		if (newMessage != null) {
+			if (currentMessage != null) {
+				// If new message is update (meaning current message is in
+				// memcache)
+				result = currentMessage + LcomConst.ITEM_SEPARATOR + newMessage;
+			} else {
+				// If new message is first message
+				result = newMessage;
+			}
 		} else {
-			// If new message is first message
-			result = newMessage;
+			result = currentMessage;
 		}
+
 		return result;
 	}
 
