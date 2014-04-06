@@ -130,7 +130,7 @@ public class DatastoreUtil {
 		int secondUserId = data.getSecondUserId();
 		String secondUserName = data.getSecondUserName();
 		String message = data.getLatestMessage();
-		long postDate = 0;
+		long expireDate = data.getLastMessageExpireTime();
 		int numOfMessage = data.getNumOfNewMessage();
 
 		if (firstUserName == null) {
@@ -143,21 +143,21 @@ public class DatastoreUtil {
 			message = "unknown";
 		}
 
-		if (postDate == 0L) {
-			postDate = TimeUtil.getCurrentDate();
+		if (expireDate == 0L) {
+			expireDate = TimeUtil.getCurrentDate() + 1;
 		}
 
 		if (userId == firstUserId) {
 			parsed = firstUserId + LcomConst.SEPARATOR + firstUserName
 					+ LcomConst.SEPARATOR + secondUserId + LcomConst.SEPARATOR
 					+ secondUserName + LcomConst.SEPARATOR + message
-					+ LcomConst.SEPARATOR + String.valueOf(postDate)
+					+ LcomConst.SEPARATOR + String.valueOf(expireDate)
 					+ LcomConst.SEPARATOR + numOfMessage;
 		} else {
 			parsed = secondUserId + LcomConst.SEPARATOR + secondUserName
 					+ LcomConst.SEPARATOR + firstUserId + LcomConst.SEPARATOR
 					+ firstUserName + LcomConst.SEPARATOR + message
-					+ LcomConst.SEPARATOR + String.valueOf(postDate)
+					+ LcomConst.SEPARATOR + String.valueOf(expireDate)
 					+ LcomConst.SEPARATOR + numOfMessage;
 		}
 

@@ -18,8 +18,8 @@ public class LcomAllUserData {
 	@Persistent
 	private int mTotalUserNum = 0;
 
-	public LcomAllUserData() {
-
+	public LcomAllUserData(int totalUserNum) {
+		mTotalUserNum = totalUserNum;
 	}
 
 	public int getTotalUserNum() {

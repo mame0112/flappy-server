@@ -49,9 +49,19 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 			log.log(Level.WARNING, "message:" + message);
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
+
+			// Put latest message to LcomNewMessage table
 			manager.addNewMessageInfo(Integer.valueOf(userId),
 					Integer.valueOf(targetUserId), userName, targetUserName,
 					message, Long.valueOf(date));
+
+			// Update Friendship table so that we can show it in
+			// FrinedListActivity
+			manager.updateLatestMessageInfoOnFriendshipTable(
+					Integer.valueOf(userId), Integer.valueOf(targetUserId),
+					message, Long.valueOf(date));
+
+			// Send message data to friend via GCM
 			String regId = manager.getDeviceIdForGCMPush(Integer
 					.valueOf(userId));
 			if (regId != null && !regId.isEmpty()) {

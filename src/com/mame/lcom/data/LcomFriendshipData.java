@@ -31,10 +31,10 @@ public class LcomFriendshipData {
 	private String mLastMessage = null;
 
 	/**
-	 * Time that two users comes to friend
+	 * Time that last messag is sent
 	 */
 	@Persistent
-	private long mFriendTime = 0;
+	private long mLastExpireTime = 0L;
 
 	/**
 	 * This will be used to send the number of new message to client side. Then,
@@ -46,13 +46,13 @@ public class LcomFriendshipData {
 
 	public LcomFriendshipData(int firstUserId, String firstUserName,
 			int secondUserId, String secondUserName, String lastMessage,
-			long time, int numOfNewMessage) {
+			long expireTime, int numOfNewMessage) {
 		mFirstUserId = firstUserId;
 		mFirstUserName = firstUserName;
 		mSecondUserId = secondUserId;
 		mSecondUserName = secondUserName;
 		mLastMessage = lastMessage;
-		mFriendTime = time;
+		mLastExpireTime = expireTime;
 		mNumOfNewMessage = numOfNewMessage;
 
 	}
@@ -77,8 +77,8 @@ public class LcomFriendshipData {
 		return mLastMessage;
 	}
 
-	public long getFriendTime() {
-		return mFriendTime;
+	public long getLastMessageExpireTime() {
+		return mLastExpireTime;
 	}
 
 	public int getNumOfNewMessage() {
@@ -101,12 +101,12 @@ public class LcomFriendshipData {
 		mSecondUserName = secondUserName;
 	}
 
-	public void getLatestMessage(String lastMessage) {
+	public void setLatestMessage(String lastMessage) {
 		mLastMessage = lastMessage;
 	}
 
-	public void setFriendTime(long time) {
-		mFriendTime = time;
+	public void setLastMessageExpireTime(long time) {
+		mLastExpireTime = time;
 	}
 
 	public void setNumOfNewMessage(int numOfNewMessage) {

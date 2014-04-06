@@ -151,7 +151,8 @@ public class LcomDatabaseManager {
 					int newUserNum = userNum + 1;
 					totalData.changetTotalUserNum(newUserNum);
 				} else {
-					totalData = new LcomAllUserData();
+					// If total user data is 0
+					totalData = new LcomAllUserData(1);
 					totalData.changetTotalUserNum(1);
 				}
 
@@ -490,6 +491,75 @@ public class LcomDatabaseManager {
 		} finally {
 			pm.close();
 		}
+	}
+
+	public synchronized void updateLatestMessageInfoOnFriendshipTable(
+			int userId, int targetUserId, String latestMessage,
+			long lastPostedTime) {
+		log.log(Level.INFO, "updateLatestMessageInfoOnFriendshipTable");
+
+		if (userId != LcomConst.NO_USER && targetUserId != LcomConst.NO_USER) {
+			if (latestMessage != null && lastPostedTime != 0L) {
+
+				boolean result = false;
+
+				PersistenceManager pm = LcomPersistenceManagerFactory.get()
+						.getPersistenceManager();
+				String queryFirst = "select from "
+						+ LcomFriendshipData.class.getName()
+						+ " where mFirstUserId == " + userId + "";
+				List<LcomFriendshipData> firstUsers = (List<LcomFriendshipData>) pm
+						.newQuery(queryFirst).execute();
+
+				if (firstUsers != null && firstUsers.size() != 0) {
+					for (LcomFriendshipData firstData : firstUsers) {
+						if (firstData != null) {
+							int friendId = firstData.getSecondUserId();
+							if (targetUserId == friendId) {
+								// If we found message, update message and
+								// posted time
+								firstData.setLatestMessage(latestMessage);
+								long expireDate = TimeUtil
+										.getExpireDate(lastPostedTime);
+								firstData.setLastMessageExpireTime(expireDate);
+								result = true;
+								break;
+							}
+						}
+					}
+				}
+
+				// If result is still false, we continue to check
+				if (result == false) {
+					// Second, friend to user
+					String querySecond = "select from "
+							+ LcomFriendshipData.class.getName()
+							+ " where mSecondUserId == " + userId + "";
+					List<LcomFriendshipData> secondUsers = (List<LcomFriendshipData>) pm
+							.newQuery(queryFirst).execute();
+					if (secondUsers != null && secondUsers.size() != 0) {
+						for (LcomFriendshipData secondData : secondUsers) {
+							if (secondData != null) {
+								int friendId = secondData.getFirstUserId();
+								if (targetUserId == friendId) {
+									// If we found message, update message and
+									// posted time
+									secondData.setLatestMessage(latestMessage);
+									long expireDate = TimeUtil
+											.getExpireDate(lastPostedTime);
+									secondData
+											.setLastMessageExpireTime(expireDate);
+									result = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+
+			}
+		}
+
 	}
 
 	public synchronized boolean isUsersAreFriend(int userId, int targetUserId) {
