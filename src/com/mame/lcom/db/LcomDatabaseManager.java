@@ -673,12 +673,18 @@ public class LcomDatabaseManager {
 						int secondUserId = data.getSecondUserId();
 
 						// If first user is user himself
-						if (messageNum.containsKey(firstUserId)) {
-							int firstNumMessage = messageNum.get(firstUserId);
-							data.setNumOfNewMessage(firstNumMessage);
-						} else {
-							int secondNumMessage = messageNum.get(secondUserId);
-							data.setNumOfNewMessage(secondNumMessage);
+						if (messageNum != null) {
+							if (messageNum.containsKey(firstUserId)) {
+								int firstNumMessage = messageNum
+										.get(firstUserId);
+								data.setNumOfNewMessage(firstNumMessage);
+							} else if (messageNum.containsKey(secondUserId)) {
+								int secondNumMessage = messageNum
+										.get(secondUserId);
+								data.setNumOfNewMessage(secondNumMessage);
+							} else {
+								// Nothing to do (error case)
+							}
 						}
 					}
 				}
