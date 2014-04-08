@@ -816,7 +816,7 @@ public class LcomDatabaseManager {
 		if (friendsId != null && friendsId.size() != 0) {
 			for (String id : friendsId) {
 				String query = "select from " + LcomUserData.class.getName()
-						+ " where mUserId == " + id;
+						+ " where mUserId ==" + id;
 				List<LcomUserData> users = (List<LcomUserData>) pm.newQuery(
 						query).execute();
 				LcomUserData data = users.get(0);
