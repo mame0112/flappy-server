@@ -63,7 +63,7 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 
 			// Send message data to friend via GCM
 			String regId = manager.getDeviceIdForGCMPush(Integer
-					.valueOf(userId));
+					.valueOf(targetUserId));
 			if (regId != null && !regId.isEmpty()) {
 				GCMIntentManager pushManager = new GCMIntentManager();
 				pushManager.pushGCMNotification(resp, Integer.valueOf(userId),
