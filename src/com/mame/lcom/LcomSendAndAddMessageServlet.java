@@ -66,8 +66,8 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 					.valueOf(targetUserId));
 			if (regId != null && !regId.isEmpty()) {
 				GCMIntentManager pushManager = new GCMIntentManager();
-				pushManager.pushGCMNotification(resp, Integer.valueOf(userId),
-						message, regId);
+				pushManager.pushGCMNotification(Integer.valueOf(userId),
+						Integer.valueOf(targetUserId), message, regId);
 			}
 
 		} else {
