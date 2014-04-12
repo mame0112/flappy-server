@@ -18,8 +18,8 @@ public class GCMIntentManager {
 	public GCMIntentManager() {
 	}
 
-	public void pushGCMNotification(int userId, int targetUserId, String msg,
-			String regId) {
+	public void pushGCMNotification(int userId, int targetUserId,
+			String userName, String targetUserName, String msg, String regId) {
 
 		log.log(Level.WARNING, "pushGCMNotification");
 
@@ -27,7 +27,8 @@ public class GCMIntentManager {
 
 		Sender sender = new Sender(LcomConst.API_KEY);
 
-		String builtMessage = buildMessageString(userId, targetUserId, msg);
+		String builtMessage = buildMessageString(userId, targetUserId,
+				userName, targetUserName, msg);
 
 		Message message = new Message.Builder().addData("msg", builtMessage)
 				.build();
@@ -50,7 +51,7 @@ public class GCMIntentManager {
 	}
 
 	private String buildMessageString(int userId, int targetUserId,
-			String message) {
+			String userName, String targetUserName, String message) {
 		if (userId == LcomConst.NO_USER) {
 			return null;
 		}
@@ -60,14 +61,9 @@ public class GCMIntentManager {
 			return null;
 		}
 
-		// In case of ConversationActivity case
-		if (targetUserId != LcomConst.NO_USER) {
-			result = userId + LcomConst.SEPARATOR + targetUserId
-					+ LcomConst.SEPARATOR + message;
-		} else {
-			// In case of FriendListActivity case
-			result = userId + LcomConst.SEPARATOR + message;
-		}
+		result = userId + LcomConst.SEPARATOR + targetUserId
+				+ LcomConst.SEPARATOR + userName + LcomConst.SEPARATOR
+				+ targetUserName + LcomConst.SEPARATOR + message;
 
 		return result;
 	}
