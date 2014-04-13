@@ -18,6 +18,7 @@ import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomAllUserData;
 import com.mame.lcom.data.LcomExpiredMessageData;
 import com.mame.lcom.data.LcomFriendshipData;
+//import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.data.LcomMessageDeviceId;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
@@ -486,6 +487,14 @@ public class LcomDatabaseManager {
 		LcomFriendshipData data = new LcomFriendshipData(firstUserId,
 				firstUserName, secondUserId, secondUserName, lastMessage, time,
 				numOfNewMessage);
+
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		try {
+			helper.putFriendListDataToMemCache(data);
+		} catch (LcomMemcacheException e) {
+			log.log(Level.INFO, "LcomMemcacheException: " + e.getMessage());
+		}
+
 		try {
 			pm.makePersistent(data);
 		} finally {
@@ -498,9 +507,10 @@ public class LcomDatabaseManager {
 			long lastPostedTime) {
 		log.log(Level.INFO, "updateLatestMessageInfoOnFriendshipTable");
 
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+
 		if (userId != LcomConst.NO_USER && targetUserId != LcomConst.NO_USER) {
 			if (latestMessage != null && lastPostedTime != 0L) {
-
 				boolean result = false;
 
 				PersistenceManager pm = LcomPersistenceManagerFactory.get()
@@ -522,6 +532,16 @@ public class LcomDatabaseManager {
 								long expireDate = TimeUtil
 										.getExpireDate(lastPostedTime);
 								firstData.setLastMessageExpireTime(expireDate);
+
+								// Put to memcache
+								try {
+									helper.putFriendListDataToMemCache(firstData);
+								} catch (LcomMemcacheException e) {
+									log.log(Level.WARNING,
+											"LcomMemcacheException: "
+													+ e.getMessage());
+								}
+
 								result = true;
 								break;
 							}
@@ -536,7 +556,7 @@ public class LcomDatabaseManager {
 							+ LcomFriendshipData.class.getName()
 							+ " where mSecondUserId == " + userId + "";
 					List<LcomFriendshipData> secondUsers = (List<LcomFriendshipData>) pm
-							.newQuery(queryFirst).execute();
+							.newQuery(querySecond).execute();
 					if (secondUsers != null && secondUsers.size() != 0) {
 						for (LcomFriendshipData secondData : secondUsers) {
 							if (secondData != null) {
@@ -549,6 +569,16 @@ public class LcomDatabaseManager {
 											.getExpireDate(lastPostedTime);
 									secondData
 											.setLastMessageExpireTime(expireDate);
+
+									// Put to memcache
+									try {
+										helper.putFriendListDataToMemCache(secondData);
+									} catch (LcomMemcacheException e) {
+										log.log(Level.WARNING,
+												"LcomMemcacheException: "
+														+ e.getMessage());
+									}
+
 									result = true;
 									break;
 								}
@@ -616,19 +646,33 @@ public class LcomDatabaseManager {
 	public synchronized List<LcomFriendshipData> getFriendListData(int userId) {
 		log.log(Level.INFO, "getFriendListData");
 
-		List<LcomFriendshipData> friendList = getFriendshipDataForUser(userId);
+		// Try to get from memcache
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		List<LcomFriendshipData> friendList = null;
+		try {
+			friendList = helper.getFriendListDataFromMemCache(userId);
+		} catch (LcomMemcacheException e) {
+			log.log(Level.INFO, "LcomMemcacheException: " + e.getMessage());
+		}
 
-		// Debug
-		for (LcomFriendshipData data : friendList) {
-			if (data != null) {
-				log.log(Level.INFO, "firstUserName: " + data.getFirstUserName());
-				log.log(Level.INFO,
-						"secondUserName: " + data.getSecondUserName());
-				log.log(Level.INFO,
-						"latest message: " + data.getLatestMessage());
+		// If there is no data in memcache, get friendlist from memcache
+		if (friendList == null || friendList.size() == 0) {
+			friendList = getFriendshipDataForUser(userId);
+
+			// Debug
+			for (LcomFriendshipData data : friendList) {
+				if (data != null) {
+					log.log(Level.INFO,
+							"firstUserName: " + data.getFirstUserName());
+					log.log(Level.INFO,
+							"secondUserName: " + data.getSecondUserName());
+					log.log(Level.INFO,
+							"latest message: " + data.getLatestMessage());
+				}
 			}
 		}
 
+		// Get new message
 		if (friendList != null && friendList.size() != 0) {
 			log.log(Level.WARNING, "friendList is not null");
 			PersistenceManager pm = LcomPersistenceManagerFactory.get()
@@ -654,7 +698,8 @@ public class LcomDatabaseManager {
 						log.log(Level.WARNING, "A targetUserId" + targetUserId
 								+ " userId: " + message.getUserId());
 					} else {
-						// Otherwise (meaning target user infomration is already
+						// Otherwise (meaning target user infomration is
+						// already
 						// been in hashmap),
 						// Update it (+1)
 						int num = messageNum.get(targetUserId);
