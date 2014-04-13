@@ -117,6 +117,7 @@ public class LcomDatabaseManagerHelper {
 
 	public List<LcomNewMessageData> getNewMessageFromMemcache(int userId)
 			throws LcomMemcacheException {
+		log.log(Level.INFO, "getNewMessageFromMemcache");
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
 		try {
@@ -135,22 +136,79 @@ public class LcomDatabaseManagerHelper {
 					// Parse cached message to Messsage data list
 					List<LcomNewMessageData> messages = util
 							.parseCachedMessageToList(cachedMessage);
-					return messages;
 
-					// if (messages != null && messages.size() != 0) {
 					// List<LcomNewMessageData> result = new
 					// ArrayList<LcomNewMessageData>();
-
+					//
+					// // Set read state to already read
 					// for (LcomNewMessageData message : messages) {
-					// int id = message.getTargetUserId();
-					// if (userId == id) {
+					// if (message != null) {
+					// message.setReadState(true);
 					// result.add(message);
 					// }
 					// }
-					// return result;
-					// } else {
-					// return null;
-					// }
+
+					return messages;
+				}
+
+			} else {
+				log.log(Level.WARNING, "LcomMemcacheException illega userId");
+				throw new LcomMemcacheException("illegal userId");
+			}
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+			throw new LcomMemcacheException("IllegalArgumentException: "
+					+ e.getMessage());
+		} catch (InvalidValueException e) {
+			log.log(Level.WARNING, "InvalidValueException: " + e.getMessage());
+			throw new LcomMemcacheException("InvalidValueException: "
+					+ e.getMessage());
+		}
+		return null;
+
+	}
+
+	public List<LcomNewMessageData> getNewMessageFromMemcacheWithChangeReadState(
+			int userId) throws LcomMemcacheException {
+		log.log(Level.INFO, "getNewMessageFromMemcache");
+		MemcacheService memcacheService = MemcacheServiceFactory
+				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
+		try {
+			if (userId != LcomConst.NO_USER) {
+
+				@SuppressWarnings("unchecked")
+				String cachedMessage = (String) memcacheService.get(userId);
+				if (cachedMessage != null) {
+					log.log(Level.INFO, "cachedMessage length: "
+							+ cachedMessage.length());
+				}
+
+				if (cachedMessage != null) {
+					LcomMemcacheUtil util = new LcomMemcacheUtil();
+
+					// Parse cached message to Messsage data list
+					List<LcomNewMessageData> messages = util
+							.parseCachedMessageToList(cachedMessage);
+
+					List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
+
+					// Set read state to already read
+					for (LcomNewMessageData message : messages) {
+						if (message != null) {
+							message.setReadState(true);
+							result.add(message);
+						}
+					}
+
+					String updatedString = util
+							.parseMessagesData2String(result);
+
+					// set read state-updated message to memcache again
+					memcacheService.delete(userId);
+					memcacheService.put(userId, updatedString);
+
+					return result;
 				}
 
 			} else {
@@ -219,23 +277,23 @@ public class LcomDatabaseManagerHelper {
 
 	}
 
-	public void putNewMessagesToMemCache(List<LcomNewMessageData> messages)
-			throws LcomMemcacheException {
+	public void putNewMessagesToMemCache(int userId,
+			List<LcomNewMessageData> messages) throws LcomMemcacheException {
 		log.log(Level.INFO, "putNewMessagesToMemCache");
 		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
+				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
 
 		try {
 			if (messages != null) {
 
 				LcomMemcacheUtil util = new LcomMemcacheUtil();
 				String parsed = util.parseMessagesData2String(messages);
+				log.log(Level.INFO, "parsed: " + parsed);
 				if (parsed != null) {
 
 					// In come cases, there is current memcache. Then, we try to
 					// update.
-					String currentCache = (String) memcacheService
-							.get(LcomNewMessageData.class.getSimpleName());
+					String currentCache = (String) memcacheService.get(userId);
 					String result = null;
 					if (currentCache != null) {
 						result = util.createNewMssageToMemcache(currentCache,
@@ -245,10 +303,8 @@ public class LcomDatabaseManagerHelper {
 					}
 
 					// Update memcache
-					memcacheService.delete(LcomNewMessageData.class
-							.getSimpleName());
-					memcacheService.put(
-							LcomNewMessageData.class.getSimpleName(), result);
+					memcacheService.delete(userId);
+					memcacheService.put(userId, result);
 				}
 
 			} else {

@@ -314,7 +314,7 @@ public class LcomDatabaseManager {
 
 			// Store message to memcache
 			try {
-				helper.putNewMessagesToMemCache(result);
+				helper.putNewMessagesToMemCache(userId, result);
 			} catch (LcomMemcacheException e) {
 				log.log(Level.WARNING,
 						"LcomMemcacheException: " + e.getMessage());
@@ -324,9 +324,30 @@ public class LcomDatabaseManager {
 			log.log(Level.INFO, "Data from memcache. size: " + result.size());
 		}
 
-		return result;
+		// Get only unread message
+		if (result != null && result.size() != 0) {
+			List<LcomNewMessageData> unreadMessages = new ArrayList<LcomNewMessageData>();
+			for (LcomNewMessageData message : result) {
+				boolean isRead = message.isMessageRead();
+				if (!isRead) {
+					unreadMessages.add(message);
+				}
+			}
+
+			return unreadMessages;
+		}
+
+		return null;
 	}
 
+	/**
+	 * Get thread message for target user. If you call this method, message read
+	 * state shall automatically be changed to "read" state.
+	 * 
+	 * @param userId
+	 * @param targetUserId
+	 * @return
+	 */
 	public synchronized List<LcomNewMessageData> getNewMessagesWithTargetUser(
 			int userId, int targetUserId) {
 		log.log(Level.WARNING, "getNewMessagesWithTargetUser");
@@ -337,27 +358,33 @@ public class LcomDatabaseManager {
 		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 		try {
 			List<LcomNewMessageData> messagesInMemcache = new ArrayList<LcomNewMessageData>();
-			messagesInMemcache = helper.getNewMessageFromMemcache(userId);
+
+			// By calling below method, read state in memcache is automatically
+			// changed.
+			messagesInMemcache = helper
+					.getNewMessageFromMemcacheWithChangeReadState(userId);
 			result = getMessageForTargetUser(targetUserId, messagesInMemcache);
 		} catch (LcomMemcacheException e) {
 			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
 		}
 
+		// Common operation
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		// query messages its target user is me
+		List<LcomNewMessageData> messagesFromOthers = null;
+		String queryFromOthers = "select from "
+				+ LcomNewMessageData.class.getName()
+				+ " where mTargetUserId == " + userId;
+		messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
+				queryFromOthers).execute();
+
+		result = getMessageForTargetUser(targetUserId, messagesFromOthers);
+
 		// If there is no message in memcache
-		if (result == null) {
+		if (result == null || result.size() == 0) {
 			log.log(Level.INFO, "Data from datastore");
-			PersistenceManager pm = LcomPersistenceManagerFactory.get()
-					.getPersistenceManager();
-
-			// query messages its target user is me
-			List<LcomNewMessageData> messagesFromOthers = null;
-			String queryFromOthers = "select from "
-					+ LcomNewMessageData.class.getName()
-					+ " where mTargetUserId == " + userId;
-			messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
-					queryFromOthers).execute();
-
-			result = getMessageForTargetUser(targetUserId, messagesFromOthers);
 
 			if (result != null && result.size() != 0) {
 				log.log(Level.WARNING,
@@ -365,18 +392,19 @@ public class LcomDatabaseManager {
 
 				// Try to put latest message data to memcache
 				try {
-					helper.putNewMessagesToMemCache(result);
+					helper.putNewMessagesToMemCache(userId, result);
 				} catch (LcomMemcacheException e) {
 					log.log(Level.WARNING,
 							"LcomMemcacheException: " + e.getMessage());
 				}
 			}
 
-			pm.close();
-
 		} else {
 			log.log(Level.INFO, "Data from memcache");
+			// Set read state in Datastore
 		}
+
+		pm.close();
 
 		return result;
 	}
@@ -391,6 +419,9 @@ public class LcomDatabaseManager {
 					int targetId = message.getUserId();
 					if (targetId == targetUserId) {
 						result.add(message);
+
+						// Set message to "already read"state
+						message.setReadState(true);
 					}
 				}
 			}
@@ -796,7 +827,8 @@ public class LcomDatabaseManager {
 		long expireDate = TimeUtil.getExpireDate(currentDate);
 
 		LcomNewMessageData data = new LcomNewMessageData(userId, targetUserId,
-				userName, targetUserName, message, currentDate, expireDate);
+				userName, targetUserName, message, currentDate, expireDate,
+				false);
 
 		if (data != null) {
 
@@ -938,15 +970,16 @@ public class LcomDatabaseManager {
 				}
 			}
 
+			// TODO Depends on situtaiton, we need to support below function
 			// Put valid message to memcache
-			if (validMessages != null && validMessages.size() != 0) {
-				try {
-					helper.putNewMessagesToMemCache(validMessages);
-				} catch (LcomMemcacheException e) {
-					log.log(Level.WARNING,
-							"LcomMemcacheException: " + e.getMessage());
-				}
-			}
+			// if (validMessages != null && validMessages.size() != 0) {
+			// try {
+			// helper.putNewMessagesToMemCache(validMessages);
+			// } catch (LcomMemcacheException e) {
+			// log.log(Level.WARNING,
+			// "LcomMemcacheException: " + e.getMessage());
+			// }
+			// }
 
 		}
 

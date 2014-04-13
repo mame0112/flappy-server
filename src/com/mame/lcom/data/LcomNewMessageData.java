@@ -45,12 +45,15 @@ public class LcomNewMessageData {
 	@Persistent
 	private long mExpireTime = 0L;
 
+	@Persistent
+	private boolean mIsRead = false;
+
 	/**
 	 * Constructor
 	 */
 	public LcomNewMessageData(int userId, int targetUserId, String userName,
 			String targetUserName, String message, long postedDate,
-			long expireTime) {
+			long expireTime, boolean isRead) {
 		mUserId = userId;
 		mTargetUserId = targetUserId;
 		mUserName = userName;
@@ -58,6 +61,7 @@ public class LcomNewMessageData {
 		mMessage = message;
 		mPostedDate = postedDate;
 		mExpireTime = expireTime;
+		mIsRead = isRead;
 	}
 
 	public int getUserId() {
@@ -88,6 +92,10 @@ public class LcomNewMessageData {
 		return mExpireTime;
 	}
 
+	public boolean isMessageRead() {
+		return mIsRead;
+	}
+
 	public void setUserId(int userId) {
 		mUserId = userId;
 	}
@@ -114,6 +122,10 @@ public class LcomNewMessageData {
 
 	public void setExpireTime(long expireTime) {
 		mExpireTime = expireTime;
+	}
+
+	public void setReadState(boolean isRead) {
+		mIsRead = isRead;
 	}
 
 }

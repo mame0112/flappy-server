@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomMessageDeviceId;
 import com.mame.lcom.data.LcomNewMessageData;
-import com.mame.lcom.db.LcomDatabaseManagerHelper;
 
 public class LcomMemcacheUtil {
 	private final Logger log = Logger.getLogger(LcomMemcacheUtil.class
@@ -24,7 +23,8 @@ public class LcomMemcacheUtil {
 						+ message.getTargetUserName() + LcomConst.SEPARATOR
 						+ message.getMessage() + LcomConst.SEPARATOR
 						+ message.getPostedDate() + LcomConst.SEPARATOR
-						+ message.getExpireDate() + LcomConst.ITEM_SEPARATOR;
+						+ message.getExpireDate() + LcomConst.SEPARATOR
+						+ message.isMessageRead() + LcomConst.ITEM_SEPARATOR;
 			}
 
 			if (input != null) {
@@ -46,7 +46,8 @@ public class LcomMemcacheUtil {
 					+ message.getTargetUserName() + LcomConst.SEPARATOR
 					+ message.getMessage() + LcomConst.SEPARATOR
 					+ message.getPostedDate() + LcomConst.SEPARATOR
-					+ message.getExpireDate();
+					+ message.getExpireDate() + LcomConst.SEPARATOR
+					+ message.isMessageRead();
 			log.log(Level.WARNING, "result: " + result);
 			return result;
 		}
@@ -66,22 +67,31 @@ public class LcomMemcacheUtil {
 			// Then, we devide each item to each data.
 			for (int i = 0; i < item.length; i++) {
 
-				String[] parsed = item[i].split(LcomConst.SEPARATOR);
+				try {
+					String[] parsed = item[i].split(LcomConst.SEPARATOR);
 
-				String userId = parsed[0];
-				String userName = parsed[1];
-				String targetUserId = parsed[2];
-				String targetUserName = parsed[3];
-				String message = parsed[4];
-				String postDate = parsed[5];
-				String expireDate = parsed[6];
+					String userId = parsed[0];
+					String userName = parsed[1];
+					String targetUserId = parsed[2];
+					String targetUserName = parsed[3];
+					String message = parsed[4];
+					String postDate = parsed[5];
+					String expireDate = parsed[6];
+					String isRead = parsed[7];
 
-				// Create NewMessageData object
-				LcomNewMessageData data = new LcomNewMessageData(
-						Integer.valueOf(userId), Integer.valueOf(targetUserId),
-						userName, targetUserName, message,
-						Long.valueOf(postDate), Long.valueOf(expireDate));
-				messages.add(data);
+					// Create NewMessageData object
+					LcomNewMessageData data = new LcomNewMessageData(
+							Integer.valueOf(userId),
+							Integer.valueOf(targetUserId), userName,
+							targetUserName, message, Long.valueOf(postDate),
+							Long.valueOf(expireDate), Boolean.valueOf(isRead));
+					messages.add(data);
+				} catch (IndexOutOfBoundsException e) {
+					// Nothing to do
+					log.log(Level.WARNING,
+							"IndexOutOfBoundsException: " + e.getMessage());
+				}
+
 			}
 
 			return messages;
