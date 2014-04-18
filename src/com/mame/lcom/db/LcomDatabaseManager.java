@@ -938,24 +938,25 @@ public class LcomDatabaseManager {
 			}
 
 			// List for old messages
-			@SuppressWarnings("unchecked")
-			List<LcomNewMessageData> oldMessages = (List<LcomNewMessageData>) pm
-					.newQuery(query).execute();
+			List<LcomNewMessageData> oldMessages = new ArrayList<LcomNewMessageData>();
 
 			// List for not expired (valid) messages
-			@SuppressWarnings("unchecked")
-			List<LcomNewMessageData> validMessages = (List<LcomNewMessageData>) pm
-					.newQuery(query).execute();
+			// List<LcomNewMessageData> validMessages = new
+			// ArrayList<LcomNewMessageData>();
+
+			log.log(Level.INFO, "currentTime: " + currentTime);
 
 			for (LcomNewMessageData message : allMessages) {
 				long expireTime = message.getExpireDate();
+				log.log(Level.INFO, "expireTime: " + expireTime);
 
 				// If the target message is already expired
 				if (currentTime > expireTime) {
 					oldMessages.add(message);
-				} else {
-					validMessages.add(message);
 				}
+				// else {
+				// validMessages.add(message);
+				// }
 			}
 
 			// Backuo old messages
@@ -987,6 +988,7 @@ public class LcomDatabaseManager {
 
 	private static synchronized List<LcomExpiredMessageData> backupToExpiredTable(
 			List<LcomNewMessageData> oldMessages) {
+		log.log(Level.INFO, "backupToExpiredTable");
 
 		if (oldMessages != null) {
 

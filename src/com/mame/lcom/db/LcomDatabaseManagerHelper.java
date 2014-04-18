@@ -397,6 +397,7 @@ public class LcomDatabaseManagerHelper {
 		try {
 			// Remove new message
 			if (registeredIds != null && registeredIds.size() != 0) {
+				log.log(Level.INFO, "delete all");
 				memcacheService.deleteAll(registeredIds);
 			}
 		} catch (IllegalArgumentException e) {
