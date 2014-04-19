@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
+import com.mame.lcom.invitation.LcomMail;
 import com.mame.lcom.util.DatastoreUtil;
 import com.mame.lcom.util.TimeUtil;
 
@@ -33,6 +34,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 		String password = req.getParameter(LcomConst.SERVLET_PASSWORD);
 		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
 		String thumb = req.getParameter(LcomConst.SERVLET_THUMBNAIL);
+		String language = req.getParameter(LcomConst.SERVLET_LANGUAGE);
 
 		List<String> list = new ArrayList<String>();
 
@@ -69,6 +71,8 @@ public class LcomCreateAccountServlet extends HttpServlet {
 					LcomUserData data = new LcomUserData(userIdByMail,
 							userName, password, mailAddress, thumbnail);
 					userId = manager.addNewUserData(data);
+					LcomMail mail = new LcomMail();
+					mail.sendServiceWelcomeMail(mailAddress, userName, language);
 
 				} else {
 					// If mail address exist in DB although user name is not
