@@ -163,19 +163,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 				// set his/her user name)
 				list.add(mailAddress);
 
-				// } catch (Exception e) {
-				// log.log(Level.WARNING, "Mail exception: " + e.getMessage());
-				// }
 			}
-
-			// try {
-			// // Send mail
-			// LcomMail mail = new LcomMail();
-			// mail.sendInvitationMail(mailAddress, userName, message);
-			// } catch (MessagingException e) {
-			// log.log(Level.WARNING, "MessagingException:" + e.getMessage());
-			// result = LcomConst.INVITATION_CONFIRMED_MAIL_CANNOT_BE_SENT;
-			// }
 
 		} else {
 			// If some of data is lacked

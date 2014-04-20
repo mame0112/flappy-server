@@ -8,7 +8,7 @@
 	<cron>
 		<url>/cron/messageclean</url>
 		<description>Clean out obsolete messages</description>
-		<schedule>every 3 minutes</schedule>
+		<schedule>every 60 minutes</schedule>
 		<target>small</target>
 	</cron>
 </cronentries>

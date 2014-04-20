@@ -79,15 +79,21 @@ public class LcomCreateAccountServlet extends HttpServlet {
 					// registered (This is a case that the user was invited by
 					// his friend)
 					log.log(Level.INFO, "A2");
+
+					// Update friend himself information
 					manager.updateUserData(userIdByMail, userName, password,
 							mailAddress, thumbnail);
-					userId = manager.getNumOfUserId();
+
+					// Get user information
+					manager.updateUserNameInFriendhsiopTable(userIdByMail,
+							userName);
+
+					// userId = manager.getNumOfUserId();
+					userId = userIdByMail;
 					result = LcomConst.CREATE_ACCOUNT_RESULT_OK_WITH_ADDRESS_REGISTERED;
-					// LcomUserData data = new LcomUserData(userId, userName,
-					// password, mailAddress);
 				}
 			} else {
-				log.log(Level.INFO, "B" + TimeUtil.calcResponse());
+				log.log(Level.INFO, "B");
 				result = LcomConst.CREATE_ACCOUNT_USER_ALREADY_EXIST;
 			}
 		} else {

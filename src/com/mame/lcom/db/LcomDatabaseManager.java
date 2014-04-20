@@ -217,6 +217,50 @@ public class LcomDatabaseManager {
 		}
 	}
 
+	/**
+	 * THis method shall be called if the user register his user name before his
+	 * friend invited to this service (meaning user name was mail address)
+	 * 
+	 * @param userId
+	 * @param userName
+	 */
+	public synchronized void updateUserNameInFriendhsiopTable(int userId,
+			String userName) {
+		log.log(Level.INFO, "updateUserNameInFriendhsiopTable");
+		if (userId != LcomConst.NO_USER && userName != null) {
+			log.log(Level.INFO, "useId: " + userId + " uerName: " + userName);
+			PersistenceManager pm = LcomPersistenceManagerFactory.get()
+					.getPersistenceManager();
+			// Get user information based on mail address
+			String query = "select from " + LcomFriendshipData.class.getName()
+					+ " where mSecondUserId == " + userId;
+			List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
+			result = (List<LcomFriendshipData>) pm.newQuery(query).execute();
+
+			if (result != null && result.size() != 0) {
+				log.log(Level.INFO, "result size: " + result.size());
+				for (LcomFriendshipData data : result) {
+					String secondName = data.getSecondUserName();
+					if (secondName == null || secondName.equals(LcomConst.NULL)
+							|| secondName.equals("")) {
+						data.setSecondUserName(userName);
+						try {
+							pm.makePersistent(data);
+						} finally {
+							pm.close();
+						}
+					}
+				}
+			}
+
+		} else {
+			log.log(Level.INFO, "useId: " + userId);
+			if (userName != null) {
+				log.log(Level.INFO, "useName: " + userName);
+			}
+		}
+	}
+
 	public synchronized void updateUserDate(LcomUserData updatedData) {
 		if (updatedData != null) {
 			PersistenceManager pm = LcomPersistenceManagerFactory.get()
