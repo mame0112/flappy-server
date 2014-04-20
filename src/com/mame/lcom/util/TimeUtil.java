@@ -29,15 +29,17 @@ public class TimeUtil {
 
 	public static long getExpireDate(long date) {
 		Calendar now = Calendar.getInstance();
-		long expireTime = now.getTimeInMillis() + (30 * 60 * 1000); // 3omin
+		long expireTime = now.getTimeInMillis()
+				+ LcomConst.MESSAGE_EXPIRE_PERIOD; // 3omin
 		// now.setTime(date);
 		// now.add(Calendar.MINUTE, LcomConst.MESSAGE_EXPIRE_PERIOD);
 		// Date time = now.getTime();
 		return expireTime;
 	}
 
-//	public static long getDateInDateFormat(String date) throws ParseException {
-//		Date result = new SimpleDateFormat(LcomConst.DATE_PATTERN).parse(date);
-//		return result;
-//	}
+	// public static long getDateInDateFormat(String date) throws ParseException
+	// {
+	// Date result = new SimpleDateFormat(LcomConst.DATE_PATTERN).parse(date);
+	// return result;
+	// }
 }

@@ -65,10 +65,11 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 			String regId = manager.getDeviceIdForGCMPush(Integer
 					.valueOf(targetUserId));
 			if (regId != null && !regId.isEmpty()) {
+				long expireDate = TimeUtil.getExpireDate(Long.valueOf(date));
 				GCMIntentManager pushManager = new GCMIntentManager();
 				pushManager.pushGCMNotification(Integer.valueOf(userId),
 						Integer.valueOf(targetUserId), userName,
-						targetUserName, message, regId);
+						targetUserName, message, regId, expireDate);
 			}
 
 		} else {
