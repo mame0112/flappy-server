@@ -20,10 +20,6 @@ public class TimeUtil {
 
 	public static long getCurrentDate() {
 		Date date1 = new Date();
-		// SimpleDateFormat sdf = new SimpleDateFormat(LcomConst.DATE_PATTERN);
-		// Date currentDate = new Date(date1.getTime());
-		// Date currentDate = sdf.par
-		// return currentDate;
 		return date1.getTime();
 	}
 

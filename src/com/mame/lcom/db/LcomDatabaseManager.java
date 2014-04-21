@@ -718,7 +718,8 @@ public class LcomDatabaseManager {
 		return result;
 	}
 
-	public synchronized List<LcomFriendshipData> getFriendListData(int userId) {
+	public synchronized List<LcomFriendshipData> getFriendListData(int userId,
+			long currentTime) {
 		log.log(Level.INFO, "getFriendListData");
 
 		// Try to get from memcache
@@ -764,25 +765,30 @@ public class LcomDatabaseManager {
 
 				for (LcomNewMessageData message : newMessages) {
 
-					// If target user is me
-					int targetUserId = message.getUserId();
+					// We shall handle messages those expire time is still valid
+					if (message.getExpireDate() > currentTime) {
+						// If target user is me
+						int targetUserId = message.getUserId();
 
-					// If the target user infomration is not in Hashmap
-					if (!messageNum.containsKey(targetUserId)) {
-						messageNum.put(targetUserId, 1);
-						log.log(Level.WARNING, "A targetUserId" + targetUserId
-								+ " userId: " + message.getUserId());
-					} else {
-						// Otherwise (meaning target user infomration is
-						// already
-						// been in hashmap),
-						// Update it (+1)
-						int num = messageNum.get(targetUserId);
-						int newNum = num + 1;
-						messageNum.put(targetUserId, newNum);
-						log.log(Level.WARNING, "B targetUserId" + targetUserId
-								+ " userId: " + message.getUserId()
-								+ " newNum: " + newNum);
+						// If the target user infomration is not in Hashmap
+						if (!messageNum.containsKey(targetUserId)) {
+							messageNum.put(targetUserId, 1);
+							log.log(Level.WARNING,
+									"A targetUserId" + targetUserId
+											+ " userId: " + message.getUserId());
+						} else {
+							// Otherwise (meaning target user infomration is
+							// already
+							// been in hashmap),
+							// Update it (+1)
+							int num = messageNum.get(targetUserId);
+							int newNum = num + 1;
+							messageNum.put(targetUserId, newNum);
+							log.log(Level.WARNING,
+									"B targetUserId" + targetUserId
+											+ " userId: " + message.getUserId()
+											+ " newNum: " + newNum);
+						}
 					}
 				}
 
