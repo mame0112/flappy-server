@@ -1,95 +1,132 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-		<title>flippy</title>
-		<meta name="description" content="Responsive Retina-Friendly Menu with different, size-dependent layouts" />
-		<meta name="keywords" content="flippy, communication, loose, cloud, chat" />
-		<meta name="author" content="mame" />
-		<link rel="shortcut icon" href="../favicon.ico"> 
-		<link rel="stylesheet" type="text/css" href="css/default.css" />
-		<link rel="stylesheet" type="text/css" href="css/component.css" />
-		<script src="js/modernizr.custom.js"></script>
-	</head>
-	<body>
-		<div class="container">	
-			<!-- Codrops top bar -->
-			<div class="codrops-top clearfix">
-				<a class="codrops-icon codrops-icon-prev" href="http://tympanus.net/Development/PageTransitions/"><span>Previous Demo</span></a>
-				<span class="right"><a class="codrops-icon codrops-icon-drop" href="http://tympanus.net/codrops/?p=14991"><span>Back to the Codrops Article</span></a></span>
-			</div>
-			<header>
-				<h1>flippy<span>Stress-less communication with your friend by to be disappeard message</span></h1>
-				<h2>flippy will enable you to xxxxx.</h2>
-			</header>
-			<div class="main clearfix">
-				<nav id="menu" class="nav">					
-					<ul>
-						<li>
-							<a href="#">
-								<span class="title">Get app</span>
-								<span class="body">
-								<span class="icon">
-									<i aria-hidden="true" class="icon-home"></i>
-								</span>
-								</span>
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<span class="title">What is this?</span>
-								<div class="body">
-								<span class="icon"> 
-									<i aria-hidden="true" class="icon-services"></i>
-								</div>
-								</span>
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<span class="title">Update info</span>
-								<span class="body">
-								<span class="icon">
-									<i aria-hidden="true" class="icon-portfolio"></i>
-								</span>
-								</span>
-							</a>
-						</li>
-						<li>
-							<a href="#">
-								<span class="title">Support</span>
-								<span class="body">
-								<span class="icon">
-									<i aria-hidden="true" class="icon-blog"></i>
-								</span>
-								</span>
-							</a>
-						</li>
-						<li>
-							<a href="privacypolicy.html">
-								<span class="title">Privacy policy</span>
-								<span class="body">
-								<span class="icon">
-									<i aria-hidden="true" class="icon-team"></i>
-								</span>
-								</span>
-							</a>
-						</li>
-						<li>
-							<a href="tos.html">
-								<span class="title">Teams of service</span>
-								<span class="body">
-								<span class="icon">
-									<i aria-hidden="true" class="icon-tos"></i>
-								</span>
-								</span>
-							</a>
-						</li>
-					</ul>
-				</nav>
-			</div>
-		</div><!-- /container -->
-	</body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>flappy</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/jumbotron.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=478333052179762";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <div class="container">
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">flappy</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">What's "flappy?"</a></li>
+            <li><a href="#">Update info</a></li>
+            <li><a href="#">Support</a></li>
+            <li><a href="privacypolicy.html">Privacy policy</a></li>
+            <li><a href="tos.html">Teams of service</a></li>
+          </ul>
+        </li>
+      </ul>
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#">Blog</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<div class="jumbotron">
+    <h1><img src="image/flappy_title_logo.png" alt="...">flappy</h1>
+    <p>Stress-less communication with your friend by to be disappeard message</p>
+	    <p><a class="btn btn-primary btn-lg" role="button">Get started</a></p>
+</div>
+<h2>About this service</h2>
+<div class="row">
+  <div class="col-xs-4 col-md-4">
+    <a href="#" class="thumbnail">
+      <img src="image/flappy_website_overview_first.png" alt="...">
+    </a>
+	<h3>What's flappy?</h3>
+	<p>'flappy' is stress-less communication tool. You will not feel stress any more different from other messaging service.</p>
+  </div>
+  <div class="col-xs-4 col-md-4">
+    <a href="#" class="thumbnail">
+      <img src="image/flappy_website_overview_second.png" alt="...">
+    </a>
+    <h3>Stress-less?</h3>
+    <p>One of characteristic feature of 'flappy' is to be disappeared message. If you don't read new message more than 30 minutes, it will disappear automatically and you will not be able to read it anymore.</p>
+  </div>
+  <div class="col-xs-4 col-md-4">
+    <a href="#" class="thumbnail">
+      <img src="image/flappy_website_overview_third.png" alt="...">
+    </a>
+    <h3>So what?</h3>
+    <p>This messaging service will not make message receiver reply because you and your friend might missed the message before disappearing. It means message sender can send message without considering situation of receiver. As as result, you can send message more freely than now!</p>
+  </div>
+</div>
+<div class="row">
+	<div class="col-xs-4 col-md-4">
+		<div class="fb-like-box"
+ data-href="https://www.facebook.com/flappy.communication"
+  data-width="320" data-height="320" data-colorscheme="light"
+   data-show-faces="true" data-header="true"
+    data-stream="false" data-show-border="true">
+		</div>
+	</div>
+</div>
+
+<div class="alert alert-success">Test comment</div>
+<div id="wrap">
+Footer
+</div>
+    </div>
+  </body>
 </html>
