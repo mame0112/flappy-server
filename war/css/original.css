@@ -1,0 +1,104 @@
+html,body {
+	height: 100%;
+}
+
+#wrap {
+	min-height: 100%;
+	height: auto;
+	margin: 0 auto -100px;
+	padding: 0 0 100px;
+}
+
+.navbar-default {
+    background-color: #ff4a75;
+    border-color: #ff4a75;
+}
+
+.navbar-default .navbar-brand {
+    color: #fff;
+}
+
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+    color: #eeeeee;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #fff;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: #eee;
+
+}
+
+.navbar-default .navbar-nav > li > .twitter-share-button {
+	margin-top: 10px;
+	padding-left: 10px;
+}
+
+.navbar-default .navbar-nav > .active > a, 
+.navbar-default .navbar-nav > .active > a:hover, 
+.navbar-default .navbar-nav > .active > a:focus {
+    color: #eee;
+    background-color: #ee3964;
+}
+.navbar-default .navbar-nav > .open > a, 
+.navbar-default .navbar-nav > .open > a:hover, 
+.navbar-default .navbar-nav > .open > a:focus {
+    color: #eee;
+    background-color: #ee3964;
+}
+
+#footer {
+	font-size: 14px;
+	padding-top: 15px;
+	height: 100px;
+	color: #eeeeee;
+	background-color: #333333;
+}
+
+#footer li a:link,a:visited,a:active {
+	color: #ffffff;
+}
+
+#footer li a:hover {
+	color: #333333;
+}
+
+#footer address {
+	margin-top: 8px;
+}
+
+.container {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+h4 {
+	margin-top: 25px;
+}
+
+.row {
+	margin-bottom: 20px;
+}
+
+.row p {
+	font-size: 18px;
+}
+
+.row .row {
+	margin-top: 10px;
+	margin-bottom: 0;
+}
+
+[class*="col-"] {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+hr {
+	margin-top: 40px;
+	margin-bottom: 40px;
+}
