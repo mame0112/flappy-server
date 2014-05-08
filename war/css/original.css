@@ -1,3 +1,38 @@
+/* Custom, iPhone Retina */
+@media only screen and (min-width : 320px) {
+	.jumbotron {
+		background-image: url(../image/flappy_heroshot.jpg);
+	}
+}
+
+/* Extra Small Devices, Phones */
+@media only screen and (min-width : 480px) {
+	.jumbotron {
+		background-image: url(../image/flappy_heroshot.jpg);
+	}
+}
+
+/* Small Devices, Tablets */
+@media only screen and (min-width : 768px) {
+	.jumbotron {
+		background-image: url(../image/flappy_heroshot.jpg);
+	}
+}
+
+/* Medium Devices, Desktops */
+@media only screen and (min-width : 992px) {
+	.jumbotron {
+		background-image: url(../image/flappy_heroshot.jpg);
+	}
+}
+
+/* Large Devices, Wide Screens */
+@media only screen and (min-width : 1200px) {
+	.jumbotron {
+		background-image: url(../image/flappy_heroshot.jpg);
+	}
+}
+
 html,body {
 	height: 100%;
 }
@@ -10,45 +45,43 @@ html,body {
 }
 
 .navbar-default {
-    background-color: #ff4a75;
-    border-color: #ff4a75;
+	background-color: #ff4a75;
+	border-color: #ff4a75;
 }
 
 .navbar-default .navbar-brand {
-    color: #fff;
+	color: #fff;
 }
 
-.navbar-default .navbar-brand:hover,
-.navbar-default .navbar-brand:focus {
-    color: #eeeeee;
+.navbar-default .navbar-brand:hover,.navbar-default .navbar-brand:focus
+	{
+	color: #eeeeee;
 }
 
-.navbar-default .navbar-nav > li > a {
-    color: #fff;
+.navbar-default .navbar-nav>li>a {
+	color: #fff;
 }
 
-.navbar-default .navbar-nav > li > a:hover,
-.navbar-default .navbar-nav > li > a:focus {
-    color: #eee;
-
+.navbar-default .navbar-nav>li>a:hover,.navbar-default .navbar-nav>li>a:focus
+	{
+	color: #eee;
 }
 
-.navbar-default .navbar-nav > li > .twitter-share-button {
+.navbar-default .navbar-nav>li>.twitter-share-button {
 	margin-top: 10px;
 	padding-left: 10px;
 }
 
-.navbar-default .navbar-nav > .active > a, 
-.navbar-default .navbar-nav > .active > a:hover, 
-.navbar-default .navbar-nav > .active > a:focus {
-    color: #eee;
-    background-color: #ee3964;
+.navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:hover,.navbar-default .navbar-nav>.active>a:focus
+	{
+	color: #eee;
+	background-color: #ee3964;
 }
-.navbar-default .navbar-nav > .open > a, 
-.navbar-default .navbar-nav > .open > a:hover, 
-.navbar-default .navbar-nav > .open > a:focus {
-    color: #eee;
-    background-color: #ee3964;
+
+.navbar-default .navbar-nav>.open>a,.navbar-default .navbar-nav>.open>a:hover,.navbar-default .navbar-nav>.open>a:focus
+	{
+	color: #eee;
+	background-color: #ee3964;
 }
 
 #footer {
@@ -93,7 +126,7 @@ h4 {
 	margin-bottom: 0;
 }
 
-[class*="col-"] {
+[class *="col-"] {
 	padding-top: 15px;
 	padding-bottom: 15px;
 }
