@@ -401,34 +401,35 @@ public class LcomDatabaseManager {
 
 		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 		try {
-			List<LcomNewMessageData> messagesInMemcache = new ArrayList<LcomNewMessageData>();
+			// List<LcomNewMessageData> messagesInMemcache = new
+			// ArrayList<LcomNewMessageData>();
 
 			// By calling below method, read state in memcache is automatically
 			// changed.
-			messagesInMemcache = helper
-					.getNewMessageFromMemcacheWithChangeReadState(userId);
-			result = getMessageForTargetUser(targetUserId, messagesInMemcache);
+			result = helper.getNewMessageFromMemcacheWithChangeReadState(
+					userId, targetUserId);
+			// result = getMessageForTargetUser(targetUserId,
+			// messagesInMemcache);
 		} catch (LcomMemcacheException e) {
 			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
 		}
 
-		// Common operation
-		PersistenceManager pm = LcomPersistenceManagerFactory.get()
-				.getPersistenceManager();
-
-		// query messages its target user is me
-		List<LcomNewMessageData> messagesFromOthers = null;
-		String queryFromOthers = "select from "
-				+ LcomNewMessageData.class.getName()
-				+ " where mTargetUserId == " + userId;
-		messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
-				queryFromOthers).execute();
-
-		result = getMessageForTargetUser(targetUserId, messagesFromOthers);
-
 		// If there is no message in memcache
 		if (result == null || result.size() == 0) {
 			log.log(Level.INFO, "Data from datastore");
+
+			PersistenceManager pm = LcomPersistenceManagerFactory.get()
+					.getPersistenceManager();
+
+			// query messages its target user is me
+			List<LcomNewMessageData> messagesFromOthers = null;
+			String queryFromOthers = "select from "
+					+ LcomNewMessageData.class.getName()
+					+ " where mTargetUserId == " + userId;
+			messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
+					queryFromOthers).execute();
+
+			result = getMessageForTargetUser(targetUserId, messagesFromOthers);
 
 			if (result != null && result.size() != 0) {
 				log.log(Level.WARNING,
@@ -443,12 +444,12 @@ public class LcomDatabaseManager {
 				}
 			}
 
+			pm.close();
+
 		} else {
 			log.log(Level.INFO, "Data from memcache");
 			// Set read state in Datastore
 		}
-
-		pm.close();
 
 		return result;
 	}
@@ -460,12 +461,15 @@ public class LcomDatabaseManager {
 		if (targetUserId != LcomConst.NO_USER && original != null) {
 			for (LcomNewMessageData message : original) {
 				if (message != null) {
-					int targetId = message.getUserId();
-					if (targetId == targetUserId) {
-						result.add(message);
+					boolean isRead = message.isMessageRead();
+					if (isRead == false) {
+						int targetId = message.getUserId();
+						if (targetId == targetUserId) {
+							result.add(message);
 
-						// Set message to "already read"state
-						message.setReadState(true);
+							// Set message to "already read"state
+							message.setReadState(true);
+						}
 					}
 				}
 			}

@@ -170,7 +170,7 @@ public class LcomDatabaseManagerHelper {
 	}
 
 	public List<LcomNewMessageData> getNewMessageFromMemcacheWithChangeReadState(
-			int userId) throws LcomMemcacheException {
+			int userId, int targetUserId) throws LcomMemcacheException {
 		log.log(Level.INFO, "getNewMessageFromMemcache");
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
@@ -192,17 +192,27 @@ public class LcomDatabaseManagerHelper {
 							.parseCachedMessageToList(cachedMessage);
 
 					List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
+					List<LcomNewMessageData> cacheUpdated = new ArrayList<LcomNewMessageData>();
 
 					// Set read state to already read
 					for (LcomNewMessageData message : messages) {
 						if (message != null) {
-							message.setReadState(true);
-							result.add(message);
+
+							// only for meesage that is sent by targetUserId, we
+							// shall return it.
+							int targetId = message.getTargetUserId();
+							if (targetId == targetUserId) {
+								message.setReadState(true);
+								result.add(message);
+							}
+
+							// For update cache
+							cacheUpdated.add(message);
 						}
 					}
 
 					String updatedString = util
-							.parseMessagesData2String(result);
+							.parseMessagesData2String(cacheUpdated);
 
 					// set read state-updated message to memcache again
 					memcacheService.delete(userId);
