@@ -389,37 +389,28 @@ public class LcomDatabaseManager {
 	 * state shall automatically be changed to "read" state.
 	 * 
 	 * @param userId
-	 * @param targetUserId
+	 * @param friendUserId
 	 * @return
 	 */
 	public synchronized List<LcomNewMessageData> getNewMessagesWithTargetUser(
-			int userId, int targetUserId) {
+			int userId, int friendUserId) {
 		log.log(Level.WARNING, "getNewMessagesWithTargetUser");
 
 		// List<LcomNewMessageData> messagesInMemcache
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
 
 		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
-		try {
-			// List<LcomNewMessageData> messagesInMemcache = new
-			// ArrayList<LcomNewMessageData>();
 
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		try {
 			// By calling below method, read state in memcache is automatically
 			// changed.
 			result = helper.getNewMessageFromMemcacheWithChangeReadState(
-					userId, targetUserId);
-			// result = getMessageForTargetUser(targetUserId,
-			// messagesInMemcache);
-		} catch (LcomMemcacheException e) {
-			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
-		}
+					userId, friendUserId);
 
-		// If there is no message in memcache
-		if (result == null || result.size() == 0) {
-			log.log(Level.INFO, "Data from datastore");
-
-			PersistenceManager pm = LcomPersistenceManagerFactory.get()
-					.getPersistenceManager();
+			// Common operation for no cache and cache without new message
 
 			// query messages its target user is me
 			List<LcomNewMessageData> messagesFromOthers = null;
@@ -429,26 +420,37 @@ public class LcomDatabaseManager {
 			messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
 					queryFromOthers).execute();
 
-			result = getMessageForTargetUser(targetUserId, messagesFromOthers);
+			result = getMessageForTargetUser(friendUserId, messagesFromOthers);
 
-			if (result != null && result.size() != 0) {
-				log.log(Level.WARNING,
-						"messagesFromOthers size: " + result.size());
+			// Cache exist, but no new message. In this case cache and Data
+			// store should have same information. Then we need not to put data
+			// onto memcache
 
-				// Try to put latest message data to memcache
-				try {
-					helper.putNewMessagesToMemCache(userId, result);
-				} catch (LcomMemcacheException e) {
+		} catch (LcomMemcacheException e) {
+			// This catch includes no cache exist case
+			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
+
+			// In case of no cache exist, we need to put latest inforamtion to
+			// cache
+			if (result == null || result.size() == 0) {
+				log.log(Level.INFO, "Data from datastore");
+
+				if (result != null && result.size() != 0) {
 					log.log(Level.WARNING,
-							"LcomMemcacheException: " + e.getMessage());
+							"messagesFromOthers size: " + result.size());
+
+					// Try to put latest message data to memcache
+					try {
+						helper.putNewMessagesToMemCache(userId, result);
+					} catch (LcomMemcacheException e1) {
+						log.log(Level.WARNING,
+								"LcomMemcacheException: " + e1.getMessage());
+					}
 				}
 			}
 
+		} finally {
 			pm.close();
-
-		} else {
-			log.log(Level.INFO, "Data from memcache");
-			// Set read state in Datastore
 		}
 
 		return result;
@@ -750,6 +752,8 @@ public class LcomDatabaseManager {
 							"latest message: " + data.getLatestMessage());
 				}
 			}
+		} else {
+			// TOOD Do we need friend list to store memcache?
 		}
 
 		// Get new message

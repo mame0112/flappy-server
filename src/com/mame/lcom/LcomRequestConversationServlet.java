@@ -31,18 +31,18 @@ public class LcomRequestConversationServlet extends HttpServlet {
 		// String identifier = req
 		// .getParameter(LcomConst.SERVLET_CONTEXT_IDENTIFIER);
 		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
-		String targetUserId = req
+		String friendUserId = req
 				.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
 
 		List<String> list = new ArrayList<String>();
 
-		if (origin != null && userId != null && targetUserId != null) {
+		if (origin != null && userId != null && friendUserId != null) {
 			list.add(origin);
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 			List<LcomNewMessageData> datas = manager
 					.getNewMessagesWithTargetUser(Integer.valueOf(userId),
-							Integer.valueOf(targetUserId));
+							Integer.valueOf(friendUserId));
 			if (datas != null && datas.size() != 0) {
 				String result = DatastoreUtil.parseNewMessageList(datas);
 				list.add(result);

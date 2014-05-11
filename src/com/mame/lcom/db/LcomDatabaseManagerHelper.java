@@ -170,8 +170,9 @@ public class LcomDatabaseManagerHelper {
 	}
 
 	public List<LcomNewMessageData> getNewMessageFromMemcacheWithChangeReadState(
-			int userId, int targetUserId) throws LcomMemcacheException {
-		log.log(Level.INFO, "getNewMessageFromMemcache");
+			int userId, int friendUserId) throws LcomMemcacheException {
+		log.log(Level.INFO, "getNewMessageFromMemcacheWithChangeReadState: "
+				+ friendUserId);
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
 		try {
@@ -198,12 +199,22 @@ public class LcomDatabaseManagerHelper {
 					for (LcomNewMessageData message : messages) {
 						if (message != null) {
 
+							log.log(Level.INFO,
+									"message content: " + message.getMessage());
+
 							// only for meesage that is sent by targetUserId, we
 							// shall return it.
-							int targetId = message.getTargetUserId();
-							if (targetId == targetUserId) {
-								message.setReadState(true);
-								result.add(message);
+							int fromUserId = message.getUserId();
+							log.log(Level.INFO, "fromUserId: " + fromUserId);
+							if (fromUserId == friendUserId) {
+
+								boolean isRead = message.isMessageRead();
+
+								if (isRead == false) {
+									message.setReadState(true);
+									result.add(message);
+								}
+
 							}
 
 							// For update cache
@@ -219,6 +230,10 @@ public class LcomDatabaseManagerHelper {
 					memcacheService.put(userId, updatedString);
 
 					return result;
+				} else {
+					// No cache exist
+					log.log(Level.WARNING, "No cache exist");
+					throw new LcomMemcacheException("No cache exist");
 				}
 
 			} else {
@@ -235,8 +250,6 @@ public class LcomDatabaseManagerHelper {
 			throw new LcomMemcacheException("InvalidValueException: "
 					+ e.getMessage());
 		}
-		return null;
-
 	}
 
 	public void putNewMessageToMemCache(LcomNewMessageData message)
