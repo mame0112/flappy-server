@@ -53,7 +53,7 @@ public class LcomNewMessageServlet extends HttpServlet {
 					log.log(Level.INFO, "data.getLastMessageExpireTime():"
 							+ data.getLastMessageExpireTime());
 					// Not to send already expire data
-					if (currentTime < data.getLastMessageExpireTime()) {
+					if (currentTime > data.getLastMessageExpireTime()) {
 						int firstUserId = data.getFirstUserId();
 
 						// If first user is user himself (meaning friend is
@@ -61,6 +61,8 @@ public class LcomNewMessageServlet extends HttpServlet {
 						// user)
 						if (firstUserId == Integer.valueOf(userId)) {
 							String friendName = data.getSecondUserName();
+							log.log(Level.INFO, "getSecondUserName: "
+									+ friendName);
 							if (friendName == null || friendName.equals("")
 									|| friendName.equals(LcomConst.NULL)) {
 								log.log(Level.INFO, "data.getSecondUserId():"
@@ -74,6 +76,8 @@ public class LcomNewMessageServlet extends HttpServlet {
 							// If second user is user (meaning friend is first
 							// user)
 							String friendName = data.getFirstUserName();
+							log.log(Level.INFO, "getFirstUserName: "
+									+ friendName);
 							if (friendName == null || friendName.equals("")
 									|| friendName.equals(LcomConst.NULL)) {
 								log.log(Level.INFO, "data.getFirstUserId():"
