@@ -923,15 +923,21 @@ public class LcomDatabaseManager {
 		if (datas != null && datas.size() != 0) {
 			data = datas.get(0);
 			data.changetTotalUserNum(numOfUser);
+			try {
+				pm.makePersistent(data);
+			} finally {
+				pm.close();
+			}
+		} else {
+			// If data doesn't exist
+			try {
+				LcomAllUserData newData = new LcomAllUserData(numOfUser);
+				pm.makePersistent(newData);
+			} finally {
+				pm.close();
+			}
 		}
 
-		try {
-			pm.makePersistent(data);
-		} finally {
-			pm.close();
-		}
-
-		pm.close();
 	}
 
 	/**
@@ -1181,5 +1187,29 @@ public class LcomDatabaseManager {
 		}
 
 		return null;
+	}
+
+	public void deleteUserData(int userId) {
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+		String query = "select from " + LcomUserData.class.getName()
+				+ " where mUserId == " + userId;
+		List<LcomUserData> datas = (List<LcomUserData>) pm.newQuery(query)
+				.execute();
+		if (datas != null) {
+			try {
+				LcomUserData data = datas.get(0);
+				if (data != null && data.getUserId() != LcomConst.NO_USER) {
+					try {
+						pm.deletePersistent(data);
+					} finally {
+						pm.close();
+					}
+				}
+			} catch (IndexOutOfBoundsException e) {
+				// Nothing to do
+			}
+
+		}
 	}
 }

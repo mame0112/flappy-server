@@ -46,9 +46,6 @@ public class FirstTest {
 	public void setUp() {
 		helper.setUp();
 		mManager = LcomDatabaseManager.getInstance();
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-
 	}
 
 	@After
@@ -58,51 +55,75 @@ public class FirstTest {
 
 	@Test
 	public void testGetUserIdByNameAndPassword1() {
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		mManager.addNewUserData(data);
 		int userId = mManager.getUserIdByNameAndPassword("aaaa", "bbbb");
 		assertEquals(userId, 0);
+		mManager.deleteUserData(0);
 	}
 
 	@Test
 	public void testGetUserIdByNameAndPassword2() {
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		mManager.addNewUserData(data);
 		int userId = mManager.getUserIdByNameAndPassword(null, "bbbb");
 		assertEquals(userId, -1);
+		mManager.deleteUserData(0);
 	}
 
 	@Test
 	public void testGetUserIdByNameAndPassword3() {
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		mManager.addNewUserData(data);
 		int userId = mManager.getUserIdByNameAndPassword("aaaa", null);
 		assertEquals(userId, -1);
+		mManager.deleteUserData(0);
 	}
 
 	@Test
 	public void testGetUserIdByNameAndPassword4() {
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		mManager.addNewUserData(data);
 		int userId = mManager.getUserIdByNameAndPassword("aaaa", "illegal");
 		assertEquals(userId, -1);
+		mManager.deleteUserData(0);
 	}
 
 	@Test
 	public void testGetUserIdByName1() {
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		mManager.addNewUserData(data);
 		int userId = mManager.getUserIdByName("aaaa");
 		assertEquals(userId, 0);
+		mManager.deleteUserData(0);
 	}
 
 	@Test
 	public void testGetUserIdByName2() {
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		mManager.addNewUserData(data);
 		int userId = mManager.getUserIdByName(null);
 		assertEquals(userId, -1);
+		mManager.deleteUserData(0);
 	}
 
 	@Test
 	public void testGetUserIdByName3() {
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		mManager.addNewUserData(data);
+
 		int userId = mManager.getUserIdByName("illegal");
 		assertEquals(userId, -1);
+		mManager.deleteUserData(0);
 	}
 
 	@Test
 	public void testAddNewUserData1() {
 		LcomUserData data2 = new LcomUserData(LcomConst.NO_USER, "cccc",
 				"dddd", "b@b", null);
+		mManager.debugModifyNumOfUser(1);
 		int userId = mManager.addNewUserData(data2);
+
 		assertEquals(userId, 1);
 
 		LcomUserData result = mManager.getUserData(userId);
@@ -110,13 +131,20 @@ public class FirstTest {
 		assertEquals(result.getPassword(), "dddd");
 		assertEquals(result.getMailAddress(), "b@b");
 		assertEquals(result.getThumbnail(), null);
+		mManager.deleteUserData(0);
+		mManager.debugModifyNumOfUser(1);
 	}
 
 	@Test
 	public void testAddNewUserData2() {
 		LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", "b@b", null);
+		mManager.debugModifyNumOfUser(1);
 		int userId = mManager.addNewUserData(data2);
+
 		assertEquals(userId, 1);
+
+		mManager.deleteUserData(0);
+		mManager.debugModifyNumOfUser(1);
 	}
 
 	@Test
@@ -128,6 +156,7 @@ public class FirstTest {
 	@Test
 	public void testAddNewUserData4() {
 		LcomUserData data2 = new LcomUserData(1, null, "dddd", "b@b", null);
+		mManager.debugModifyNumOfUser(2);
 		int userId = mManager.addNewUserData(data2);
 
 		LcomUserData result = mManager.getUserData(userId);
