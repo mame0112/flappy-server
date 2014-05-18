@@ -6,5 +6,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/kosukeEndo/Documents/workspace/server/welcome/flappy-server/war/WEB-INF/lib/gson-2.2.2.jar"/>
 	<classpathentry kind="lib" path="/Users/kosukeEndo/Documents/workspace/server/welcome/flappy-server/war/WEB-INF/lib/gcm-server.jar"/>
+	<classpathentry kind="lib" path="/Users/kosukeEndo/Documents/workspace/server/junit/flappy-server/war/WEB-INF/lib/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="/Applications/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.9.2/appengine-java-sdk-1.9.2/lib/impl/appengine-api.jar"/>
+	<classpathentry kind="lib" path="/Applications/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.9.2/appengine-java-sdk-1.9.2/lib/impl/appengine-api-stubs.jar"/>
+	<classpathentry kind="lib" path="/Applications/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.9.2/appengine-java-sdk-1.9.2/lib/impl/appengine-api-labs.jar"/>
+	<classpathentry kind="lib" path="/Applications/eclipse/plugins/com.google.appengine.eclipse.sdkbundle_1.9.2/appengine-java-sdk-1.9.2/lib/testing/appengine-testing.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
