@@ -183,6 +183,7 @@ public class LcomDatabaseManager {
 	 */
 	public synchronized void updateUserData(int userId, String userName,
 			String password, String mailAddress, Blob thumbnail) {
+		log.log(Level.INFO, "updateUserData");
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 		String query = "select from " + LcomUserData.class.getName()
@@ -214,6 +215,9 @@ public class LcomDatabaseManager {
 				pm.close();
 			}
 
+			// Update memcache
+			LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+			helper.putUserDataToMemCache(targetData);
 		}
 	}
 
@@ -289,6 +293,10 @@ public class LcomDatabaseManager {
 					oldData.setThumbnail(thumbnail);
 				}
 
+				// Update memcache
+				LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+				helper.putUserDataToMemCache(oldData);
+
 			} finally {
 				pm.close();
 			}
@@ -326,7 +334,7 @@ public class LcomDatabaseManager {
 		return userNum;
 	}
 
-	private synchronized List<LcomNewMessageData> getNewMessages(int userId) {
+	public synchronized List<LcomNewMessageData> getNewMessages(int userId) {
 		log.log(Level.WARNING, "getNewMessages");
 
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
@@ -549,9 +557,7 @@ public class LcomDatabaseManager {
 				helper.putUserDataToMemCache(result);
 			}
 			pm.close();
-
 		}
-
 		return result;
 	}
 

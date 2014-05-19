@@ -68,6 +68,22 @@ public class LcomDatabaseManagerHelper {
 		return null;
 	}
 
+	public void removeUserDataFromMemcache(int userId) {
+		MemcacheService memcacheService = MemcacheServiceFactory
+				.getMemcacheService(LcomUserData.class.getSimpleName());
+
+		try {
+			memcacheService.delete(userId);
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+		} catch (MemcacheServiceException e) {
+			log.log(Level.WARNING,
+					"MemcacheServiceException: " + e.getMessage());
+		}
+
+	}
+
 	public void putTotalNumberOfUser(int numOfUser) {
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomAllUserData.class.getSimpleName());
@@ -81,7 +97,21 @@ public class LcomDatabaseManagerHelper {
 			log.log(Level.WARNING,
 					"MemcacheServiceException: " + e.getMessage());
 		}
+	}
 
+	public void removeTotalNumberOfUser() {
+		MemcacheService memcacheService = MemcacheServiceFactory
+				.getMemcacheService(LcomAllUserData.class.getSimpleName());
+
+		try {
+			memcacheService.delete(LcomConst.NUM_OF_USER);
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+		} catch (MemcacheServiceException e) {
+			log.log(Level.WARNING,
+					"MemcacheServiceException: " + e.getMessage());
+		}
 	}
 
 	public int getTotalNumberOfUser() {
@@ -115,6 +145,13 @@ public class LcomDatabaseManagerHelper {
 		return LcomConst.NO_USER;
 	}
 
+	/**
+	 * This userId must be your own id. this must be targetUserId
+	 * 
+	 * @param userId
+	 * @return
+	 * @throws LcomMemcacheException
+	 */
 	public List<LcomNewMessageData> getNewMessageFromMemcache(int userId)
 			throws LcomMemcacheException {
 		log.log(Level.INFO, "getNewMessageFromMemcache");
@@ -345,6 +382,21 @@ public class LcomDatabaseManagerHelper {
 					"MemcacheServiceException: " + e.getMessage());
 			throw new LcomMemcacheException("MemcacheServiceException: "
 					+ e.getMessage());
+		}
+	}
+
+	public void removeNewMessagesFromMemCache(int userId) {
+		MemcacheService memcacheService = MemcacheServiceFactory
+				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
+
+		try {
+			memcacheService.delete(userId);
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+		} catch (MemcacheServiceException e) {
+			log.log(Level.WARNING,
+					"MemcacheServiceException: " + e.getMessage());
 		}
 	}
 

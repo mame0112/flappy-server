@@ -3,6 +3,7 @@ package com.mame.lcom.test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.junit.After;
@@ -14,9 +15,11 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomFriendshipData;
+import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.db.LcomDatabaseManagerHelper;
+import com.mame.lcom.db.LcomMemcacheException;
 import com.mame.lcom.util.DbgUtil;
 import com.mame.lcom.util.TimeUtil;
 
@@ -42,6 +45,7 @@ public class FirstTest {
 	@After
 	public void tearDown() {
 		helper.tearDown();
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 	}
 
 	@Test
@@ -184,14 +188,52 @@ public class FirstTest {
 		assertEquals(result.getThumbnail(), null);
 	}
 
+	/**
+	 * Without memcache
+	 */
 	@Test
 	public void testUpdateUserData1() {
 		// LcomUserData data2 = new LcomUserData();
 		int userId = 2;
+		LcomDatabaseManagerHelper dbHelper = new LcomDatabaseManagerHelper();
+
 		LcomUserData data2 = new LcomUserData(userId, "cccc2", "dddd2", "b@b2",
 				null);
-		mManager.debugModifyNumOfUser(userId + 1);
+		mManager.debugModifyNumOfUser(userId);
 		mManager.addNewUserData(data2);
+
+		LcomUserData result = mManager.getUserData(userId);
+
+		assertEquals(result.getUserName(), "cccc2");
+
+		mManager.updateUserData(userId, "cccc_updated", null, null, null);
+
+		dbHelper.removeUserDataFromMemcache(userId);
+
+		LcomUserData result2 = mManager.getUserData(userId);
+
+		assertEquals(result2.getUserName(), "cccc_updated");
+		assertEquals(result2.getPassword(), "dddd2");
+		assertEquals(result2.getMailAddress(), "b@b2");
+		assertEquals(result2.getThumbnail(), null);
+
+		dbHelper.removeUserDataFromMemcache(userId);
+	}
+
+	/**
+	 * With memcache
+	 */
+	@Test
+	public void testUpdateUserData2() {
+		// LcomUserData data2 = new LcomUserData();
+		int userId = 2;
+		LcomDatabaseManagerHelper dbHelper = new LcomDatabaseManagerHelper();
+
+		LcomUserData data2 = new LcomUserData(userId, "cccc2", "dddd2", "b@b2",
+				null);
+		mManager.debugModifyNumOfUser(userId);
+		mManager.addNewUserData(data2);
+
 		LcomUserData result = mManager.getUserData(userId);
 
 		assertEquals(result.getUserName(), "cccc2");
@@ -201,8 +243,8 @@ public class FirstTest {
 		LcomUserData result2 = mManager.getUserData(userId);
 
 		assertEquals(result2.getUserName(), "cccc_updated");
-		assertEquals(result2.getPassword(), "dddd");
-		assertEquals(result2.getMailAddress(), "b@b");
+		assertEquals(result2.getPassword(), "dddd2");
+		assertEquals(result2.getMailAddress(), "b@b2");
 		assertEquals(result2.getThumbnail(), null);
 	}
 
@@ -228,8 +270,47 @@ public class FirstTest {
 
 	}
 
+	/**
+	 * Without memcache
+	 */
 	@Test
-	public void testUpdateUserDate() {
+	public void testUpdateUserDate1() {
+
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		helper.removeUserDataFromMemcache(1);
+
+		LcomUserData oldData = new LcomUserData(1, "cccc", "dddd", "b@b", null);
+		mManager.addNewUserData(oldData);
+
+		LcomUserData newData = new LcomUserData(1, "cccc2", "dddd2", "b@b2",
+				null);
+
+		mManager.updateUserDate(newData);
+
+		helper.removeUserDataFromMemcache(1);
+
+		LcomUserData data = mManager.getUserData(1);
+
+		assertNotNull(data);
+
+		assertEquals(data.getUserId(), 1);
+		assertEquals(data.getUserName(), "cccc2");
+		assertEquals(data.getMailAddress(), "b@b2");
+		assertEquals(data.getPassword(), "dddd2");
+
+		helper.removeUserDataFromMemcache(1);
+
+	}
+
+	/**
+	 * With memcache
+	 */
+	@Test
+	public void testUpdateUserDate2() {
+
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		helper.removeUserDataFromMemcache(1);
+
 		LcomUserData oldData = new LcomUserData(1, "cccc", "dddd", "b@b", null);
 		mManager.addNewUserData(oldData);
 
@@ -246,6 +327,146 @@ public class FirstTest {
 		assertEquals(data.getUserName(), "cccc2");
 		assertEquals(data.getMailAddress(), "b@b2");
 		assertEquals(data.getPassword(), "dddd2");
+
+		helper.removeUserDataFromMemcache(1);
+
+	}
+
+	/**
+	 * With memcach
+	 */
+	@Test
+	public void testGetNumOfUserId1() {
+		mManager.debugModifyNumOfUser(1);
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		helper.putTotalNumberOfUser(2);
+
+		int num = mManager.getNumOfUserId();
+
+		assertEquals(num, 2);
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		assertEquals(dbhelper.getTotalNumberOfUser(), 2);
+	}
+
+	/**
+	 * Without memcach
+	 */
+	@Test
+	public void testGetNumOfUserId2() {
+		mManager.debugModifyNumOfUser(3);
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		dbhelper.removeTotalNumberOfUser();
+
+		int num = mManager.getNumOfUserId();
+
+		assertEquals(num, 3);
+		assertEquals(dbhelper.getTotalNumberOfUser(), 3);
+	}
+
+	/**
+	 * Without memcache
+	 */
+	@Test
+	public void testGetNewMessages1() {
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+
+		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test message 1",
+				TimeUtil.getCurrentDate() + 100);
+		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test message 2",
+				TimeUtil.getCurrentDate() + 100);
+		dbhelper.removeNewMessagesFromMemCache(1);
+
+		// try {
+		// dbhelper.putNewMessagesToMemCache(0, newMessages);
+		// } catch (LcomMemcacheException e) {
+		// assertTrue(false);
+		// }
+
+		List<LcomNewMessageData> results = mManager.getNewMessages(1);
+
+		assertNotNull(results);
+		assertEquals(results.size(), 2);
+
+		LcomNewMessageData data = results.get(0);
+
+		assertEquals(data.getMessage(), "test message 1");
+		try {
+			assertNotNull(dbhelper.getNewMessageFromMemcache(1));
+		} catch (LcomMemcacheException e) {
+			assertTrue(false);
+		}
+	}
+
+	/**
+	 * With memcache
+	 */
+	@Test
+	public void testGetNewMessages2() {
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		ArrayList<LcomNewMessageData> newMessages = new ArrayList<LcomNewMessageData>();
+
+		LcomNewMessageData data1 = new LcomNewMessageData(0, 1, "aaaa", "bbbb",
+				"test message 1", TimeUtil.getCurrentDate() - 100,
+				TimeUtil.getCurrentDate() + 100, true);
+		;
+		LcomNewMessageData data2 = new LcomNewMessageData(0, 1, "aaaa", "bbbb",
+				"test message 2", TimeUtil.getCurrentDate() - 100,
+				TimeUtil.getCurrentDate() + 100, false);
+
+		newMessages.add(data1);
+		newMessages.add(data2);
+
+		try {
+			dbhelper.putNewMessagesToMemCache(1, newMessages);
+		} catch (LcomMemcacheException e1) {
+			assertTrue(false);
+		}
+
+		List<LcomNewMessageData> results = mManager.getNewMessages(1);
+
+		assertNotNull(results);
+		assertEquals(results.size(), 1);
+
+		LcomNewMessageData data = results.get(0);
+
+		assertEquals(data.getMessage(), "test message 2");
+		try {
+			assertNotNull(dbhelper.getNewMessageFromMemcache(1));
+		} catch (LcomMemcacheException e) {
+			assertTrue(false);
+		}
+	}
+
+	/**
+	 * With memcache
+	 */
+	@Test
+	public void testGetNewMessagesWithTargetUser1() {
+		// Userid is 0, targetUserId is 1.
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+
+		ArrayList<LcomNewMessageData> newMessages = new ArrayList<LcomNewMessageData>();
+
+		LcomNewMessageData data1 = new LcomNewMessageData(0, 1, "aaaa", "bbbb",
+				"test message 1", TimeUtil.getCurrentDate() - 100,
+				TimeUtil.getCurrentDate() + 100, true);
+		;
+		LcomNewMessageData data2 = new LcomNewMessageData(0, 1, "aaaa", "bbbb",
+				"test message 2", TimeUtil.getCurrentDate() - 100,
+				TimeUtil.getCurrentDate() + 100, false);
+
+		newMessages.add(data1);
+		newMessages.add(data2);
+		try {
+			helper.putNewMessagesToMemCache(1, newMessages);
+		} catch (LcomMemcacheException e) {
+			assertTrue(false);
+		}
+
+		List<LcomNewMessageData> result = mManager
+				.getNewMessagesWithTargetUser(0, 1);
+		assertNotNull(result);
+		assertEquals(2, result.size());
 
 	}
 }
