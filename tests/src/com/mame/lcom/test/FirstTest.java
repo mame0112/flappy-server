@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
@@ -467,6 +468,82 @@ public class FirstTest {
 				.getNewMessagesWithTargetUser(0, 1);
 		assertNotNull(result);
 		assertEquals(2, result.size());
+
+	}
+
+	@Test
+	public void testGetUserIdByMailAddress() {
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb",
+				"test@mail.com", null);
+		mManager.addNewUserData(data);
+
+		int userId = mManager.getUserIdByMailAddress("test@mail.com");
+
+		assertEquals(userId, 0);
+		LcomUserData cacheData = dbhelper.getUserDataFromMemcache(0);
+		assertNotNull(cacheData);
+		assertEquals(0, cacheData.getUserId());
+		assertEquals("aaaa", cacheData.getUserName());
+		assertEquals("bbbb", cacheData.getPassword());
+		assertEquals("test@mail.com", cacheData.getMailAddress());
+
+	}
+
+	/**
+	 * with memcache
+	 */
+	@Test
+	public void testGetUserData1() {
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb",
+				"test@mail.com", null);
+
+		LcomUserData data2 = new LcomUserData(0, "aaaa2", "bbbb2",
+				"test@mail.com2", null);
+		mManager.addNewUserData(data2);
+
+		// Override cache to check cache function
+		dbhelper.putUserDataToMemCache(data);
+
+		LcomUserData result = mManager.getUserData(0);
+
+		assertNotNull(result);
+		assertEquals(result.getUserName(), "aaaa");
+	}
+
+	/**
+	 * without memcache
+	 */
+	@Test
+	public void testGetUserData() {
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+
+		LcomUserData data2 = new LcomUserData(0, "aaaa2", "bbbb2",
+				"test@mail.com2", null);
+		mManager.addNewUserData(data2);
+
+		// Override cache to check cache function
+		dbhelper.removeUserDataFromMemcache(0);
+
+		LcomUserData result = mManager.getUserData(0);
+
+		assertNotNull(result);
+		assertEquals(result.getUserName(), "aaaa2");
+	}
+
+	@Test
+	public void testAddNewFriendshipInfo() {
+		mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
+				TimeUtil.getCurrentDate(), 3);
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+
+		// Need to check memcache as well
+
+		List<LcomFriendshipData> datas = mManager.getFriendshipDataForUser(0);
+		assertNotNull(datas);
+		assertEquals(1, datas.size());
 
 	}
 }

@@ -490,48 +490,28 @@ public class LcomDatabaseManager {
 
 	public synchronized int getUserIdByMailAddress(String address) {
 		int userId = LcomConst.NO_USER;
-
-		MemcacheService memcacheService = MemcacheServiceFactory
-				.getMemcacheService();
-		@SuppressWarnings("unchecked")
-		List<LcomUserData> datas = (List<LcomUserData>) memcacheService
-				.get(LcomUserData.class + LcomConst.MEMCACHE_SEPARATOR
-						+ LcomConst.USER_ID_BY_MAIL_ADDRESS);
-		if (datas != null && datas.size() != 0) {
-			LcomUserData data = datas.get(0);
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+		String query = "select from " + LcomUserData.class.getName()
+				+ " where mMailAddress == \"" + address + "\"";
+		List<LcomUserData> users = (List<LcomUserData>) pm.newQuery(query)
+				.execute();
+		// If user (mail address) is already registered into DB
+		if (users != null && users.size() != 0) {
+			LcomUserData data = users.get(0);
 			userId = data.getUserId();
-		} else {
-			// If memcache doesn't exit here
-			PersistenceManager pm = LcomPersistenceManagerFactory.get()
-					.getPersistenceManager();
-			String query = "select from " + LcomUserData.class.getName()
-					+ " where mMailAddress == \"" + address + "\"";
-			List<LcomUserData> users = (List<LcomUserData>) pm.newQuery(query)
-					.execute();
-			// If user (mail address) is already registered into DB
-			if (users != null && users.size() != 0) {
-				LcomUserData data = users.get(0);
-				userId = data.getUserId();
-			} else {
-				// If user (mail address) is not registered into DB
-				userId = LcomConst.NO_USER;
+
+			LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+			LcomUserData currentData = helper.getUserDataFromMemcache(userId);
+			if (currentData == null) {
+				helper.putUserDataToMemCache(currentData);
 			}
-			pm.close();
-			// helper.setMemcache(LcomAllUserData.class, address, userId);
+
+		} else {
+			// If user (mail address) is not registered into DB
+			userId = LcomConst.NO_USER;
 		}
-
-		// TODO
-		// MemcacheService memcacheService = MemcacheServiceFactory
-		// .getMemcacheService();
-		// @SuppressWarnings("unchecked")
-		// userId = (Integer) memcacheService
-		// .get(LcomAllUserData.class + LcomConst.MEMCACHE_SEPARATOR
-		// + LcomConst.NUM_OF_USER);
-
-		// LcomMemcacheHelper<Integer> helper = LcomMemcacheHelper
-		// .getMemcacheHelper();
-		// userId = (Integer) helper.getMemcache(LcomAllUserData.class,
-		// address);
+		pm.close();
 
 		return userId;
 	}
