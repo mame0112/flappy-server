@@ -1,41 +1,32 @@
 package com.mame.lcom.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.logging.Level;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.mame.lcom.constant.LcomConst;
+import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.data.LcomUserData;
-
-import static org.junit.Assert.*;
-
 import com.mame.lcom.db.LcomDatabaseManager;
-
-import javax.jdo.PersistenceManager;
+import com.mame.lcom.db.LcomDatabaseManagerHelper;
+import com.mame.lcom.util.DbgUtil;
+import com.mame.lcom.util.TimeUtil;
 
 public class FirstTest {
 
-	private List keyList = null;
+	private final static String TAG = "DatabaseManagerTest";
 
 	private DatastoreService ds;
 
 	private static final String DATA_KIND = "LcomUserData";
-
-	private String[] propertyNames = { "mMailAddress", "mPassword",
-			"mThumbnail", "mUserId", "mUserName" };
-	// private String propertyName = "propertyName";
-
-	private String[] propertyValues = { "pValue1", "pValue2", "pValue3",
-			"pValue4", "pValue5" };
 
 	private LcomDatabaseManager mManager = null;
 
@@ -138,7 +129,7 @@ public class FirstTest {
 	@Test
 	public void testAddNewUserData2() {
 		LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", "b@b", null);
-		mManager.debugModifyNumOfUser(1);
+		mManager.debugModifyNumOfUser(2);
 		int userId = mManager.addNewUserData(data2);
 
 		assertEquals(userId, 1);
@@ -169,6 +160,7 @@ public class FirstTest {
 	@Test
 	public void testAddNewUserData5() {
 		LcomUserData data2 = new LcomUserData(1, "cccc", null, "b@b", null);
+		mManager.debugModifyNumOfUser(2);
 		int userId = mManager.addNewUserData(data2);
 
 		LcomUserData result = mManager.getUserData(userId);
@@ -182,6 +174,7 @@ public class FirstTest {
 	@Test
 	public void testAddNewUserData6() {
 		LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", null, null);
+		mManager.debugModifyNumOfUser(2);
 		int userId = mManager.addNewUserData(data2);
 
 		LcomUserData result = mManager.getUserData(userId);
@@ -197,8 +190,8 @@ public class FirstTest {
 		int userId = 2;
 		LcomUserData data2 = new LcomUserData(userId, "cccc2", "dddd2", "b@b2",
 				null);
+		mManager.debugModifyNumOfUser(userId + 1);
 		mManager.addNewUserData(data2);
-
 		LcomUserData result = mManager.getUserData(userId);
 
 		assertEquals(result.getUserName(), "cccc2");
@@ -211,5 +204,48 @@ public class FirstTest {
 		assertEquals(result2.getPassword(), "dddd");
 		assertEquals(result2.getMailAddress(), "b@b");
 		assertEquals(result2.getThumbnail(), null);
+	}
+
+	@Test
+	public void testUpdateUserNameInFriendhsiopTable1() {
+		mManager.addNewFriendshipInfo(1, "aaaa", 3, null, "aaaa",
+				TimeUtil.getCurrentDate(), 1);
+
+		mManager.updateUserNameInFriendhsiopTable(3, "updated_cccc");
+
+		ArrayList<LcomFriendshipData> datas = (ArrayList<LcomFriendshipData>) mManager
+				.getFriendshipDataForUser(3);
+
+		assertNotNull(datas);
+		assertEquals(1, datas.size());
+
+		LcomFriendshipData data = datas.get(0);
+		String updatedName = data.getSecondUserName();
+
+		assertEquals("updated_cccc", updatedName);
+		// TODO need to remove memcache
+		// LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+
+	}
+
+	@Test
+	public void testUpdateUserDate() {
+		LcomUserData oldData = new LcomUserData(1, "cccc", "dddd", "b@b", null);
+		mManager.addNewUserData(oldData);
+
+		LcomUserData newData = new LcomUserData(1, "cccc2", "dddd2", "b@b2",
+				null);
+
+		mManager.updateUserDate(newData);
+
+		LcomUserData data = mManager.getUserData(1);
+
+		assertNotNull(data);
+
+		assertEquals(data.getUserId(), 1);
+		assertEquals(data.getUserName(), "cccc2");
+		assertEquals(data.getMailAddress(), "b@b2");
+		assertEquals(data.getPassword(), "dddd2");
+
 	}
 }

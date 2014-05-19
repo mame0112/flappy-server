@@ -141,16 +141,16 @@ public class LcomDatabaseManager {
 					int userNum = totalData.getTotalUserNum();
 					log.log(Level.INFO, "userNum: " + userNum);
 
-					if (data != null) {
-						int originalUserId = data.getUserId();
-						if (originalUserId == LcomConst.NO_USER) {
-							data.setUserId(userNum);
-						}
+					int originalUserId = data.getUserId();
+					if (originalUserId == LcomConst.NO_USER) {
+						data.setUserId(userNum);
+						// int newUserNum = userNum + 1;
+						userId = userNum;
+						int newUserNum = userNum + 1;
+						totalData.changetTotalUserNum(newUserNum);
+					} else {
+						userId = originalUserId;
 					}
-					// int newUserNum = userNum + 1;
-					userId = userNum;
-					int newUserNum = userNum + 1;
-					totalData.changetTotalUserNum(newUserNum);
 				} else {
 					// If total user data is 0
 					totalData = new LcomAllUserData(1);
@@ -837,7 +837,7 @@ public class LcomDatabaseManager {
 		return null;
 	}
 
-	private synchronized List<LcomFriendshipData> getFriendshipDataForUser(
+	public synchronized List<LcomFriendshipData> getFriendshipDataForUser(
 			int userId) {
 		log.log(Level.INFO, "getFriendshipDataForUser");
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()

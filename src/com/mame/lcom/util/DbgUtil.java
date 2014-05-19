@@ -7,7 +7,7 @@ public class DbgUtil {
 
 	private final static Logger log = Logger.getLogger(DbgUtil.class.getName());
 
-	public void showLog(Level level, String log) {
+	public static void showLog(Level level, String log) {
 //		log.log(Level.INFO, "doPost:");
 	}
 }
