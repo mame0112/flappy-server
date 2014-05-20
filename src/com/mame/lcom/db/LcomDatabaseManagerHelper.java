@@ -580,6 +580,22 @@ public class LcomDatabaseManagerHelper {
 		}
 	}
 
+	public void removeFriendshipDataFromMemcache(int userId) {
+		MemcacheService memcacheService = MemcacheServiceFactory
+				.getMemcacheService(LcomFriendshipData.class.getSimpleName());
+
+		try {
+			memcacheService.delete(userId);
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+		} catch (MemcacheServiceException e) {
+			log.log(Level.WARNING,
+					"MemcacheServiceException: " + e.getMessage());
+		}
+
+	}
+
 	public synchronized LcomFriendshipData getFriendListDataFromMemCacheWithFriendId(
 			int firstId, int secondId) throws LcomMemcacheException {
 

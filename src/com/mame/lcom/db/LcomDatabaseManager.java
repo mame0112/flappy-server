@@ -691,7 +691,7 @@ public class LcomDatabaseManager {
 					+ LcomFriendshipData.class.getName()
 					+ " where mSecondUserId == " + userId + "";
 			List<LcomFriendshipData> secondUsers = (List<LcomFriendshipData>) pm
-					.newQuery(queryFirst).execute();
+					.newQuery(querySecond).execute();
 			if (secondUsers != null && secondUsers.size() != 0) {
 				for (LcomFriendshipData data : secondUsers) {
 					if (data != null) {
@@ -727,17 +727,8 @@ public class LcomDatabaseManager {
 		if (friendList == null || friendList.size() == 0) {
 			friendList = getFriendshipDataForUser(userId);
 
-			// Debug
-			for (LcomFriendshipData data : friendList) {
-				if (data != null) {
-					log.log(Level.INFO,
-							"firstUserName: " + data.getFirstUserName());
-					log.log(Level.INFO,
-							"secondUserName: " + data.getSecondUserName());
-					log.log(Level.INFO,
-							"latest message: " + data.getLatestMessage());
-				}
-			}
+			// TODO Do we need to add data to memcache?
+
 		} else {
 			// TOOD Do we need friend list to store memcache?
 		}
@@ -826,38 +817,56 @@ public class LcomDatabaseManager {
 	public synchronized List<LcomFriendshipData> getFriendshipDataForUser(
 			int userId) {
 		log.log(Level.INFO, "getFriendshipDataForUser");
-		PersistenceManager pm = LcomPersistenceManagerFactory.get()
-				.getPersistenceManager();
 
+		List<LcomFriendshipData> firstFriendship = null;
 		List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
 
-		// Get friendship data.
-		// First, user is first.
-		String queryFirst = "select from " + LcomFriendshipData.class.getName()
-				+ " where mFirstUserId == " + userId;
-		List<LcomFriendshipData> firstFriendship = (List<LcomFriendshipData>) pm
-				.newQuery(queryFirst).execute();
+		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 
-		if (firstFriendship != null && firstFriendship.size() != 0) {
-			log.log(Level.INFO,
-					"firstFriendship size: " + firstFriendship.size());
-			result.addAll(firstFriendship);
+		try {
+			firstFriendship = helper.getFriendListDataFromMemCache(userId);
+		} catch (LcomMemcacheException e) {
+			log.log(Level.INFO, "LcomMemcacheException: " + e.getMessage());
 		}
 
-		// First, user is second.
-		String querySecond = "select from "
-				+ LcomFriendshipData.class.getName()
-				+ " where mSecondUserId == " + userId;
-		List<LcomFriendshipData> secondFriendship = (List<LcomFriendshipData>) pm
-				.newQuery(querySecond).execute();
+		if (firstFriendship == null) {
+			PersistenceManager pm = LcomPersistenceManagerFactory.get()
+					.getPersistenceManager();
 
-		// Combine two List
-		if (secondFriendship != null && secondFriendship.size() != 0) {
-			log.log(Level.INFO,
-					"secondFriendship size: " + secondFriendship.size());
-			result.addAll(secondFriendship);
+			// Get friendship data.
+			// First, user is first.
+			String queryFirst = "select from "
+					+ LcomFriendshipData.class.getName()
+					+ " where mFirstUserId == " + userId;
+			firstFriendship = (List<LcomFriendshipData>) pm
+					.newQuery(queryFirst).execute();
+
+			if (firstFriendship != null && firstFriendship.size() != 0) {
+				log.log(Level.INFO,
+						"firstFriendship size: " + firstFriendship.size());
+				result.addAll(firstFriendship);
+			}
+
+			// First, user is second.
+			String querySecond = "select from "
+					+ LcomFriendshipData.class.getName()
+					+ " where mSecondUserId == " + userId;
+			List<LcomFriendshipData> secondFriendship = (List<LcomFriendshipData>) pm
+					.newQuery(querySecond).execute();
+
+			// Combine two List
+			if (secondFriendship != null && secondFriendship.size() != 0) {
+				log.log(Level.INFO, "secondFriendship size: "
+						+ secondFriendship.size());
+				result.addAll(secondFriendship);
+			}
+
+			// TODO Need to put data to memcache
+
+			pm.close();
+		} else {
+			result = firstFriendship;
 		}
-		pm.close();
 
 		return result;
 	}
@@ -1196,6 +1205,28 @@ public class LcomDatabaseManager {
 				// Nothing to do
 			}
 
+		}
+	}
+
+	public void debugDeleteFriendshipData() {
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+		String query = "select from " + LcomFriendshipData.class.getName();
+		List<LcomFriendshipData> datas = (List<LcomFriendshipData>) pm
+				.newQuery(query).execute();
+		if (datas != null && datas.size() != 0) {
+			for (LcomFriendshipData data : datas) {
+				try {
+					try {
+						pm.deletePersistent(data);
+					} finally {
+						pm.close();
+					}
+
+				} catch (IndexOutOfBoundsException e) {
+					// Nothing to do
+				}
+			}
 		}
 	}
 }
