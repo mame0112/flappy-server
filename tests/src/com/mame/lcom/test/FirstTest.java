@@ -2,9 +2,16 @@ package com.mame.lcom.test;
 
 import static org.junit.Assert.*;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
+
+import javax.imageio.ImageIO;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,6 +22,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.mame.lcom.constant.LcomConst;
+import com.mame.lcom.data.LcomExpiredMessageData;
 import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
@@ -846,7 +854,7 @@ public class FirstTest {
 	}
 
 	@Test
-	public void testAddNewMessageInfo1() {
+	public void testAddNewMessageInfo() {
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 		dbhelper.removeNewMessagesFromMemCache(0);
 		long currentTime = TimeUtil.getCurrentDate() - 1000;
@@ -869,5 +877,164 @@ public class FirstTest {
 			assertTrue(false);
 		}
 
+	}
+
+	/**
+	 * With no user data
+	 */
+	@Test
+	public void testGetFriendThubmnails1() {
+
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		dbhelper.removeUserDataFromMemcache(0);
+		dbhelper.removeUserDataFromMemcache(1);
+
+		List<String> input = new ArrayList<String>();
+		input.add("0");
+		input.add("1");
+
+		HashMap<Integer, String> result = mManager.getFriendThubmnails(input);
+
+		assertNotNull(result);
+		assertEquals(result.size(), 0);
+
+	}
+
+	/**
+	 * With no thumbnail data (although user data is stored)
+	 */
+	@Test
+	public void testGetFriendThubmnails2() {
+
+		LcomUserData data1 = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", "b@b", null);
+		mManager.addNewUserData(data1);
+		mManager.addNewUserData(data2);
+
+		List<String> input = new ArrayList<String>();
+		input.add("0");
+		input.add("1");
+
+		HashMap<Integer, String> result = mManager.getFriendThubmnails(input);
+
+		assertNotNull(result);
+		assertEquals(result.size(), 0);
+
+	}
+
+	/**
+	 * With thumbnail data
+	 */
+	// TODO
+	// @Test
+	// public void testGetFriendThubmnails3() {
+	//
+	// try {
+	// URL url = new URL("welcome_title_logo.png");
+	// InputStream in = url.openStream();
+	// ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+	// Streams.copy(in, bytes, true /* close stream after copy */);
+	// Blob blob = new Blob(bytes.toByteArray());
+	//
+	// LcomUserData data1 = new LcomUserData(0, "aaaa", "bbbb", "a@a",
+	// null);
+	// LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", "b@b",
+	// null);
+	// mManager.addNewUserData(data1);
+	// mManager.addNewUserData(data2);
+	//
+	// List<String> input = new ArrayList<String>();
+	// input.add("0");
+	// input.add("1");
+	//
+	// HashMap<Integer, String> result = mManager
+	// .getFriendThubmnails(input);
+	//
+	// assertNotNull(result);
+	// assertEquals(result.size(), 0);
+	//
+	// } catch (Exception e) {
+	// assertTrue(false);
+	// }
+	//
+	// }
+
+	/**
+	 * With no memcache and no datastore data
+	 */
+	@Test
+	public void testBackupOldMessageData1() {
+		long current = TimeUtil.getCurrentDate();
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+
+		mManager.backupOldMessageData(current);
+
+		// Check for memcache
+		try {
+			List<LcomNewMessageData> datas = dbhelper
+					.getNewMessageFromMemcache(0);
+			assertNull(datas);
+		} catch (LcomMemcacheException e) {
+			assertTrue(false);
+		}
+
+		// check for datastore
+		dbhelper.removeNewMessagesFromMemCache(0);
+		List<LcomNewMessageData> datas2 = mManager.getNewMessages(0);
+		assertNull(datas2);
+
+	}
+
+	/**
+	 * With memcache and datastore data
+	 */
+	@Test
+	public void testBackupOldMessageData2() {
+		long current = TimeUtil.getCurrentDate();
+		long previous = current - 5000;
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+
+		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", previous);
+
+		// add memcache if it doesn't exist
+		List<LcomNewMessageData> cached = null;
+		try {
+			cached = dbhelper.getNewMessageFromMemcache(0);
+		} catch (LcomMemcacheException e1) {
+			assertTrue(false);
+		}
+		if (cached == null) {
+			LcomNewMessageData data = new LcomNewMessageData(0, 1, "aaaa",
+					"bbbb", "test", previous - 1000, previous, false);
+			List<LcomNewMessageData> dataList = new ArrayList<LcomNewMessageData>();
+			dataList.add(data);
+			try {
+				dbhelper.putNewMessagesToMemCache(0, dataList);
+			} catch (LcomMemcacheException e) {
+				assertTrue(false);
+			}
+		}
+
+		mManager.backupOldMessageData(current);
+
+		// Check for memcache
+		try {
+			List<LcomNewMessageData> datas = dbhelper
+					.getNewMessageFromMemcache(0);
+			assertNull(datas);
+		} catch (LcomMemcacheException e) {
+			assertTrue(false);
+		}
+
+		// check for datastore
+		dbhelper.removeNewMessagesFromMemCache(0);
+		List<LcomNewMessageData> datas2 = mManager.getNewMessages(0);
+		assertNull(datas2);
+
+		// Check backup table
+		List<LcomExpiredMessageData> backUped = mManager
+				.debugGetExpiredMessages();
+		assertNotNull(backUped);
+		assertEquals(1, backUped.size());
 	}
 }

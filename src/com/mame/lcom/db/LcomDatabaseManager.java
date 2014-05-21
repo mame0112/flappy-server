@@ -955,12 +955,17 @@ public class LcomDatabaseManager {
 						+ " where mUserId ==" + id;
 				List<LcomUserData> users = (List<LcomUserData>) pm.newQuery(
 						query).execute();
-				LcomUserData data = users.get(0);
-				Blob thumbnail = data.getThumbnail();
-				if (thumbnail != null) {
-					String thumbStr = DatastoreUtil
-							.transcodeBlob2String(thumbnail);
-					result.put(Integer.valueOf(id), thumbStr);
+				try {
+					LcomUserData data = users.get(0);
+					Blob thumbnail = data.getThumbnail();
+					if (thumbnail != null) {
+						String thumbStr = DatastoreUtil
+								.transcodeBlob2String(thumbnail);
+						result.put(Integer.valueOf(id), thumbStr);
+					}
+				} catch (IndexOutOfBoundsException e) {
+					log.log(Level.INFO,
+							"IndexOutOfBoundsException: " + e.getMessage());
 				}
 			}
 		}
@@ -1067,6 +1072,19 @@ public class LcomDatabaseManager {
 			return expiredMessages;
 		}
 		return null;
+	}
+
+	public List<LcomExpiredMessageData> debugGetExpiredMessages() {
+		log.log(Level.INFO, "debugGetExpiredMessages");
+
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		String query = "select from " + LcomExpiredMessageData.class.getName();
+		List<LcomExpiredMessageData> messages = (List<LcomExpiredMessageData>) pm
+				.newQuery(query).execute();
+
+		return messages;
 	}
 
 	public synchronized void setDeviceIdForMessagePush(int userId,
