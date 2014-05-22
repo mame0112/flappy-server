@@ -209,14 +209,15 @@ public class LcomDatabaseManagerHelper {
 	public List<LcomNewMessageData> getNewMessageFromMemcacheWithChangeReadState(
 			int userId, int friendUserId) throws LcomMemcacheException {
 		log.log(Level.INFO, "getNewMessageFromMemcacheWithChangeReadState: "
-				+ friendUserId);
+				+ userId + " / " + friendUserId);
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
 		try {
-			if (userId != LcomConst.NO_USER) {
+			if (friendUserId != LcomConst.NO_USER) {
 
 				@SuppressWarnings("unchecked")
-				String cachedMessage = (String) memcacheService.get(userId);
+				String cachedMessage = (String) memcacheService
+						.get(friendUserId);
 				if (cachedMessage != null) {
 					log.log(Level.INFO, "cachedMessage length: "
 							+ cachedMessage.length());
@@ -241,9 +242,9 @@ public class LcomDatabaseManagerHelper {
 
 							// only for meesage that is sent by targetUserId, we
 							// shall return it.
-							int fromUserId = message.getUserId();
-							log.log(Level.INFO, "fromUserId: " + fromUserId);
-							if (fromUserId == friendUserId) {
+							int toUserId = message.getUserId();
+							log.log(Level.INFO, "toUserId: " + toUserId);
+							if (toUserId == userId) {
 
 								boolean isRead = message.isMessageRead();
 
@@ -460,7 +461,20 @@ public class LcomDatabaseManagerHelper {
 			throw new LcomMemcacheException("MemcacheServiceException: "
 					+ e.getMessage());
 		}
+	}
 
+	public void removeDevceIdFromMemCache(int userId) {
+		log.log(Level.INFO, "removeDevceIdFromMemCache");
+		MemcacheService memcacheService = MemcacheServiceFactory
+				.getMemcacheService(LcomMessageDeviceId.class.getSimpleName());
+		try {
+			if (userId != LcomConst.NO_USER) {
+				memcacheService.delete(userId);
+			}
+		} catch (IllegalArgumentException e) {
+			log.log(Level.WARNING,
+					"IllegalArgumentException: " + e.getMessage());
+		}
 	}
 
 	public synchronized void deleteAllNewMessages(

@@ -12,8 +12,6 @@ import javax.jdo.Query;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomAllUserData;
 import com.mame.lcom.data.LcomExpiredMessageData;
@@ -171,6 +169,29 @@ public class LcomDatabaseManager {
 			}
 		}
 		return userId;
+	}
+
+	public void debugDeleteUserData(int userId) {
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+		String query = "select from " + LcomUserData.class.getName()
+				+ " where mUserId == " + userId;
+		List<LcomUserData> datas = (List<LcomUserData>) pm.newQuery(query)
+				.execute();
+		if (datas != null && datas.size() != 0) {
+			for (LcomUserData data : datas) {
+				try {
+					try {
+						pm.deletePersistent(data);
+					} finally {
+						pm.close();
+					}
+
+				} catch (IndexOutOfBoundsException e) {
+					// Nothing to do
+				}
+			}
+		}
 	}
 
 	/**
@@ -365,19 +386,25 @@ public class LcomDatabaseManager {
 			pm.close();
 
 			// Store message to memcache
-			try {
-				helper.putNewMessagesToMemCache(userId, result);
-			} catch (LcomMemcacheException e) {
-				log.log(Level.WARNING,
-						"LcomMemcacheException: " + e.getMessage());
+			if (result != null && result.size() != 0) {
+				log.log(Level.INFO, "resultsize::: " + result.size());
+				try {
+					helper.putNewMessagesToMemCache(userId, result);
+				} catch (LcomMemcacheException e) {
+					log.log(Level.WARNING,
+							"LcomMemcacheException: " + e.getMessage());
+				}
+			} else {
+				log.log(Level.INFO, "result is null or 0");
 			}
 
 		} else {
-			log.log(Level.INFO, "Data from memcache. size: " + result.size());
+			log.log(Level.INFO, "result is null or 0");
 		}
 
 		// Get only unread message
 		if (result != null && result.size() != 0) {
+			log.log(Level.INFO, "result size: " + result.size());
 			List<LcomNewMessageData> unreadMessages = new ArrayList<LcomNewMessageData>();
 			for (LcomNewMessageData message : result) {
 				boolean isRead = message.isMessageRead();
@@ -874,6 +901,7 @@ public class LcomDatabaseManager {
 	public synchronized void addNewMessageInfo(int userId, int targetUserId,
 			String userName, String targetUserName, String message,
 			long currentDate) {
+		log.log(Level.INFO, "addNewMessageInfo");
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
@@ -884,6 +912,7 @@ public class LcomDatabaseManager {
 				false);
 
 		if (data != null) {
+			log.log(Level.INFO, "data is not null");
 
 			// Put the data to datastore
 			try {
@@ -900,7 +929,40 @@ public class LcomDatabaseManager {
 				log.log(Level.WARNING,
 						"LcomMemcacheException: " + e.getMessage());
 			}
+		}
+	}
 
+	public synchronized void debugDeleteNewMessageInfo(int userId,
+			int targetUserId) {
+		log.log(Level.INFO, "debugDeleteNewMessageInfo");
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+
+		String queryFirst = "select from " + LcomNewMessageData.class.getName()
+				+ " where mUserId == " + userId;
+		List<LcomNewMessageData> firstMessages = (List<LcomNewMessageData>) pm
+				.newQuery(queryFirst).execute();
+
+		String querySecomd = "select from "
+				+ LcomNewMessageData.class.getName()
+				+ " where mTargetUserId == " + userId;
+		List<LcomNewMessageData> secondMessages = (List<LcomNewMessageData>) pm
+				.newQuery(querySecomd).execute();
+
+		try {
+			if (firstMessages != null && firstMessages.size() != 0) {
+				log.log(Level.INFO,
+						"firstFriendship size: " + firstMessages.size());
+				pm.deletePersistent(firstMessages);
+			}
+			if (secondMessages != null && secondMessages.size() != 0) {
+				log.log(Level.INFO,
+						"secondMessages size: " + secondMessages.size());
+				pm.deletePersistent(secondMessages);
+			}
+
+		} finally {
+			pm.close();
 		}
 
 	}

@@ -1,24 +1,20 @@
 package com.mame.lcom.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
-
-import javax.imageio.ImageIO;
+import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.appengine.api.datastore.Blob;
-import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.mame.lcom.constant.LcomConst;
@@ -29,16 +25,12 @@ import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.db.LcomDatabaseManagerHelper;
 import com.mame.lcom.db.LcomMemcacheException;
-import com.mame.lcom.util.DbgUtil;
 import com.mame.lcom.util.TimeUtil;
 
 public class FirstTest {
 
-	private final static String TAG = "DatabaseManagerTest";
-
-	private DatastoreService ds;
-
-	private static final String DATA_KIND = "LcomUserData";
+	private final static Logger log = Logger.getLogger(FirstTest.class
+			.getName());
 
 	private LcomDatabaseManager mManager = null;
 
@@ -451,6 +443,8 @@ public class FirstTest {
 	 */
 	@Test
 	public void testGetNewMessagesWithTargetUser1() {
+		log.log(Level.INFO, "testGetNewMessagesWithTargetUser1");
+
 		// Userid is 0, targetUserId is 1.
 		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 
@@ -855,8 +849,12 @@ public class FirstTest {
 
 	@Test
 	public void testAddNewMessageInfo() {
+		log.log(Level.INFO, "testAddNewMessageInfo");
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 		dbhelper.removeNewMessagesFromMemCache(0);
+		mManager.debugDeleteUserData(0);
+		mManager.debugDeleteNewMessageInfo(0, 1);
+
 		long currentTime = TimeUtil.getCurrentDate() - 1000;
 		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "Message here",
 				currentTime);
@@ -991,8 +989,10 @@ public class FirstTest {
 	@Test
 	public void testBackupOldMessageData2() {
 		long current = TimeUtil.getCurrentDate();
-		long previous = current - 5000;
+		long previous = current - 100000;
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		dbhelper.removeNewMessagesFromMemCache(0);
+		mManager.debugDeleteUserData(0);
 
 		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", previous);
 
@@ -1005,7 +1005,7 @@ public class FirstTest {
 		}
 		if (cached == null) {
 			LcomNewMessageData data = new LcomNewMessageData(0, 1, "aaaa",
-					"bbbb", "test", previous - 1000, previous, false);
+					"bbbb", "test", previous - 100000, previous, false);
 			List<LcomNewMessageData> dataList = new ArrayList<LcomNewMessageData>();
 			dataList.add(data);
 			try {
@@ -1036,5 +1036,47 @@ public class FirstTest {
 				.debugGetExpiredMessages();
 		assertNotNull(backUped);
 		assertEquals(1, backUped.size());
+	}
+
+	@Test
+	public void testSetDeviceIdForMessagePush() {
+		String deviceId = "TestDeviceId";
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+
+		mManager.setDeviceIdForMessagePush(0, deviceId);
+
+		// Check memcache
+		String cached = mManager.getDeviceIdForGCMPush(0);
+		assertNotNull(cached);
+		assertEquals(cached, deviceId);
+
+		// Check datastore
+		dbhelper.removeDevceIdFromMemCache(0);
+		String stored = mManager.getDeviceIdForGCMPush(0);
+		assertNotNull(stored);
+		assertEquals(stored, deviceId);
+	}
+
+	@Test
+	public void testDeleteUserData() {
+		mManager.deleteUserData(0);
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+
+		// With no user data case
+		mManager.deleteUserData(0);
+
+		dbhelper.removeUserDataFromMemcache(0);
+		LcomUserData result1 = mManager.getUserData(0);
+		assertNull(result1);
+
+		// With user data case
+		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
+		mManager.addNewUserData(data);
+
+		mManager.deleteUserData(0);
+
+		dbhelper.removeUserDataFromMemcache(0);
+		LcomUserData result2 = mManager.getUserData(0);
+		assertNull(result2);
 	}
 }
