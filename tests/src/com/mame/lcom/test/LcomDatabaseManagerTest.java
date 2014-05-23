@@ -27,9 +27,9 @@ import com.mame.lcom.db.LcomDatabaseManagerHelper;
 import com.mame.lcom.db.LcomMemcacheException;
 import com.mame.lcom.util.TimeUtil;
 
-public class FirstTest {
+public class LcomDatabaseManagerTest {
 
-	private final static Logger log = Logger.getLogger(FirstTest.class
+	private final static Logger log = Logger.getLogger(LcomDatabaseManagerTest.class
 			.getName());
 
 	private LcomDatabaseManager mManager = null;
