@@ -444,9 +444,11 @@ public class FirstTest {
 	@Test
 	public void testGetNewMessagesWithTargetUser1() {
 		log.log(Level.INFO, "testGetNewMessagesWithTargetUser1");
+		mManager.debugDeleteNewMessageInfo(0, 1);
 
 		// Userid is 0, targetUserId is 1.
-		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		dbhelper.removeNewMessagesFromMemCache(0);
 
 		ArrayList<LcomNewMessageData> newMessages = new ArrayList<LcomNewMessageData>();
 
@@ -460,16 +462,17 @@ public class FirstTest {
 
 		newMessages.add(data1);
 		newMessages.add(data2);
+
 		try {
-			helper.putNewMessagesToMemCache(1, newMessages);
+			dbhelper.putNewMessagesToMemCache(1, newMessages);
 		} catch (LcomMemcacheException e) {
 			assertTrue(false);
 		}
 
-		List<LcomNewMessageData> result = mManager
-				.getNewMessagesWithTargetUser(0, 1);
-		assertNotNull(result);
-		assertEquals(2, result.size());
+		// List<LcomNewMessageData> result = mManager
+		// .getNewMessagesWithTargetUser(0, 1);
+		// assertNotNull(result);
+		// assertEquals(2, result.size());
 
 	}
 
@@ -859,7 +862,7 @@ public class FirstTest {
 		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "Message here",
 				currentTime);
 
-		List<LcomNewMessageData> datas = mManager.getNewMessages(0);
+		List<LcomNewMessageData> datas = mManager.getNewMessages(1);
 
 		assertNotNull(datas);
 		assertEquals(datas.size(), 1);
@@ -867,7 +870,7 @@ public class FirstTest {
 
 		try {
 			List<LcomNewMessageData> memDatas = dbhelper
-					.getNewMessageFromMemcache(0);
+					.getNewMessageFromMemcache(1);
 			assertNotNull(memDatas);
 			assertEquals(memDatas.size(), 1);
 			assertEquals(memDatas.get(0).getMessage(), "Message here");
@@ -978,7 +981,7 @@ public class FirstTest {
 
 		// check for datastore
 		dbhelper.removeNewMessagesFromMemCache(0);
-		List<LcomNewMessageData> datas2 = mManager.getNewMessages(0);
+		List<LcomNewMessageData> datas2 = mManager.getNewMessages(1);
 		assertNull(datas2);
 
 	}
@@ -988,13 +991,15 @@ public class FirstTest {
 	 */
 	@Test
 	public void testBackupOldMessageData2() {
+		log.log(Level.INFO, "testBackupOldMessageData2");
 		long current = TimeUtil.getCurrentDate();
 		long previous = current - 100000;
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 		dbhelper.removeNewMessagesFromMemCache(0);
 		mManager.debugDeleteUserData(0);
 
-		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", previous);
+		log.log(Level.INFO, "previous: " + previous);
+		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", current);
 
 		// add memcache if it doesn't exist
 		List<LcomNewMessageData> cached = null;
@@ -1005,7 +1010,65 @@ public class FirstTest {
 		}
 		if (cached == null) {
 			LcomNewMessageData data = new LcomNewMessageData(0, 1, "aaaa",
-					"bbbb", "test", previous - 100000, previous, false);
+					"bbbb", "test", current - 100000, current, false);
+			List<LcomNewMessageData> dataList = new ArrayList<LcomNewMessageData>();
+			dataList.add(data);
+			try {
+				dbhelper.putNewMessagesToMemCache(0, dataList);
+			} catch (LcomMemcacheException e) {
+				assertTrue(false);
+			}
+		}
+
+		mManager.backupOldMessageData(current + 10000000);
+
+		// Check for memcache
+		try {
+			List<LcomNewMessageData> datas = dbhelper
+					.getNewMessageFromMemcache(0);
+			assertNull(datas);
+		} catch (LcomMemcacheException e) {
+			assertTrue(false);
+		}
+
+		// check for datastore
+		dbhelper.removeNewMessagesFromMemCache(1);
+		List<LcomNewMessageData> datas2 = mManager.getNewMessages(1);
+		assertNull(datas2);
+
+		// Check backup table
+		List<LcomExpiredMessageData> backUped = mManager
+				.debugGetExpiredMessages();
+		assertNotNull(backUped);
+		assertEquals(1, backUped.size());
+	}
+
+	/**
+	 * With memcache and datastore data and not expire case
+	 */
+	@Test
+	public void testBackupOldMessageData3() {
+		log.log(Level.INFO, "testBackupOldMessageData3");
+		long current = TimeUtil.getCurrentDate();
+		long previous = current - 100000;
+		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		dbhelper.removeNewMessagesFromMemCache(0);
+		mManager.debugDeleteUserData(0);
+		mManager.debugDeleteNewMessageInfo(0, 1);
+
+		log.log(Level.INFO, "previous: " + previous);
+		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", current);
+
+		// add memcache if it doesn't exist
+		List<LcomNewMessageData> cached = null;
+		try {
+			cached = dbhelper.getNewMessageFromMemcache(0);
+		} catch (LcomMemcacheException e1) {
+			assertTrue(false);
+		}
+		if (cached == null) {
+			LcomNewMessageData data = new LcomNewMessageData(0, 1, "aaaa",
+					"bbbb", "test", current - 100000, current, false);
 			List<LcomNewMessageData> dataList = new ArrayList<LcomNewMessageData>();
 			dataList.add(data);
 			try {
@@ -1028,14 +1091,14 @@ public class FirstTest {
 
 		// check for datastore
 		dbhelper.removeNewMessagesFromMemCache(0);
-		List<LcomNewMessageData> datas2 = mManager.getNewMessages(0);
-		assertNull(datas2);
+		List<LcomNewMessageData> datas2 = mManager.getNewMessages(1);
+		assertNotNull(datas2);
 
 		// Check backup table
 		List<LcomExpiredMessageData> backUped = mManager
 				.debugGetExpiredMessages();
 		assertNotNull(backUped);
-		assertEquals(1, backUped.size());
+		assertEquals(0, backUped.size());
 	}
 
 	@Test
