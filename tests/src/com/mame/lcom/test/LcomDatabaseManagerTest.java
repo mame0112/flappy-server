@@ -29,8 +29,8 @@ import com.mame.lcom.util.TimeUtil;
 
 public class LcomDatabaseManagerTest {
 
-	private final static Logger log = Logger.getLogger(LcomDatabaseManagerTest.class
-			.getName());
+	private final static Logger log = Logger
+			.getLogger(LcomDatabaseManagerTest.class.getName());
 
 	private LcomDatabaseManager mManager = null;
 
