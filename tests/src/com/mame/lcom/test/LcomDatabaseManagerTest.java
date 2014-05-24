@@ -1114,7 +1114,11 @@ public class LcomDatabaseManagerTest {
 		assertEquals(cached, deviceId);
 
 		// Check datastore
-		dbhelper.removeDevceIdFromMemCache(0);
+		try {
+			dbhelper.removeDevceIdFromMemCache(0);
+		} catch (LcomMemcacheException e) {
+			assertTrue(false);
+		}
 		String stored = mManager.getDeviceIdForGCMPush(0);
 		assertNotNull(stored);
 		assertEquals(stored, deviceId);

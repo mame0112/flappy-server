@@ -463,7 +463,8 @@ public class LcomDatabaseManagerHelper {
 		}
 	}
 
-	public void removeDevceIdFromMemCache(int userId) {
+	public void removeDevceIdFromMemCache(int userId)
+			throws LcomMemcacheException {
 		log.log(Level.INFO, "removeDevceIdFromMemCache");
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomMessageDeviceId.class.getSimpleName());
@@ -474,6 +475,8 @@ public class LcomDatabaseManagerHelper {
 		} catch (IllegalArgumentException e) {
 			log.log(Level.WARNING,
 					"IllegalArgumentException: " + e.getMessage());
+			throw new LcomMemcacheException("IllegalArgumentException: "
+					+ e.getMessage());
 		}
 	}
 
@@ -525,6 +528,8 @@ public class LcomDatabaseManagerHelper {
 						+ LcomConst.SEPARATOR + messageTime;
 				try {
 
+					// TODO can we use firstId??
+
 					// Once we get current data
 					String currentData = (String) memcacheService.get(firstId);
 
@@ -546,7 +551,7 @@ public class LcomDatabaseManagerHelper {
 								if (secondId == Integer
 										.valueOf(currentSecondId)) {
 									isExist = true;
-									// Put new data
+									// Put new data instead of old data
 									output = output + LcomConst.ITEM_SEPARATOR
 											+ parsed;
 								} else {
@@ -557,17 +562,22 @@ public class LcomDatabaseManagerHelper {
 							}
 						}
 
+					} else {
+						log.log(Level.INFO, "currentData is null");
 					}
 
 					// If target second user id is new for memcache
 					if (!isExist) {
 						output = output + LcomConst.ITEM_SEPARATOR + parsed;
+						log.log(Level.INFO, "user doesn't exist");
 					}
 
 					// Remove unnecessary part
 					output = output.substring(
 							1 + LcomConst.ITEM_SEPARATOR.length(),
 							output.length());
+
+					log.log(Level.INFO, "output: " + output);
 
 					// Once we delete old memcache
 					memcacheService.delete(firstId);

@@ -782,7 +782,7 @@ public class LcomDatabaseManager {
 						// If target user is me
 						int targetUserId = message.getUserId();
 
-						// If the target user infomration is not in Hashmap
+						// If the target user information is not in Hashmap
 						if (!messageNum.containsKey(targetUserId)) {
 							messageNum.put(targetUserId, 1);
 							log.log(Level.WARNING,
