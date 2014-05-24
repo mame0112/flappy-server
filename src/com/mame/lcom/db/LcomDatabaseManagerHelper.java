@@ -206,6 +206,16 @@ public class LcomDatabaseManagerHelper {
 
 	}
 
+	/**
+	 * get new message information from memcache. Aware that this method throw
+	 * LcomMencacheException in case ther is no cache. Return null if no data
+	 * for target user.
+	 * 
+	 * @param userId
+	 * @param friendUserId
+	 * @return
+	 * @throws LcomMemcacheException
+	 */
 	public List<LcomNewMessageData> getNewMessageFromMemcacheWithChangeReadState(
 			int userId, int friendUserId) throws LcomMemcacheException {
 		log.log(Level.INFO, "getNewMessageFromMemcacheWithChangeReadState: "

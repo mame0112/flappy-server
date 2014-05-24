@@ -445,7 +445,15 @@ public class LcomDatabaseManager {
 			result = helper.getNewMessageFromMemcacheWithChangeReadState(
 					userId, friendUserId);
 
-			// Common operation for no cache and cache without new message
+		} catch (LcomMemcacheException e) {
+			// This catch includes no cache exist case
+			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
+		}
+
+		// In case of no cache exist, we need to put latest inforamtion to
+		// cache
+		if (result == null || result.size() == 0) {
+			log.log(Level.INFO, "Data from datastore");
 
 			// query messages its target user is me
 			List<LcomNewMessageData> messagesFromOthers = null;
@@ -457,35 +465,18 @@ public class LcomDatabaseManager {
 
 			result = getMessageForTargetUser(friendUserId, messagesFromOthers);
 
-			// Cache exist, but no new message. In this case cache and Data
-			// store should have same information. Then we need not to put data
-			// onto memcache
+			if (result != null && result.size() != 0) {
+				log.log(Level.WARNING,
+						"messagesFromOthers size: " + result.size());
 
-		} catch (LcomMemcacheException e) {
-			// This catch includes no cache exist case
-			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
-
-			// In case of no cache exist, we need to put latest inforamtion to
-			// cache
-			if (result == null || result.size() == 0) {
-				log.log(Level.INFO, "Data from datastore");
-
-				if (result != null && result.size() != 0) {
+				// Try to put latest message data to memcache
+				try {
+					helper.putNewMessagesToMemCache(userId, result);
+				} catch (LcomMemcacheException e1) {
 					log.log(Level.WARNING,
-							"messagesFromOthers size: " + result.size());
-
-					// Try to put latest message data to memcache
-					try {
-						helper.putNewMessagesToMemCache(userId, result);
-					} catch (LcomMemcacheException e1) {
-						log.log(Level.WARNING,
-								"LcomMemcacheException: " + e1.getMessage());
-					}
+							"LcomMemcacheException: " + e1.getMessage());
 				}
 			}
-
-		} finally {
-			pm.close();
 		}
 
 		return result;
