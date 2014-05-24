@@ -409,6 +409,8 @@ public class LcomDatabaseManager {
 			for (LcomNewMessageData message : result) {
 				boolean isRead = message.isMessageRead();
 				if (!isRead) {
+					log.log(Level.INFO, "message with already read:: "
+							+ message.getMessage());
 					unreadMessages.add(message);
 				}
 			}

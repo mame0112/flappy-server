@@ -226,11 +226,11 @@ public class LcomDatabaseManagerHelper {
 			if (friendUserId != LcomConst.NO_USER) {
 
 				@SuppressWarnings("unchecked")
-				String cachedMessage = (String) memcacheService
-						.get(friendUserId);
+				String cachedMessage = (String) memcacheService.get(userId);
 				if (cachedMessage != null) {
 					log.log(Level.INFO, "cachedMessage length: "
 							+ cachedMessage.length());
+					log.log(Level.INFO, "cachedMessage: " + cachedMessage);
 				}
 
 				if (cachedMessage != null) {
@@ -252,7 +252,7 @@ public class LcomDatabaseManagerHelper {
 
 							// only for meesage that is sent by targetUserId, we
 							// shall return it.
-							int toUserId = message.getUserId();
+							int toUserId = message.getTargetUserId();
 							log.log(Level.INFO, "toUserId: " + toUserId);
 							if (toUserId == userId) {
 
