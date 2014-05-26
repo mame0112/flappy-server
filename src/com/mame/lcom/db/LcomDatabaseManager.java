@@ -361,52 +361,76 @@ public class LcomDatabaseManager {
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
 
 		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+		List<LcomNewMessageData> unreadMessages = null;
 		try {
 			result = helper.getNewMessageFromMemcache(userId);
-		} catch (LcomMemcacheException e) {
-			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
-		}
+			unreadMessages = changeNewMessageReadState(result);
 
-		// If we can't get message from memcache, we try to get it from
-		// datastore
-		// TODO we may be able to datastore chceck if we can change get logic
-		// from memcache
-		if (result == null || result.size() == 0) {
-			log.log(Level.INFO, "Data from datastore");
-			PersistenceManager pm = LcomPersistenceManagerFactory.get()
-					.getPersistenceManager();
+			// `Put new messages to memcache
+			helper.removeNewMessagesFromMemCache(userId);
+			helper.putNewMessagesToMemCache(userId, unreadMessages);
 
-			// query messages its target user is me
-			String queryFromOthers = "select from "
-					+ LcomNewMessageData.class.getName()
-					+ " where mTargetUserId == " + userId;
-			result = (List<LcomNewMessageData>) pm.newQuery(queryFromOthers)
-					.execute();
-
-			pm.close();
-
-			// Store message to memcache
 			if (result != null && result.size() != 0) {
-				log.log(Level.INFO, "resultsize::: " + result.size());
-				try {
-					helper.putNewMessagesToMemCache(userId, result);
-				} catch (LcomMemcacheException e) {
-					log.log(Level.WARNING,
-							"LcomMemcacheException: " + e.getMessage());
-				}
+				// cache exist. It means we should not store it to cache again.
+				log.log(Level.WARNING, "Cache exists result: " + result);
+				return unreadMessages;
 			} else {
-				log.log(Level.INFO, "result is null or 0");
+				// cache exist
+				log.log(Level.WARNING, "Cache could be strange status");
 			}
+		} catch (LcomMemcacheException e) {
+			// Cache doesn't exit. It means we need to put it to cache.
+			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
+			// If we can't get message from memcache, we try to get it from
+			// datastore
+			if (result == null || result.size() == 0) {
+				log.log(Level.INFO, "Data from datastore");
+				PersistenceManager pm = LcomPersistenceManagerFactory.get()
+						.getPersistenceManager();
 
-		} else {
-			log.log(Level.INFO, "result is null or 0");
+				// query messages its target user is me
+				String queryFromOthers = "select from "
+						+ LcomNewMessageData.class.getName()
+						+ " where mTargetUserId == " + userId;
+				result = (List<LcomNewMessageData>) pm
+						.newQuery(queryFromOthers).execute();
+
+				pm.close();
+
+				// Put data to memcache
+				if (result != null && result.size() != 0) {
+					try {
+						unreadMessages = changeNewMessageReadState(result);
+						if (unreadMessages != null
+								&& unreadMessages.size() != 0) {
+							helper.putNewMessagesToMemCache(userId,
+									unreadMessages);
+						}
+					} catch (LcomMemcacheException e1) {
+						log.log(Level.WARNING,
+								"LcomMemcacheException: " + e1.getMessage());
+					}
+				}
+				return unreadMessages;
+			} else {
+				// Nothing to do
+				log.log(Level.INFO,
+						"result is not null or 0 (From memcache, could be strange status");
+			}
 		}
 
-		// Get only unread message
-		if (result != null && result.size() != 0) {
-			log.log(Level.INFO, "result size: " + result.size());
+		return null;
+	}
+
+	private List<LcomNewMessageData> changeNewMessageReadState(
+			List<LcomNewMessageData> input) {
+		log.log(Level.INFO, "changeNewMessageReadState");
+		// Store message to memcache
+		if (input != null && input.size() != 0) {
+
+			log.log(Level.INFO, "resultsize::: " + input.size());
 			List<LcomNewMessageData> unreadMessages = new ArrayList<LcomNewMessageData>();
-			for (LcomNewMessageData message : result) {
+			for (LcomNewMessageData message : input) {
 				boolean isRead = message.isMessageRead();
 				if (!isRead) {
 					log.log(Level.INFO, "message with already read:: "
@@ -416,6 +440,9 @@ public class LcomDatabaseManager {
 			}
 
 			return unreadMessages;
+
+		} else {
+			log.log(Level.INFO, "result is null or 0 A");
 		}
 
 		return null;
@@ -434,7 +461,7 @@ public class LcomDatabaseManager {
 		log.log(Level.WARNING, "getNewMessagesWithTargetUser");
 
 		// List<LcomNewMessageData> messagesInMemcache
-		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
+		List<LcomNewMessageData> memcacheResult = new ArrayList<LcomNewMessageData>();
 
 		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 
@@ -444,17 +471,18 @@ public class LcomDatabaseManager {
 		try {
 			// By calling below method, read state in memcache is automatically
 			// changed.
-			result = helper.getNewMessageFromMemcacheWithChangeReadState(
-					userId, friendUserId);
+			memcacheResult = helper
+					.getNewMessageFromMemcacheWithChangeReadState(userId,
+							friendUserId);
 
 		} catch (LcomMemcacheException e) {
 			// This catch includes no cache exist case
 			log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
 		}
 
-		// In case of no cache exist, we need to put latest inforamtion to
+		// In case of no cache exist, we need to put latest information to
 		// cache
-		if (result == null || result.size() == 0) {
+		if (memcacheResult == null || memcacheResult.size() == 0) {
 			log.log(Level.INFO, "Data from datastore");
 
 			// query messages its target user is me
@@ -464,24 +492,61 @@ public class LcomDatabaseManager {
 					+ " where mTargetUserId == " + userId;
 			messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
 					queryFromOthers).execute();
+			List<LcomNewMessageData> datastoreResult = getMessageForTargetUser(
+					friendUserId, messagesFromOthers);
 
-			result = getMessageForTargetUser(friendUserId, messagesFromOthers);
-
-			if (result != null && result.size() != 0) {
-				log.log(Level.WARNING,
-						"messagesFromOthers size: " + result.size());
+			if (datastoreResult != null && datastoreResult.size() != 0) {
+				log.log(Level.WARNING, "datastoreResult size: "
+						+ datastoreResult.size());
 
 				// Try to put latest message data to memcache
 				try {
-					helper.putNewMessagesToMemCache(userId, result);
+					helper.putNewMessagesToMemCache(userId, datastoreResult);
 				} catch (LcomMemcacheException e1) {
 					log.log(Level.WARNING,
 							"LcomMemcacheException: " + e1.getMessage());
 				}
 			}
-		}
+			pm.close();
+			return datastoreResult;
+		} else {
+			// If result from memcache is not null, we need to try to update
+			// datastore.
+			List<LcomNewMessageData> messagesFromOthers = null;
+			String queryFromOthers = "select from "
+					+ LcomNewMessageData.class.getName()
+					+ " where mTargetUserId == " + userId;
 
-		return result;
+			messagesFromOthers = (List<LcomNewMessageData>) pm.newQuery(
+					queryFromOthers).execute();
+
+			List<LcomNewMessageData> datastoreResult = getMessageForTargetUser(
+					friendUserId, messagesFromOthers);
+
+			if (datastoreResult != null && datastoreResult.size() != 0) {
+				for (LcomNewMessageData data : datastoreResult) {
+					int friendId = data.getUserId();
+					if (friendId == friendUserId) {
+						data.setReadState(true);
+						try {
+							pm.makePersistent(data);
+						} finally {
+							pm.close();
+						}
+					}
+				}
+			}
+
+			return memcacheResult;
+		}
+	}
+
+	private List<LcomNewMessageData> updateNewMessageStatusInDataStore(
+			List<LcomNewMessageData> input) {
+		if (input != null && input.size() != 0) {
+			// aa
+		}
+		return null;
 	}
 
 	private List<LcomNewMessageData> getMessageForTargetUser(int targetUserId,
@@ -495,10 +560,10 @@ public class LcomDatabaseManager {
 					if (isRead == false) {
 						int targetId = message.getUserId();
 						if (targetId == targetUserId) {
-							result.add(message);
-
 							// Set message to "already read"state
 							message.setReadState(true);
+
+							result.add(message);
 						}
 					}
 				}

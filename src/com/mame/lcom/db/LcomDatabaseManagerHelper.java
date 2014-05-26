@@ -165,9 +165,6 @@ public class LcomDatabaseManagerHelper {
 				if (cachedMessage != null) {
 					log.log(Level.INFO, "cachedMessage length: "
 							+ cachedMessage.length());
-				}
-
-				if (cachedMessage != null) {
 					LcomMemcacheUtil util = new LcomMemcacheUtil();
 
 					// Parse cached message to Messsage data list
@@ -186,6 +183,10 @@ public class LcomDatabaseManagerHelper {
 					// }
 
 					return messages;
+				} else {
+					log.log(Level.WARNING,
+							"LcomMemcacheException illega userId");
+					throw new LcomMemcacheException("Cache doesn't exist");
 				}
 
 			} else {
@@ -202,8 +203,6 @@ public class LcomDatabaseManagerHelper {
 			throw new LcomMemcacheException("InvalidValueException: "
 					+ e.getMessage());
 		}
-		return null;
-
 	}
 
 	/**
@@ -260,9 +259,9 @@ public class LcomDatabaseManagerHelper {
 
 								if (isRead == false) {
 									message.setReadState(true);
+									log.log(Level.INFO, "Changed");
 									result.add(message);
 								}
-
 							}
 
 							// For update cache
@@ -272,6 +271,9 @@ public class LcomDatabaseManagerHelper {
 
 					String updatedString = util
 							.parseMessagesData2String(cacheUpdated);
+					if (updatedString != null) {
+						log.log(Level.INFO, "updatedString: " + updatedString);
+					}
 
 					// set read state-updated message to memcache again
 					memcacheService.delete(userId);
