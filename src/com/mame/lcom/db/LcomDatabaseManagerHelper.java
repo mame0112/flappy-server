@@ -357,7 +357,7 @@ public class LcomDatabaseManagerHelper {
 				.getMemcacheService(LcomNewMessageData.class.getSimpleName());
 
 		try {
-			if (messages != null) {
+			if (messages != null && messages.size() != 0) {
 
 				LcomMemcacheUtil util = new LcomMemcacheUtil();
 				String parsed = util.parseMessagesData2String(messages);
@@ -382,7 +382,7 @@ public class LcomDatabaseManagerHelper {
 
 			} else {
 				log.log(Level.WARNING, "LcomMemcacheException message is null");
-				throw new LcomMemcacheException("messages is null");
+				//				throw new LcomMemcacheException("messages is null");
 			}
 
 		} catch (IllegalArgumentException e) {

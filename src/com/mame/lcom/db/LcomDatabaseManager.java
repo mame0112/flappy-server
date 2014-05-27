@@ -370,9 +370,9 @@ public class LcomDatabaseManager {
 			helper.removeNewMessagesFromMemCache(userId);
 			helper.putNewMessagesToMemCache(userId, unreadMessages);
 
-			if (result != null && result.size() != 0) {
+			if (unreadMessages != null && unreadMessages.size() != 0) {
 				// cache exist. It means we should not store it to cache again.
-				log.log(Level.WARNING, "Cache exists result: " + result);
+				log.log(Level.WARNING, "Cache exists result: " + unreadMessages);
 				return unreadMessages;
 			} else {
 				// cache exist
@@ -432,7 +432,7 @@ public class LcomDatabaseManager {
 			List<LcomNewMessageData> unreadMessages = new ArrayList<LcomNewMessageData>();
 			for (LcomNewMessageData message : input) {
 				boolean isRead = message.isMessageRead();
-				if (!isRead) {
+				if (isRead == false) {
 					log.log(Level.INFO, "message with already read:: "
 							+ message.getMessage());
 					unreadMessages.add(message);
@@ -808,7 +808,7 @@ public class LcomDatabaseManager {
 			log.log(Level.INFO, "LcomMemcacheException: " + e.getMessage());
 		}
 
-		// If there is no data in memcache, get friendlist from memcache
+		// If there is no data in memcache, get friendlist from datastore
 		if (friendList == null || friendList.size() == 0) {
 			friendList = getFriendshipDataForUser(userId);
 
