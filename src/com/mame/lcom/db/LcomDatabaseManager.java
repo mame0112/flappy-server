@@ -541,14 +541,6 @@ public class LcomDatabaseManager {
 		}
 	}
 
-	private List<LcomNewMessageData> updateNewMessageStatusInDataStore(
-			List<LcomNewMessageData> input) {
-		if (input != null && input.size() != 0) {
-			// aa
-		}
-		return null;
-	}
-
 	private List<LcomNewMessageData> getMessageForTargetUser(int targetUserId,
 			List<LcomNewMessageData> original) {
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
@@ -629,9 +621,6 @@ public class LcomDatabaseManager {
 	public synchronized void addNewFriendshipInfo(int firstUserId,
 			String firstUserName, int secondUserId, String secondUserName,
 			String lastMessage, long time, int numOfNewMessage) {
-		PersistenceManager pm = LcomPersistenceManagerFactory.get()
-				.getPersistenceManager();
-
 		// int firstUserId, String firstUserName,
 		// int secondUserId, String secondUserName, String lastMessage,
 		// long time, int numOfNewMessage
@@ -640,6 +629,7 @@ public class LcomDatabaseManager {
 				firstUserName, secondUserId, secondUserName, lastMessage, time,
 				numOfNewMessage);
 
+		// Update memcache
 		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
 		try {
 			helper.putFriendListDataToMemCache(data);
@@ -647,10 +637,23 @@ public class LcomDatabaseManager {
 			log.log(Level.INFO, "LcomMemcacheException: " + e.getMessage());
 		}
 
-		try {
-			pm.makePersistent(data);
-		} finally {
-			pm.close();
+		// Update or insert Datastore
+		boolean alreadyFriend = isUsersAreFriend(firstUserId, secondUserId);
+
+		PersistenceManager pm = LcomPersistenceManagerFactory.get()
+				.getPersistenceManager();
+		if (alreadyFriend) {
+			// Existing. then Nothing to do
+			log.log(Level.INFO, "existing friendship");
+		} else {
+			log.log(Level.INFO, "add as new friend");
+			// Add as new friend
+			try {
+				pm.makePersistent(data);
+			} finally {
+				pm.close();
+			}
+
 		}
 	}
 
