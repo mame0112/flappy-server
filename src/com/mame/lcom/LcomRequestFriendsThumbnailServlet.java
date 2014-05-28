@@ -30,12 +30,13 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 
 		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
 		String friendsId = req.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		// Friend array as List
 		List<String> ids = parseFriendIds(friendsId);
 		List<String> list = new ArrayList<String>();
 
-		if (origin != null && friendsId != null) {
+		if (origin != null && friendsId != null && apiLevel != null) {
 			log.log(Level.INFO, "friendsId: " + friendsId);
 			list.add(origin);
 

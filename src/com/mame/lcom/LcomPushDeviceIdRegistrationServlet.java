@@ -27,10 +27,12 @@ public class LcomPushDeviceIdRegistrationServlet extends HttpServlet {
 		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
 		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
 		String deviceId = req.getParameter(LcomConst.SERVLET_DEVICE_ID);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		List<String> list = new ArrayList<String>();
 
-		if (origin != null && userId != null && deviceId != null) {
+		if (origin != null && userId != null && deviceId != null
+				&& apiLevel != null) {
 
 			list.add(origin);
 

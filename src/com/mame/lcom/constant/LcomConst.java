@@ -14,6 +14,8 @@ public class LcomConst {
 	public final static String MEMCACHE_SEPARATOR = "#@#";
 
 	public final static String API_KEY = "AIzaSyBkrzyfBwaHQgjVphRiUNHusjEOjPQdOr4";
+	
+	public final static int API_LEVEL = 1;
 
 	public final static String NULL = "null";
 
@@ -42,6 +44,8 @@ public class LcomConst {
 	public final static String SERVLET_ORIGIN = "servlet_origin";
 
 	public final static String SERVLET_DEVICE_ID = "servlet_device_id";
+	
+	public final static String SERVLET_API_LEVEL = "servlet_api_level";
 
 	// public final static String SERVLET_CONTEXT_IDENTIFIER =
 	// "servlet_identifier";

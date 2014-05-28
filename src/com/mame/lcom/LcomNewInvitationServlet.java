@@ -37,6 +37,7 @@ public class LcomNewInvitationServlet extends HttpServlet {
 		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
 		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
 		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 		// String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
 
 		List<String> list = new ArrayList<String>();
@@ -51,7 +52,7 @@ public class LcomNewInvitationServlet extends HttpServlet {
 		int existingUserId = LcomConst.NO_USER;
 
 		if (origin != null && userId != null && userName != null
-				&& mailAddress != null) {
+				&& mailAddress != null && apiLevel != null) {
 			log.log(Level.INFO, "userId:" + userId);
 			log.log(Level.INFO, "userName:" + userName);
 			log.log(Level.INFO, "mailAddress:" + mailAddress);

@@ -32,11 +32,12 @@ public class LcomNewMessageServlet extends HttpServlet {
 
 		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
 		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		List<String> list = new ArrayList<String>();
 		list.add(origin);
 
-		if (userId != null) {
+		if (userId != null && apiLevel != null) {
 			log.log(Level.INFO, "userId:" + userId);
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 

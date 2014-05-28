@@ -35,6 +35,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
 		String thumb = req.getParameter(LcomConst.SERVLET_THUMBNAIL);
 		String language = req.getParameter(LcomConst.SERVLET_LANGUAGE);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		List<String> list = new ArrayList<String>();
 
@@ -42,7 +43,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 		int userId = LcomConst.NO_USER;
 
 		if (origin != null && userName != null && password != null
-				&& mailAddress != null) {
+				&& mailAddress != null && apiLevel != null) {
 			list.add(origin);
 
 			Blob thumbnail = null;

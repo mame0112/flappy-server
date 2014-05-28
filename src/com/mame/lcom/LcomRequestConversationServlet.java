@@ -33,10 +33,12 @@ public class LcomRequestConversationServlet extends HttpServlet {
 		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
 		String friendUserId = req
 				.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		List<String> list = new ArrayList<String>();
 
-		if (origin != null && userId != null && friendUserId != null) {
+		if (origin != null && userId != null && friendUserId != null
+				&& apiLevel != null) {
 			list.add(origin);
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();

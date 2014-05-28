@@ -37,6 +37,7 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME);
 		String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
 		String date = req.getParameter(LcomConst.SERVLET_MESSAGE_DATE);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		List<String> list = new ArrayList<String>();
 		list.add(origin);
@@ -44,7 +45,8 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 		int result = LcomConst.SEND_MESSAGE_RESULT_OK;
 
 		if (userId != null && userName != null && targetUserId != null
-				&& targetUserName != null && message != null && date != null) {
+				&& targetUserName != null && message != null && date != null
+				&& apiLevel != null) {
 
 			log.log(Level.WARNING, "message:" + message);
 

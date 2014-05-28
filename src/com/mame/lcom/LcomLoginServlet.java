@@ -27,6 +27,7 @@ public class LcomLoginServlet extends HttpServlet {
 		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
 		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
 		String password = req.getParameter(LcomConst.SERVLET_PASSWORD);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		List<String> list = new ArrayList<String>();
 		list.add(origin);
@@ -34,7 +35,8 @@ public class LcomLoginServlet extends HttpServlet {
 		int result = LcomConst.LOGIN_RESULT_OK;
 		int userId = LcomConst.NO_USER;
 
-		if (origin != null && userName != null && password != null) {
+		if (origin != null && userName != null && password != null
+				&& apiLevel != null) {
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 			log.log(Level.INFO, "userName:" + userName);
 			log.log(Level.INFO, "password:" + password);

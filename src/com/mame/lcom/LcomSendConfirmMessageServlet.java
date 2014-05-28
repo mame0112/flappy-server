@@ -47,6 +47,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 				.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
 		String targetUserName = req
 				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		int result = LcomConst.INVITATION_CONFIRMED_RESULT_OK;
 
@@ -54,7 +55,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 		// targetUserId and targetUserName could be null if target address has
 		// not been registered
 		if (origin != null && userId != null && userName != null
-				&& mailAddress != null && message != null) {
+				&& mailAddress != null && message != null && apiLevel != null) {
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 
 			list.add(origin);

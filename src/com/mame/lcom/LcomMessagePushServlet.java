@@ -13,22 +13,16 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
+import com.mame.lcom.constant.LcomConst;
 
 public class LcomMessagePushServlet extends HttpServlet {
 
 	private final static Logger log = Logger
 			.getLogger(LcomMessagePushServlet.class.getName());
 
-	/**
-	 * https://code.google.com/apis/console/ で生成したAPIキー。
-	 */
 	private static final String API_KEY = "AIzaSyBkrzyfBwaHQgjVphRiUNHusjEOjPQdOr4";
 	private static final int RETRY_COUNT = 5;
 
-	/**
-	 * ユーザIDからRegistrationIdを引くテーブル。 -本来はストレージに保存すべき情報。 -key=ユーザID: サービスの管理するＩＤ。
-	 * -value=RegistrationId: AndroidがGCMから取得した端末ＩＤ。
-	 */
 	static Map<String, String> deviceMap = new HashMap<String, String>();
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -41,6 +35,7 @@ public class LcomMessagePushServlet extends HttpServlet {
 		String registrationId = req.getParameter("regId");
 		String userId = req.getParameter("userId");
 		String msg = req.getParameter("msg");
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		log.log(Level.WARNING, "action: " + action);
 		log.log(Level.WARNING, "registrationId: " + registrationId);

@@ -28,6 +28,7 @@ public class LcomUserNameCheckServlet extends HttpServlet {
 
 		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
 		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		List<String> list = new ArrayList<String>();
 
@@ -36,7 +37,7 @@ public class LcomUserNameCheckServlet extends HttpServlet {
 
 		list.add(origin);
 
-		if (origin != null && userName != null) {
+		if (origin != null && userName != null && apiLevel != null) {
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 
 			userId = manager.getUserIdByName(userName);
