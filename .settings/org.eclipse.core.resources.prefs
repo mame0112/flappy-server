@@ -1,4 +1,4 @@
 eclipse.preferences.version=1
-encoding//src/com/mame/lcom/LcomMessagePushServlet.java=UTF-8
 encoding//src/com/mame/lcom/gcm/GCMIntentManager.java=UTF-8
 encoding//src/com/mame/lcom/invitation/LcomMail.java=UTF-8
+encoding//src/com/mame/lcom/servlet/LcomMessagePushServlet.java=UTF-8
