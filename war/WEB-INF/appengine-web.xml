@@ -25,6 +25,7 @@
   </system-properties>
 
   <sessions-enabled>true</sessions-enabled>
+  <ssl-enabled>true</ssl-enabled>
   
   <admin-console>
     <page name="appstats" url="/appstats/"/>
