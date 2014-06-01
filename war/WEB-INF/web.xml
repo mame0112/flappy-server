@@ -114,6 +114,15 @@
 		<servlet-name>deviceid_register</servlet-name>
 		<url-pattern>/servlet/deviceid_register</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>inquery</servlet-name>
+		<servlet-class>com.mame.lcom.servlet.LcomInqueryServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>inquery</servlet-name>
+		<url-pattern>/servlet/inquery</url-pattern>
+	</servlet-mapping>
 	
 	<servlet>
 		<servlet-name>messageclean</servlet-name>

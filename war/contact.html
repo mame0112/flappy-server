@@ -51,8 +51,21 @@
 						<ul class="nav navbar-nav navbar-right">
 							<li><a href="https://twitter.com/share"
 								class="twitter-share-button" data-via="flappy_comm"
-								data-size="large">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
-</script></li>
+								data-size="large">Tweet</a> <script>
+									!function(d, s, id) {
+										var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/
+												.test(d.location) ? 'http'
+												: 'https';
+										if (!d.getElementById(id)) {
+											js = d.createElement(s);
+											js.id = id;
+											js.src = p
+													+ '://platform.twitter.com/widgets.js';
+											fjs.parentNode
+													.insertBefore(js, fjs);
+										}
+									}(document, 'script', 'twitter-wjs');
+								</script></li>
 							<li><a href="http://mame0112.hatenablog.com/">Blog</a></li>
 					</div>
 			</nav>
@@ -61,52 +74,58 @@
 				<p class="lead">If you have any question or comment on this
 					service, please contact to us from below form.</p>
 			</div>
-			<div class="row">
-				<!-- Single button -->
-				<div class="btn-group">
-					<button type="button" class="btn btn-default dropdown-toggle"
-						data-toggle="dropdown">
-						Action <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="default">Select category</a></li>
-						<li><a href="#">aa</a></li>
-						<li><a href="#">Something else here</a></li>
-						<li class="divider"></li>
-						<li><a href="#">Separated link</a></li>
-					</ul>
+			<form method="post" name="inquery_form" action="servlet/inquery"
+				onSubmit="return check()">
+				<div class="row">
+					<!-- Single button -->
+					<div class="btn-group">
+						<button type="button" class="btn btn-default dropdown-toggle"
+							data-toggle="dropdown">
+							Select category <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu" name="servlet_inquery_category" role="menu">
+							<li><a href="1">For apply</a></li>
+							<li>For how to use</li>
+							<li>For bug / problem</li>
+							<li>For improvement request</li>
+							<li>For ads, promotion and interviews</li>
+							<li>For others</li>
+						</ul>
+					</div>
 				</div>
-			</div>
 
-			<div class="row">
-				<h5>
-					Name <small>(Mandatory)</small>
-				</h5>
-				<div class="input-group">
-					<input type="text" class="form-control">
+				<div class="row">
+					<h5>
+						Name <small>(Mandatory)</small>
+					</h5>
+					<div class="input-group">
+						<input type="text" name="servlet_user_name" class="form-control">
+					</div>
 				</div>
-			</div>
-			<div class="row">
-				<h5>
-					Mail address <small>(Mandatory)</small>
-				</h5>
-				<div class="input-group">
-					<input type="text" class="form-control">
+				<div class="row">
+					<h5>
+						Mail address <small>(Mandatory)</small>
+					</h5>
+					<div class="input-group">
+						<input type="text" name="servet_mailAddress" class="form-control">
+					</div>
 				</div>
-			</div>
-			<div class="row">
-				<h5>Message</h5>
-				<div class="input-group">
-					<textarea name="your-message" cols="40" rows="5"
-						class="form-control"></textarea>
+				<div class="row">
+					<h5>Message</h5>
+					<div class="input-group">
+						<textarea name="servlet_message_body" cols="40" rows="5"
+							class="form-control"></textarea>
+					</div>
 				</div>
-			</div>
-			<div class="row">
-				<p>
-					<input type="submit" value="Submit" type="button"
-						class="btn btn-primary btn-lg" />
-				</p>
-			</div>
+				<input type="hidden" name="servlet_origin" value="inquery">
+				<input type="hidden" name="servlet_api_level" value="1">
+				<div class="row">
+					<p>
+						<input type="submit" value="Submit" type="button"
+							class="btn btn-primary btn-lg" />
+					</p>
+				</div>
+			</form>
 		</div>
 		<!-- /container -->
 	</div>

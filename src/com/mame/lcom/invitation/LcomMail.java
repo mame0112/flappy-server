@@ -182,4 +182,34 @@ public class LcomMail {
 		}
 		return false;
 	}
+
+	public boolean sendInqueryMail(String address, String category,
+			String userName, String message)
+			throws UnsupportedEncodingException {
+		log.log(Level.INFO, "sendInqueryMail");
+		if (address != null) {
+			Properties props = new Properties();
+			Session session = Session.getDefaultInstance(props, null);
+
+			String msgBody = "userName: " + userName + "<br>" + "category: "
+					+ category + "<br>" + "message: " + message;
+
+			try {
+				Message msg = new MimeMessage(session);
+				msg.setFrom(new InternetAddress(address, "Inquery"));
+				msg.setRecipient(Message.RecipientType.TO, new InternetAddress(
+						"flappy.communication@gmail.com", "flappy"));
+				msg.setSubject("Inquery / 問い合わせ");
+				msg.setText(msgBody);
+				msg.setContent(msgBody, "text/html");
+				Transport.send(msg);
+				log.log(Level.INFO, "Successfully sent message.");
+				return true;
+			} catch (MessagingException e) {
+				log.log(Level.INFO, "MessagingException:: " + e.getMessage());
+				return false;
+			}
+		}
+		return false;
+	}
 }
