@@ -24,6 +24,16 @@
 		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script src="js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			$('.dropdown-menu a').click(function() {
+				var visibleTag = $(this).parents('ul').attr('visibleTag');
+				var hiddenTag = $(this).parents('ul').attr('hiddenTag');
+				$(visibleTag).html($(this).attr('value'));
+				$(hiddenTag).val($(this).attr('value'));
+			})
+		})
+	</script>
 
 	<div id="wrap">
 		<div class="container">
@@ -74,23 +84,40 @@
 				<p class="lead">If you have any question or comment on this
 					service, please contact to us from below form.</p>
 			</div>
-			<form method="post" name="inquery_form" action="servlet/inquery"
-				onSubmit="return check()">
+			<form method="post" name="inquery_form" action="servlet/inquery">
 				<div class="row">
 					<!-- Single button -->
 					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle"
-							data-toggle="dropdown">
-							Select category <span class="caret"></span>
+						<button type="button" class="btn">
+							<span id="visibleValue">Select category</span>
 						</button>
-						<ul class="dropdown-menu" name="servlet_inquery_category" role="menu">
-							<li><a href="1">For apply</a></li>
-							<li>For how to use</li>
-							<li>For bug / problem</li>
-							<li>For improvement request</li>
-							<li>For ads, promotion and interviews</li>
-							<li>For others</li>
+						<button type="button" class="btn dropdown-toggle"
+							data-toggle="dropdown">
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu" role="menu" hiddenTag="#hiddenValue"
+							visibleTag="#visibleValue">
+							<li><a href="javascript:void(0)" value="apply">For apply</a></li>
+							<li><a href="javascript:void(0)"
+								value="For how
+									to use">For how to use</a></li>
+							<li><a href="javascript:void(0)"
+								value="For bug /
+									problem">For bug / problem</a></li>
+							<li><a href="javascript:void(0)"
+								value="For
+									improvement request">For improvement
+									request</a></li>
+							<li><a href="javascript:void(0)"
+								value="For
+									ads, promotion and interviews">For ads,
+									promotion and interviews</a></li>
+							<li><a href="javascript:void(0)"
+								value="For
+									others">For others</a></li>
 						</ul>
+						<input type="hidden" id="hiddenValue"
+							name="servlet_inquery_category" value="">
 					</div>
 				</div>
 
@@ -117,8 +144,9 @@
 							class="form-control"></textarea>
 					</div>
 				</div>
-				<input type="hidden" name="servlet_origin" value="inquery">
-				<input type="hidden" name="servlet_api_level" value="1">
+				<input type="hidden" id="hiddenValue" value="inquery"> <input
+					type="hidden" name="servlet_origin" value="inquery"> <input
+					type="hidden" name="servlet_api_level" value="1">
 				<div class="row">
 					<p>
 						<input type="submit" value="Submit" type="button"

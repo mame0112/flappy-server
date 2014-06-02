@@ -40,9 +40,13 @@ public class LcomInqueryServlet extends HttpServlet {
 
 		List<String> list = new ArrayList<String>();
 		if (origin != null && apiLevel != null) {
-			log.log(Level.INFO, "origin and apiLevel is not null");
+			log.log(Level.INFO, "origin and apiLevel is not null: " + origin
+					+ " / " + apiLevel);
 			if (userName != null) {
 				if (mailAddress != null) {
+					log.log(Level.INFO, "userName: " + userName);
+					log.log(Level.INFO, "mailAddress: " + mailAddress);
+					log.log(Level.INFO, "category: " + category);
 					result = Return_Code.RESULT_OK;
 					// Send message
 					LcomMail mail = new LcomMail();
@@ -60,8 +64,8 @@ public class LcomInqueryServlet extends HttpServlet {
 				result = Return_Code.RESULT_USERNAME_NULL;
 			}
 		} else {
-			log.log(Level.INFO, "origin or apiLevel is null");
 			result = Return_Code.RESULT_ORIGIN_OR_API_LEVEL_NULL;
+			log.log(Level.INFO, "origin and apiLevel is null");
 		}
 
 		list.add(String.valueOf(result));

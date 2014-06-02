@@ -196,10 +196,11 @@ public class LcomMail {
 
 			try {
 				Message msg = new MimeMessage(session);
-				msg.setFrom(new InternetAddress(address, "Inquery"));
+				msg.setFrom(new InternetAddress(
+						"flappy.communication@gmail.com", "Inquery"));
 				msg.setRecipient(Message.RecipientType.TO, new InternetAddress(
 						"flappy.communication@gmail.com", "flappy"));
-				msg.setSubject("Inquery / 問い合わせ");
+				msg.setSubject("Inquery");
 				msg.setText(msgBody);
 				msg.setContent(msgBody, "text/html");
 				Transport.send(msg);
