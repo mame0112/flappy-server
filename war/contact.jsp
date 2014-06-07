@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<%@ page language="java" contentType="text/html; charset=windows-31j"
+	pageEncoding="windows-31j"%>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -84,10 +85,17 @@
 				<p class="lead">If you have any question or comment on this
 					service, please contact to us from below form.</p>
 			</div>
-			<div class="alert alert-success">...</div>
+			<%
+				String result = (String) session.getAttribute("result");
+				if (result != null && !result.equals("null")) {
+			%>
+			<div class="alert alert-success">result</div>
 			<div class="alert alert-info">...</div>
 			<div class="alert alert-warning">...</div>
 			<div class="alert alert-danger">...</div>
+			<%
+				}
+			%>
 			<form method="post" name="inquery_form" action="servlet/inquery">
 				<div class="row">
 					<!-- Single button -->

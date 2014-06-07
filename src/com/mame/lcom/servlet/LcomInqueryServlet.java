@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
@@ -38,7 +39,7 @@ public class LcomInqueryServlet extends HttpServlet {
 		// success
 		Return_Code result = Return_Code.RESULT_OK;
 
-		List<String> list = new ArrayList<String>();
+		// List<String> list = new ArrayList<String>();
 		if (origin != null && apiLevel != null) {
 			log.log(Level.INFO, "origin and apiLevel is not null: " + origin
 					+ " / " + apiLevel);
@@ -68,16 +69,30 @@ public class LcomInqueryServlet extends HttpServlet {
 			log.log(Level.INFO, "origin and apiLevel is null");
 		}
 
-		list.add(String.valueOf(result));
-		list.add(origin);
+		// list.add(String.valueOf(result));
+		// list.add(origin);
 
-		String url = "/contact.html";
-		resp.sendRedirect(url);
+		String url = "/contact.jsp";
+
+		HttpSession session = req.getSession();
+		session.invalidate();
+
+		session.setAttribute("result", result.ordinal());
 
 		// String json = new Gson().toJson(list);
 		// resp.setContentType("application/json");
 		// resp.setCharacterEncoding("UTF-8");
 		// resp.getWriter().write(json);
+
+		// req.setAttribute("result", result);
+		// RequestDispatcher dispatcher = req.getRequestDispatcher(url);
+		// try {
+		// dispatcher.forward(req, resp);
+		// } catch (ServletException e) {
+		// log.log(Level.INFO, "ServletException: " + e.getMessage());
+		// }
+
+		resp.sendRedirect(url);
 
 	}
 }
