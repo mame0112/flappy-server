@@ -1,8 +1,6 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.invitation.LcomMail;
 import com.mame.lcom.util.TimeUtil;
@@ -22,7 +19,7 @@ public class LcomInqueryServlet extends HttpServlet {
 			.getName());
 
 	private enum Return_Code {
-		RESULT_OK, RESULT_ORIGIN_OR_API_LEVEL_NULL, RESULT_USERNAME_NULL, RESULT_MAIL_ADDRESS_NULL, RESULT_MESSAGE_NULL,
+		RESULT_OK, RESULT_BEFORE_SEND, RESULT_USERNAME_NULL, RESULT_MAIL_ADDRESS_NULL, RESULT_MESSAGE_NULL,
 	}
 
 	@Override
@@ -65,7 +62,7 @@ public class LcomInqueryServlet extends HttpServlet {
 				result = Return_Code.RESULT_USERNAME_NULL;
 			}
 		} else {
-			result = Return_Code.RESULT_ORIGIN_OR_API_LEVEL_NULL;
+			result = Return_Code.RESULT_BEFORE_SEND;
 			log.log(Level.INFO, "origin and apiLevel is null");
 		}
 
@@ -75,9 +72,7 @@ public class LcomInqueryServlet extends HttpServlet {
 		String url = "/contact.jsp";
 
 		HttpSession session = req.getSession();
-		session.invalidate();
-
-		session.setAttribute("result", result.ordinal());
+		session.setAttribute("result", String.valueOf(result.ordinal()));
 
 		// String json = new Gson().toJson(list);
 		// resp.setContentType("application/json");
@@ -94,5 +89,11 @@ public class LcomInqueryServlet extends HttpServlet {
 
 		resp.sendRedirect(url);
 
+	}
+
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
+		doPost(req, resp);
 	}
 }

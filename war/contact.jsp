@@ -86,14 +86,27 @@
 					service, please contact to us from below form.</p>
 			</div>
 			<%
-				String result = (String) session.getAttribute("result");
-				if (result != null && !result.equals("null")) {
+				String tmp = (String) session.getAttribute("result");
+				int result = Integer.valueOf(tmp);
+				switch (result) {
+				case 0: //result OK
 			%>
-			<div class="alert alert-success">result</div>
-			<div class="alert alert-info">...</div>
-			<div class="alert alert-warning">...</div>
-			<div class="alert alert-danger">...</div>
+			<div class="alert alert-success">Success!</div>
 			<%
+				break;
+				case 1:
+					//Nothing to show
+					break;
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				default:
+			%>
+			<div class="alert alert-danger">Failed to send inquery message</div>
+			<%
+				break;
+
 				}
 			%>
 			<form method="post" name="inquery_form" action="servlet/inquery">
