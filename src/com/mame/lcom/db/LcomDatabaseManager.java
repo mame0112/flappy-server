@@ -530,6 +530,9 @@ public class LcomDatabaseManager {
 						data.setReadState(true);
 						try {
 							pm.makePersistent(data);
+						} catch (Exception e) {
+							log.log(Level.WARNING,
+									"Exception: " + e.getMessage());
 						} finally {
 							pm.close();
 						}

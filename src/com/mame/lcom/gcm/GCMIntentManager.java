@@ -68,7 +68,9 @@ public class GCMIntentManager {
 				+ targetUserName + LcomConst.SEPARATOR + message
 				+ LcomConst.SEPARATOR + expireTime;
 
+		// Replace space to "¥t"
+		result = result.replaceAll(" ", "¥t");
+
 		return result;
 	}
-
 }
