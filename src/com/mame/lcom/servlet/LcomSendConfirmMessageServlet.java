@@ -64,9 +64,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 
 			// If target user has been already been registered
 			if (targetUserId != null && !targetUserId.equals("")
-					&& !targetUserId.equals(LcomConst.NULL)
-					&& targetUserName != null && !targetUserName.equals("")
-					&& !targetUserName.equals(LcomConst.NULL)) {
+					&& !targetUserId.equals(LcomConst.NULL)) {
 				log.log(Level.WARNING, "targetUserId: " + targetUserId);
 				if (targetUserName != null) {
 					log.log(Level.WARNING, "targetUserName: " + targetUserName);

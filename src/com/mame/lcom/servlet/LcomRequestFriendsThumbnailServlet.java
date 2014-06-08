@@ -45,6 +45,8 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 			if (datas != null) {
 				String result = parseThumbnailData(datas);
 				log.log(Level.INFO, "result; " + result);
+
+				// If no thumbnail available, "null" string shall be returned.
 				list.add(result);
 			}
 

@@ -54,7 +54,7 @@ public class LcomNewMessageServlet extends HttpServlet {
 					log.log(Level.INFO, "data.getLastMessageExpireTime():"
 							+ data.getLastMessageExpireTime());
 					// Not to send already expire data
-					if (currentTime > data.getLastMessageExpireTime()) {
+					if (currentTime < data.getLastMessageExpireTime()) {
 						int firstUserId = data.getFirstUserId();
 
 						// If first user is user himself (meaning friend is

@@ -643,8 +643,10 @@ public class LcomDatabaseManager {
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 		if (alreadyFriend) {
-			// Existing. then Nothing to do
+			// Existing. then update latest message in Friendship data
 			log.log(Level.INFO, "existing friendship");
+			updateLatestMessageInfoOnFriendshipTable(firstUserId, secondUserId,
+					lastMessage, time);
 		} else {
 			log.log(Level.INFO, "add as new friend");
 			// Add as new friend
