@@ -382,7 +382,7 @@ public class LcomDatabaseManagerHelper {
 
 			} else {
 				log.log(Level.WARNING, "LcomMemcacheException message is null");
-				//				throw new LcomMemcacheException("messages is null");
+				// throw new LcomMemcacheException("messages is null");
 			}
 
 		} catch (IllegalArgumentException e) {
@@ -616,6 +616,114 @@ public class LcomDatabaseManagerHelper {
 		}
 	}
 
+//	public synchronized void putFriendListDatasToMemCache(
+//			List<LcomFriendshipData> datas) {
+//		log.log(Level.INFO, "putFriendListDataToMemCache");
+//
+//		// Get memcache for push device id
+//		MemcacheService memcacheService = MemcacheServiceFactory
+//				.getMemcacheService(LcomFriendshipData.class.getSimpleName());
+//		
+//		String input = "a";
+//
+//		if (datas != null && datas.size() != 0) {
+//			for (LcomFriendshipData data : datas) {
+//				
+//			}
+//		}
+//		if (data != null) {
+//			int firstId = data.getFirstUserId();
+//			int secondId = data.getSecondUserId();
+//			String firstName = data.getFirstUserName();
+//			String secondName = data.getSecondUserName();
+//			String message = data.getLatestMessage();
+//			int numOfMessage = data.getNumOfNewMessage();
+//			long messageTime = data.getLastMessageExpireTime();
+//
+//			if (firstId != LcomConst.NO_USER && secondId != LcomConst.NO_USER) {
+//				// String key = firstId + LcomConst.SEPARATOR + secondId;
+//
+//				String parsed = firstId + LcomConst.SEPARATOR + secondId
+//						+ LcomConst.SEPARATOR + firstName + LcomConst.SEPARATOR
+//						+ secondName + LcomConst.SEPARATOR + message
+//						+ LcomConst.SEPARATOR + numOfMessage
+//						+ LcomConst.SEPARATOR + messageTime;
+//				try {
+//
+//					// Once we get current data
+//					String currentData = (String) memcacheService.get(firstId);
+//
+//					// And combine current data and new data
+//					// FIrst, we check if current data is already in memcache
+//
+//					boolean isExist = false;
+//					String output = "a";
+//
+//					if (currentData != null) {
+//						String[] itemData = currentData
+//								.split(LcomConst.ITEM_SEPARATOR);
+//						if (itemData != null && itemData.length != 0) {
+//							for (int i = 0; i < itemData.length; i++) {
+//								String[] parsedData = itemData[i]
+//										.split(LcomConst.SEPARATOR);
+//								String currentSecondId = parsedData[1];
+//								// If target second user id is memcache
+//								if (secondId == Integer
+//										.valueOf(currentSecondId)) {
+//									isExist = true;
+//									// Put new data instead of old data
+//									output = output + LcomConst.ITEM_SEPARATOR
+//											+ parsed;
+//								} else {
+//									// Keep current data
+//									output = output + LcomConst.ITEM_SEPARATOR
+//											+ itemData[i];
+//								}
+//							}
+//						}
+//
+//					} else {
+//						log.log(Level.INFO, "currentData is null");
+//					}
+//
+//					// If target second user id is new for memcache
+//					if (!isExist) {
+//						output = output + LcomConst.ITEM_SEPARATOR + parsed;
+//						log.log(Level.INFO, "user doesn't exist");
+//					}
+//
+//					// Remove unnecessary part
+//					output = output.substring(
+//							1 + LcomConst.ITEM_SEPARATOR.length(),
+//							output.length());
+//
+//					log.log(Level.INFO, "output: " + output);
+//
+//					// Once we delete old memcache
+//					memcacheService.delete(firstId);
+//
+//					// Put latest message to memcache
+//					memcacheService.put(firstId, output);
+//
+//				} catch (IllegalArgumentException e) {
+//					log.log(Level.WARNING,
+//							"IllegalArgumentException: " + e.getMessage());
+//					throw new LcomMemcacheException(
+//							"IllegalArgumentException: " + e.getMessage());
+//				} catch (MemcacheServiceException e) {
+//					log.log(Level.WARNING,
+//							"MemcacheServiceException: " + e.getMessage());
+//					throw new LcomMemcacheException(
+//							"MemcacheServiceException: " + e.getMessage());
+//				}
+//			} else {
+//				throw new LcomMemcacheException("firstId or secondId is null");
+//			}
+//		} else {
+//			throw new LcomMemcacheException("data is null");
+//		}
+//	}
+
 	public void removeFriendshipDataFromMemcache(int userId) {
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomFriendshipData.class.getSimpleName());
@@ -698,6 +806,7 @@ public class LcomDatabaseManagerHelper {
 
 	public synchronized List<LcomFriendshipData> getFriendListDataFromMemCache(
 			int firstId) throws LcomMemcacheException {
+		log.log(Level.INFO, "getFriendListDataFromMemCache");
 
 		MemcacheService memcacheService = MemcacheServiceFactory
 				.getMemcacheService(LcomFriendshipData.class.getSimpleName());
@@ -711,6 +820,7 @@ public class LcomDatabaseManagerHelper {
 				String parsedData = (String) memcacheService.get(firstId);
 
 				if (parsedData != null) {
+					log.log(Level.INFO, "parsedData: " + parsedData);
 
 					String[] itemArray = parsedData
 							.split(LcomConst.ITEM_SEPARATOR);
@@ -728,6 +838,10 @@ public class LcomDatabaseManagerHelper {
 							String message = dataArray[4];
 							String numOfMessage = dataArray[5];
 							String messageTime = dataArray[6];
+
+							if (message != null) {
+								log.log(Level.INFO, "message: " + message);
+							}
 
 							LcomFriendshipData data = new LcomFriendshipData(
 									Integer.valueOf(firstUserId), firstName,

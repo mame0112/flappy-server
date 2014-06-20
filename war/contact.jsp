@@ -87,25 +87,31 @@
 			</div>
 			<%
 				String tmp = (String) session.getAttribute("result");
-				int result = Integer.valueOf(tmp);
-				switch (result) {
-				case 0: //result OK
+				if (tmp != null && !tmp.equals("null")) {
+					int result = Integer.valueOf(tmp);
+					switch (result) {
+					case 0: //result OK
 			%>
 			<div class="alert alert-success">Success!</div>
 			<%
 				break;
-				case 1:
-					//Nothing to show
-					break;
-				case 2:
-				case 3:
-				case 4:
-				case 5:
-				default:
+					case 1:
+						//Nothing to show
+						break;
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					default:
 			%>
 			<div class="alert alert-danger">Failed to send inquery message</div>
 			<%
 				break;
+
+					}
+
+					//Remove session
+					session.removeAttribute("result");
 
 				}
 			%>

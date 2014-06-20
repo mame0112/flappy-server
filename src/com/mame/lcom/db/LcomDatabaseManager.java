@@ -820,10 +820,10 @@ public class LcomDatabaseManager {
 		if (friendList == null || friendList.size() == 0) {
 			friendList = getFriendshipDataForUser(userId);
 
-			// TODO Do we need to add data to memcache?
+			// TODO Store data from Datastore to memcache
 
 		} else {
-			// TOOD Do we need friend list to store memcache?
+			// Nothing to do
 		}
 
 		// Get new message

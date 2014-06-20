@@ -97,9 +97,11 @@ public class LcomNewMessageServlet extends HttpServlet {
 			}
 		}
 
+		log.log(Level.INFO, "end:" + TimeUtil.calcResponse());
 		String json = new Gson().toJson(list);
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
+		// resp.setHeader("Cache-Control", "public, max-age=86400");
 		resp.getWriter().write(json);
 
 	}
