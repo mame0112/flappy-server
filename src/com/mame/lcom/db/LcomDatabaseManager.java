@@ -1106,6 +1106,36 @@ public class LcomDatabaseManager {
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
+		// Delete latest message on Friendship table
+		String friendShipQuery = "select from "
+				+ LcomFriendshipData.class.getName();
+		List<LcomFriendshipData> friendDatas = (List<LcomFriendshipData>) pm
+				.newQuery(friendShipQuery).execute();
+
+		if (friendDatas != null && friendDatas.size() != 0) {
+			for (LcomFriendshipData data : friendDatas) {
+				if (data != null) {
+					log.log(Level.INFO, "A");
+					String latestMessage = data.getLatestMessage();
+					// If message has not been marked as "expired"
+					if (latestMessage != null
+							&& !latestMessage.equals(LcomConst.MESSAGE_EXPIRED)) {
+						log.log(Level.INFO, "B");
+						// Now we check message expire date
+						long messageTime = data.getLastMessageExpireTime();
+						if (currentTime > messageTime) {
+							log.log(Level.INFO, "C");
+							// Set message as "expired" mark.
+							data.setLatestMessage(LcomConst.MESSAGE_EXPIRED);
+						}
+					}
+				}
+			}
+		}
+
+		// TODO need to restore memcache after we remove it.
+
+		// Delete already exipre messages from LcomNewMessage table
 		String query = "select from " + LcomNewMessageData.class.getName();
 
 		List<LcomNewMessageData> allMessages = (List<LcomNewMessageData>) pm
@@ -1120,8 +1150,18 @@ public class LcomDatabaseManager {
 				}
 			}
 
-			// Clear memcache
+			// Clear out friendship memcache
 			LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
+			// try {
+			// helper
+			// TODO need to remove
+			// helper.removeFriendshipDataFromMemcache(userId);
+			// } catch (LcomMemcacheException e) {
+			// log.log(Level.WARNING,
+			// "LcomMemcacheException: " + e.getMessage());
+			// }
+
+			// Clear memcache
 			try {
 				helper.deleteAllNewMessages(registeredIds);
 			} catch (LcomMemcacheException e) {
