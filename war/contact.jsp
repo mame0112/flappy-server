@@ -126,46 +126,15 @@
 			%>
 			<form method="post" name="inquery_form" action="servlet/inquery">
 				<div class="row">
-					<!-- Single button -->
-					<div class="btn-group">
-						<button type="button" class="btn">
-							<span id="visibleValue" data-localize="contact.category_title">Select
-								category</span>
-						</button>
-						<button type="button" class="btn dropdown-toggle"
-							data-toggle="dropdown">
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu" hiddenTag="#hiddenValue"
-							visibleTag="#visibleValue">
-							<li><a href="javascript:void(0)" value="apply"
-								data-localize="contact.category_apply">For apply</a></li>
-							<li><a href="javascript:void(0)"
-								value="For how
-									to use"
-								data-localize="contact.category_how_to_use">For how to use</a></li>
-							<li><a href="javascript:void(0)"
-								value="For bug /
-									problem"
-								data-localize="contact.category_bug">For bug / problem</a></li>
-							<li><a href="javascript:void(0)"
-								value="For
-									improvement request"
-								data-localize="contact.category_improve_request">For
-									improvement request</a></li>
-							<li><a href="javascript:void(0)"
-								value="For
-									ads, promotion and interviews"
-								data-localize="contact.category_ads">For ads, promotion and
-									interviews</a></li>
-							<li><a href="javascript:void(0)"
-								value="For
-									others"
-								data-localize="contact.category_others">For others</a></li>
-						</ul>
-						<input type="hidden" id="hiddenValue"
-							name="servlet_inquery_category" value="">
-					</div>
+					<select name="servlet_inquery_category" id="visibleValue">
+						<option value="Not selected" data-localize="contact.category_title" selected>Select category</option>
+						<option value="For apply" data-localize="contact.category_apply">For apply</option>
+						<option value="For how to use" data-localize="contact.category_how_to_use">For how to use</option>
+						<option value="For bug / problem" data-localize="contact.category_bug">For bug / problem</option>
+						<option value="For improvement request" data-localize="contact.category_improve_request">For improvement request</option>
+						<option value="For ads, promotion and interviews" data-localize="contact.category_ads">For ads, promotion and interviews</option>
+						<option value="For others" data-localize="contact.category_others">For others</option>
+					</select>
 				</div>
 
 				<div class="row">
