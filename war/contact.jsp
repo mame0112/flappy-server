@@ -12,6 +12,9 @@
 <link rel="stylesheet" type="text/css" href="css/jumbotron.css">
 <link rel="stylesheet" type="text/css" href="css/original.css">
 
+<script type="text/javascript" src="jquery.js" charset="utf-8"></script>
+<script type="text/javascript" src="jquery.localize.js" charset="utf-8"></script>
+
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -20,9 +23,6 @@
     <![endif]-->
 </head>
 <body>
-	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script src="js/bootstrap.min.js"></script>
 	<script type="text/javascript">
@@ -54,10 +54,13 @@
 					<div class="collapse navbar-collapse"
 						id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav">
-							<li><a href="overview.html">About flappy</a></li>
-							<li><a href="privacypolicy.html">Privacy policy</a></li>
-							<li><a href="tos.html">Terms of use</a></li>
-							<li><a href="contact.jsp">Contact</a></li>
+							<li><a href="overview.html" data-localize="header.about">About
+									flappy</a></li>
+							<li><a href="privacypolicy.html"
+								data-localize="header.privacy">Privacy policy</a></li>
+							<li><a href="tos.html" data-localize="header.tos">Terms
+									of use</a></li>
+							<li><a href="contact.jsp" data-localize="header.contact">Contact</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 							<li><a href="https://twitter.com/share"
@@ -77,34 +80,38 @@
 										}
 									}(document, 'script', 'twitter-wjs');
 								</script></li>
-							<li><a href="http://mame0112.hatenablog.com/">Blog</a></li>
+							<li><a href="http://mame0112.hatenablog.com/"
+								data-localize="header.blog">Blog</a></li>
 					</div>
 			</nav>
 			<div class="page-header">
-				<h1>Contact</h1>
-				<p class="lead">If you have any question or comment on this
-					service, please contact to us from below form.</p>
+				<h1 data-localize="contact.title">Contact</h1>
+				<p class="lead" data-localize="contact.subtitle">If you have any
+					question or comment on this service, please contact to us from
+					below form.</p>
 			</div>
 			<%
 				String tmp = (String) session.getAttribute("result");
 				if (tmp != null && !tmp.equals("null")) {
 					int result = Integer.valueOf(tmp);
 					switch (result) {
-					case 0: //result OK
+						case 0 : //result OK
 			%>
-			<div class="alert alert-success">Success!</div>
+			<div class="alert alert-success"
+				data-localize="contact.result_success">Success!</div>
 			<%
 				break;
-					case 1:
-						//Nothing to show
-						break;
-					case 2:
-					case 3:
-					case 4:
-					case 5:
-					default:
+						case 1 :
+							//Nothing to show
+							break;
+						case 2 :
+						case 3 :
+						case 4 :
+						case 5 :
+						default :
 			%>
-			<div class="alert alert-danger">Failed to send inquery message</div>
+			<div class="alert alert-danger" data-localize="contact.result_failed">Failed
+				to send inquery message</div>
 			<%
 				break;
 
@@ -120,7 +127,8 @@
 					<!-- Single button -->
 					<div class="btn-group">
 						<button type="button" class="btn">
-							<span id="visibleValue">Select category</span>
+							<span id="visibleValue" data-localize="contact.category_title">Select
+								category</span>
 						</button>
 						<button type="button" class="btn dropdown-toggle"
 							data-toggle="dropdown">
@@ -128,24 +136,29 @@
 						</button>
 						<ul class="dropdown-menu" role="menu" hiddenTag="#hiddenValue"
 							visibleTag="#visibleValue">
-							<li><a href="javascript:void(0)" value="apply">For apply</a></li>
-							<li><a href="javascript:void(0)"
-								value="For how
-									to use">For how to use</a></li>
+							<li><a href="javascript:void(0)" value="apply"
+								data-localize="contact.category_apply">For apply</a></li>
+							<li><a href="javascript:void(0)" value="For how
+									to use"
+								data-localize="contact.category_how_to_use">For how to use</a></li>
 							<li><a href="javascript:void(0)"
 								value="For bug /
-									problem">For bug / problem</a></li>
+									problem"
+								data-localize="contact.category_bug">For bug / problem</a></li>
 							<li><a href="javascript:void(0)"
 								value="For
-									improvement request">For improvement
-									request</a></li>
+									improvement request"
+								data-localize="contact.category_improve_request">For
+									improvement request</a></li>
 							<li><a href="javascript:void(0)"
 								value="For
-									ads, promotion and interviews">For ads,
-									promotion and interviews</a></li>
+									ads, promotion and interviews"
+								data-localize="contact.category_ads">For ads, promotion and
+									interviews</a></li>
 							<li><a href="javascript:void(0)"
 								value="For
-									others">For others</a></li>
+									others"
+								data-localize="contact.category_others">For others</a></li>
 						</ul>
 						<input type="hidden" id="hiddenValue"
 							name="servlet_inquery_category" value="">
@@ -153,23 +166,23 @@
 				</div>
 
 				<div class="row">
-					<h5>
-						Name <small>(Mandatory)</small>
+					<h5 data-localize="contact.form_name">
+						Name <small data-localize="contact.form_mandatory">(Mandatory)</small>
 					</h5>
 					<div class="input-group">
 						<input type="text" name="servlet_user_name" class="form-control">
 					</div>
 				</div>
 				<div class="row">
-					<h5>
-						Mail address <small>(Mandatory)</small>
+					<h5 data-localize="contact.form_mail">
+						Mail address <small data-localize="contact.form_mandatory">(Mandatory)</small>
 					</h5>
 					<div class="input-group">
 						<input type="text" name="servet_mailAddress" class="form-control">
 					</div>
 				</div>
 				<div class="row">
-					<h5>Message</h5>
+					<h5 data-localize="contact.form_message">Message</h5>
 					<div class="input-group">
 						<textarea name="servlet_message_body" cols="40" rows="5"
 							class="form-control"></textarea>
@@ -192,20 +205,46 @@
 	<div id="footer">
 		<div class="container">
 			<ul class="nav nav-pills">
-				<li><a href="http://loosecommunication.appspot.com/">Home</a></li>
-				<li><a href="overview.html">About flappy</a></li>
-				<li class="span3"><a href="privacypolicy.html">Privacy
-						policy</a></li>
-				<li class="span4"><a href="tos.html">Terms of use</a></li>
-				<li class="span5"><a href="contact.jsp">Contact</a></li>
+				<li><a href="http://loosecommunication.appspot.com/"
+					data-localize="footer.home">Home</a></li>
+				<li><a href="overview.html" data-localize="footer.about">About
+						flappy</a></li>
+				<li class="span3"><a href="privacypolicy.html"
+					data-localize="footer.privacy">Privacy policy</a></li>
+				<li class="span4"><a href="tos.html" data-localize="footer.tos">Terms
+						of use</a></li>
+				<li class="span5"><a href="contact.jsp"
+					data-localize="footer.contact">Contact</a></li>
 				<li class="span6"><a href="http://mame0112.hatenablog.com/"
-					target="blank">Blog</a></li>
+					target="blank" data-localize="footer.blog">Blog</a></li>
 			</ul>
 			<address>
 				<strong>flappy</strong> flappy.communication@gmail.com
 			</address>
 		</div>
 	</div>
+	<script>
+		function browserLanguage() {
+			try {
+				return (navigator.browserLanguage || navigator.language || navigator.userLanguage)
+						.substr(0, 2)
+			} catch (e) {
+				return undefined;
+			}
+		}
+
+		var lang = browserLanguage();
+		if (lang == undefined) {
+			lang = "en";
+		} else {
+		}
+		var opts = {
+			language : lang,
+			skipLanguage : "en"
+		};
+
+		$("[data-localize]").localize("test", opts);
+	</script>
 </body>
 
 </html>

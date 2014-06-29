@@ -55,6 +55,22 @@
 		"enjoy_title": "そしてflappyを楽しむ",
 		"enjoy_desc": "さあ、flappyを楽しむ準備ができました！友達とストレスフリーなコミュニケーションを楽しみましょう！"
 	},
-
-	"msg":"てすと"
+	
+	"contact": {
+		"title": "問い合わせ",
+		"subtitle": "本サービスに関して何か質問やコメントなどございましたら、下記フォームからお問い合わせください。",
+		"category_title": "カテゴリを選択",
+		"category_apply": "登録方法について",
+		"category_how_to_use": "使い方について",
+		"category_bug": "不具合、問題について",
+		"category_improve_request": "改善要望について",
+		"category_ads": "広告、プロモーション、インタビューについて",
+		"category_others": "その他",
+		"form_name": "お名前",
+		"form_mandatory": "(必須)",
+		"form_mail": "メールアドレス",
+		"form_message": "メッセージ",
+		"result_success": "メッセージを送信しました！",
+		"result_failed": "メッセージ送信に失敗しました・・・。"
+	}
 }
