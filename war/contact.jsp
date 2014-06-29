@@ -60,7 +60,9 @@
 								data-localize="header.privacy">Privacy policy</a></li>
 							<li><a href="tos.html" data-localize="header.tos">Terms
 									of use</a></li>
-							<li><a href="contact.jsp" data-localize="header.contact">Contact</a></li>
+							<li><a
+								href="https://1-dot-loosecommunication.appspot.com/contact.jsp"
+								data-localize="header.contact">Contact</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 							<li><a href="https://twitter.com/share"
@@ -138,7 +140,8 @@
 							visibleTag="#visibleValue">
 							<li><a href="javascript:void(0)" value="apply"
 								data-localize="contact.category_apply">For apply</a></li>
-							<li><a href="javascript:void(0)" value="For how
+							<li><a href="javascript:void(0)"
+								value="For how
 									to use"
 								data-localize="contact.category_how_to_use">For how to use</a></li>
 							<li><a href="javascript:void(0)"
@@ -213,7 +216,8 @@
 					data-localize="footer.privacy">Privacy policy</a></li>
 				<li class="span4"><a href="tos.html" data-localize="footer.tos">Terms
 						of use</a></li>
-				<li class="span5"><a href="contact.jsp"
+				<li class="span5"><a
+					href="https://1-dot-loosecommunication.appspot.com/contact.jsp"
 					data-localize="footer.contact">Contact</a></li>
 				<li class="span6"><a href="http://mame0112.hatenablog.com/"
 					target="blank" data-localize="footer.blog">Blog</a></li>
