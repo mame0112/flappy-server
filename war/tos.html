@@ -11,6 +11,9 @@
 <link rel="stylesheet" type="text/css" href="css/jumbotron.css">
 <link rel="stylesheet" type="text/css" href="css/original.css">
 
+<script type="text/javascript" src="jquery.js" charset="utf-8"></script>
+<script type="text/javascript" src="jquery.localize.js" charset="utf-8"></script>
+
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -19,9 +22,6 @@
     <![endif]-->
 </head>
 <body>
-	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script src="js/bootstrap.min.js"></script>
 	<div id="wrap">
@@ -42,11 +42,15 @@
 					<div class="collapse navbar-collapse"
 						id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav">
-							<li><a href="overview.html">About flappy</a></li>
-							<li><a href="privacypolicy.html">Privacy policy</a></li>
-							<li><a href="tos.html">Tearms of use</a></li>
+							<li><a href="overview.html" data-localize="header.about">About
+									flappy</a></li>
+							<li><a href="privacypolicy.html"
+								data-localize="header.privacy">Privacy policy</a></li>
+							<li><a href="tos.html" data-localize="header.tos">Terms
+									of use</a></li>
 							<li><a
-								href="https://1-dot-loosecommunication.appspot.com/contact.jsp">Contact</a></li>
+								href="https://1-dot-loosecommunication.appspot.com/contact.jsp"
+								data-localize="header.contact">Contact</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 							<li><a href="https://twitter.com/share"
@@ -66,7 +70,8 @@
 										}
 									}(document, 'script', 'twitter-wjs');
 								</script></li>
-							<li><a href="http://mame0112.hatenablog.com/">Blog</a></li>
+							<li><a href="http://mame0112.hatenablog.com/"
+								data-localize="header.blog">Blog</a></li>
 					</div>
 			</nav>
 
@@ -327,15 +332,19 @@
 	<div id="footer">
 		<div class="container">
 			<ul class="nav nav-pills">
-				<li><a href="http://loosecommunication.appspot.com/">Home</a></li>
-				<li><a href="overview.html">About flappy</a></li>
-				<li class="span3"><a href="privacypolicy.html">Privacy
-						policy</a></li>
-				<li class="span4"><a href="tos.html">Terms of use</a></li>
+				<li><a href="http://loosecommunication.appspot.com/"
+					data-localize="footer.home">Home</a></li>
+				<li><a href="overview.html" data-localize="footer.about">About
+						flappy</a></li>
+				<li class="span3"><a href="privacypolicy.html"
+					data-localize="footer.privacy">Privacy policy</a></li>
+				<li class="span4"><a href="tos.html" data-localize="footer.tos">Terms
+						of use</a></li>
 				<li class="span5"><a
-					href="https://1-dot-loosecommunication.appspot.com/contact.jsp">Contact</a></li>
+					href="https://1-dot-loosecommunication.appspot.com/contact.jsp"
+					data-localize="footer.contact">Contact</a></li>
 				<li class="span6"><a href="http://mame0112.hatenablog.com/"
-					target="blank">Blog</a></li>
+					target="blank" data-localize="footer.blog">Blog</a></li>
 			</ul>
 			<address>
 				<strong>flappy</strong> flappy.communication@gmail.com
@@ -343,6 +352,27 @@
 		</div>
 	</div>
 	<!-- Footer end -->
+	<script>
+		function browserLanguage() {
+			try {
+				return (navigator.browserLanguage || navigator.language || navigator.userLanguage)
+						.substr(0, 2)
+			} catch (e) {
+				return undefined;
+			}
+		}
 
+		var lang = browserLanguage();
+		if (lang == undefined) {
+			lang = "en";
+		} else {
+		}
+		var opts = {
+			language : lang,
+			skipLanguage : "en"
+		};
+
+		$("[data-localize]").localize("test", opts);
+	</script>
 </body>
 </html>
