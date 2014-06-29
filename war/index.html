@@ -35,11 +35,8 @@
 	</script>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-
-
-
+	<script type="text/javascript" src="jquery.js" charset="utf-8"></script>
+	<script type="text/javascript" src="jquery.localize.js" charset="utf-8"></script>
 
 	<script>
 		jQuery(function($) {
@@ -96,10 +93,13 @@
 					<div class="collapse navbar-collapse"
 						id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav">
-							<li><a href="overview.html">About flappy</a></li>
-							<li><a href="privacypolicy.html">Privacy policy</a></li>
-							<li><a href="tos.html">Terms of use</a></li>
-							<li><a href="contact.jsp">Contact</a></li>
+							<li><a href="overview.html" data-localize="header.about">About
+									flappy</a></li>
+							<li><a href="privacypolicy.html"
+								data-localize="header.privacy">Privacy policy</a></li>
+							<li><a href="tos.html" data-localize="header.tos">Terms
+									of use</a></li>
+							<li><a href="contact.jsp" data-localize="header.contact">Contact</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 							<li><a href="https://twitter.com/share"
@@ -119,29 +119,32 @@
 										}
 									}(document, 'script', 'twitter-wjs');
 								</script></li>
-							<li><a href="http://mame0112.hatenablog.com/">Blog</a></li>
+							<li><a href="http://mame0112.hatenablog.com/"
+								data-localize="header.blog">Blog</a></li>
 					</div>
 			</nav>
 			<div class="jumbotron">
 				<h1>
 					<img src="image/flappy_title_logo.png" alt="flappy hero shot">flappy
 				</h1>
-				<p>Stress-less communication with your friend by to be
-					disappeard message</p>
+				<p data-localize="index.subtitle">Stress-less communication with
+					your friend by to be disappeard message</p>
 				<p>
 					<a href="#"><img src="image/googleplay.png"></a>
 				</p>
 			</div>
 
-			<h2>This service is for...</h2>
+			<h2 data-localize="index.service_target">This service is for...</h2>
 			<div class="row">
 				<div class="col-md-6">
 					<img src="image/flappy_problem2.png" alt="...">
 				</div>
 				<div class="col-md-6">
-					<h3>No reply although friend already read your message</h3>
-					<p>You have stress if there is no replay from your friend
-						although he/she already read your message.</p>
+					<h3 data-localize="index.no_reply_title">No reply although
+						friend already read your message</h3>
+					<p data-localize="index.no_reply_desc">You have stress if there
+						is no replay from your friend although he/she already read your
+						message.</p>
 				</div>
 			</div>
 			<div class="row">
@@ -149,9 +152,11 @@
 					<img src="image/flappy_problem1.png" alt="...">
 				</div>
 				<div class="col-md-6">
-					<h3>Receive too much number of messages</h3>
-					<p>You have average 100 new unread messages and feel stress to
-						go through all messages.</p>
+					<h3 data-localize="index.too_many_message_title">Receive too
+						much number of messages</h3>
+					<p data-localize="index.too_many_message_desc">You have average
+						100 new unread messages and feel stress to go through all
+						messages.</p>
 				</div>
 			</div>
 			<div class="row">
@@ -159,19 +164,20 @@
 					<img src="image/flappy_problem3.png" alt="...">
 				</div>
 				<div class="col-md-6">
-					<h3>Tend to send too much number of message</h3>
-					<p>If you want to send a bunch of messages to your friends
-						withouy important things.</p>
+					<h3 data-localize="index.wanna_send_title">Tend to send too
+						much number of message</h3>
+					<p data-localize="index.wanna_send_desc">If you want to send a
+						bunch of messages to your friends withouy important things.</p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-6">
-					<h3>Let's get started!</h3>
-					<p>Let's download Android application from below button and get
-						started!</p>
+					<h3 data-localize="index.get_started_title">Let's get started!</h3>
+					<p data-localize="index.get_started_desc">Let's download
+						Android application from below button and get started!</p>
 					<p>
-						<button type="button" class="btn btn-primary btn-lg">Download
-							Android app</button>
+						<button type="button" class="btn btn-primary btn-lg"
+							data-localize="index.download_desc">Download Android app</button>
 					</p>
 				</div>
 				<div class="col-md-6">
@@ -191,19 +197,45 @@
 	<div id="footer">
 		<div class="container">
 			<ul class="nav nav-pills">
-				<li><a href="http://loosecommunication.appspot.com/">Home</a></li>
-				<li><a href="overview.html">About flappy</a></li>
-				<li class="span3"><a href="privacypolicy.html">Privacy
-						policy</a></li>
-				<li class="span4"><a href="tos.html">Terms of use</a></li>
-				<li class="span5"><a href="contact.jsp">Contact</a></li>
+				<li><a href="http://loosecommunication.appspot.com/"
+					data-localize="footer.home">Home</a></li>
+				<li><a href="overview.html" data-localize="footer.about">About
+						flappy</a></li>
+				<li class="span3"><a href="privacypolicy.html"
+					data-localize="footer.privacy">Privacy policy</a></li>
+				<li class="span4"><a href="tos.html" data-localize="footer.tos">Terms
+						of use</a></li>
+				<li class="span5"><a href="contact.jsp"
+					data-localize="footer.contact">Contact</a></li>
 				<li class="span6"><a href="http://mame0112.hatenablog.com/"
-					target="blank">Blog</a></li>
+					target="blank" data-localize="footer.blog">Blog</a></li>
 			</ul>
 			<address>
 				<strong>flappy</strong> flappy.communication@gmail.com
 			</address>
 		</div>
 	</div>
+	<script>
+		function browserLanguage() {
+			try {
+				return (navigator.browserLanguage || navigator.language || navigator.userLanguage)
+						.substr(0, 2)
+			} catch (e) {
+				return undefined;
+			}
+		}
+
+		var lang = browserLanguage();
+		if (lang == undefined) {
+			lang = "en";
+		} else {
+		}
+		var opts = {
+			language : lang,
+			skipLanguage : "en"
+		};
+
+		$("[data-localize]").localize("test", opts);
+	</script>
 </body>
 </html>

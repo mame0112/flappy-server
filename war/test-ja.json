@@ -1,3 +1,34 @@
 {
-"msg":"こんにちは"
+	"header": {
+		"title": "flappy",
+		"about": "このサービスについて",
+		"privacy": "プライバシーポリシー",
+		"tos": "利用規約",
+		"contact": "問い合わせ",
+		"blog": "ブログ"
+	},
+
+	"footer": {
+		"home": "ホーム",
+		"about": "このサービスについて",
+		"privacy": "プライバシーポリシー",
+		"tos": "利用規約",
+		"contact": "問い合わせ",
+		"blog": "ブログ"
+	},
+
+	"index": {
+		"subtitle": "「既読スルー」できる、ストレスフリーな<br>ゆるふわコミュニケーションツール",
+		"service_target": "「flappy」はこんなあなたに:",
+		"no_reply_title": "友達からメッセージの返信が返ってこないことがある",
+		"no_reply_desc": "友達に「既読スルー」されてしまった、メッセージの返信が返ってこなくてイラッ！とすることがある、そんなあなた。",
+		"too_many_message_title": "受信メッセージが多すぎて全部読めない！",
+		"too_many_message_desc": "毎日何百ものメッセージを受信していて、未読が常にある状態がストレスな、そんなあなた。",
+		"wanna_send_title": "友達に、どーでもいい内容のメッセージを送りたい",
+		"wanna_send_desc": "友達に気を遣うことなく、メッセージを自分の送りたいときに送りたい、そんなあなた。",
+		"get_started_title": "早速、始めてみましょう！",
+		"get_started_desc": "flappyはGoogle Playから無料でダウンロードでき、無料で利用できるサービスです。",
+		"download_desc": "Androidアプリをダウンロード"
+	},
+	"msg":"てすと"
 }
