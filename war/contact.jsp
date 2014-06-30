@@ -124,16 +124,28 @@
 
 				}
 			%>
-			<form method="post" name="inquery_form" action="servlet/inquery">
+			<form method="post" name="inquery_form" action="servlet/inquery"
+				accept-charset="UTF-8">
 				<div class="row">
 					<select name="servlet_inquery_category" id="visibleValue">
-						<option value="Not selected" data-localize="contact.category_title" selected>Select category</option>
-						<option value="For apply" data-localize="contact.category_apply">For apply</option>
-						<option value="For how to use" data-localize="contact.category_how_to_use">For how to use</option>
-						<option value="For bug / problem" data-localize="contact.category_bug">For bug / problem</option>
-						<option value="For improvement request" data-localize="contact.category_improve_request">For improvement request</option>
-						<option value="For ads, promotion and interviews" data-localize="contact.category_ads">For ads, promotion and interviews</option>
-						<option value="For others" data-localize="contact.category_others">For others</option>
+						<option value="Not selected"
+							data-localize="contact.category_title" selected>Select
+							category</option>
+						<option value="For apply" data-localize="contact.category_apply">For
+							apply</option>
+						<option value="For how to use"
+							data-localize="contact.category_how_to_use">For how to
+							use</option>
+						<option value="For bug / problem"
+							data-localize="contact.category_bug">For bug / problem</option>
+						<option value="For improvement request"
+							data-localize="contact.category_improve_request">For
+							improvement request</option>
+						<option value="For ads, promotion and interviews"
+							data-localize="contact.category_ads">For ads, promotion
+							and interviews</option>
+						<option value="For others" data-localize="contact.category_others">For
+							others</option>
 					</select>
 				</div>
 
