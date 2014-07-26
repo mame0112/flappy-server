@@ -14,10 +14,7 @@ import com.google.appengine.api.datastore.Key;
 public class LcomUserData {
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key mKey;
-
-	@Persistent
-	private int mUserId = 0;
+	private long mUserId = 0;
 
 	@Persistent
 	private String mUserName = null;
@@ -34,7 +31,7 @@ public class LcomUserData {
 	/**
 	 * Constructor
 	 */
-	public LcomUserData(int userId, String userName, String password,
+	public LcomUserData(long userId, String userName, String password,
 			String mailAddress, Blob thumbnail) {
 		mUserId = userId;
 		mUserName = userName;
@@ -43,7 +40,7 @@ public class LcomUserData {
 		mThumbnail = thumbnail;
 	}
 
-	public int getUserId() {
+	public long getUserId() {
 		return mUserId;
 	}
 
@@ -63,7 +60,7 @@ public class LcomUserData {
 		return mThumbnail;
 	}
 
-	public void setUserId(int userId) {
+	public void setUserId(long userId) {
 		mUserId = userId;
 	}
 

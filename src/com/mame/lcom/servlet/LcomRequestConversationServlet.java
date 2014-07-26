@@ -42,9 +42,10 @@ public class LcomRequestConversationServlet extends HttpServlet {
 			list.add(origin);
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
+			long currentTime = TimeUtil.getCurrentDate();
 			List<LcomNewMessageData> datas = manager
 					.getNewMessagesWithTargetUser(Integer.valueOf(userId),
-							Integer.valueOf(friendUserId));
+							Integer.valueOf(friendUserId), currentTime);
 			if (datas != null && datas.size() != 0) {
 				String result = DatastoreUtil.parseNewMessageList(datas);
 				list.add(result);

@@ -40,7 +40,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 		List<String> list = new ArrayList<String>();
 
 		int result = LcomConst.CREATE_ACCOUNT_RESULT_OK;
-		int userId = LcomConst.NO_USER;
+		long userId = LcomConst.NO_USER;
 
 		if (origin != null && userName != null && password != null
 				&& mailAddress != null && apiLevel != null) {
@@ -62,7 +62,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 			if (userId == LcomConst.NO_USER) {
 				// Check if the current user is registered by other use because
 				// someone asked him to join this service
-				int userIdByMail = manager.getUserIdByMailAddress(mailAddress);
+				long userIdByMail = manager.getUserIdByMailAddress(mailAddress);
 				log.log(Level.INFO, "userIdByMail: " + userIdByMail);
 				if (userIdByMail == LcomConst.NO_USER) {
 					// If the target mail address doesn't exist in DB (This is

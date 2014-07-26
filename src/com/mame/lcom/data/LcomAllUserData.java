@@ -13,9 +13,6 @@ public class LcomAllUserData {
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key mKey;
-
-	@Persistent
 	private int mTotalUserNum = 0;
 
 	public LcomAllUserData(int totalUserNum) {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datastore-indexes autoGenerate="false">
+	<datastore-index kind="LcomFriendshipData" ancestor="true"
+		source="manual">
+		<property name="mExpireTime" direction="asc" />
+	</datastore-index>
+	<datastore-index kind="LcomUserData" ancestor="true"
+		source="manual">
+		<property name="mThumbnail" direction="asc" />
+	</datastore-index>
+</datastore-indexes>

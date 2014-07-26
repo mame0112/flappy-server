@@ -63,11 +63,6 @@ public class LcomMessagePushServlet extends HttpServlet {
 			log.log(Level.WARNING, "registrationId: " + registrationId);
 
 			Result result = sender.send(message, registrationId, RETRY_COUNT);
-			// Result result = sender
-			// .send(message,
-			// "APA91bEXOz2NPGB7zzZkQMgBiR8AyGvAa1gUE-F-cX5IMu9_s_KDMUI6ikvCxokbEzcHTQbQAC1EfoEKysh0NJDggulwQz18jRSkqmJV9ASIX4cdnI2RBpGSR6qNe9W0baZL9lBC1XPev1Gg_t06SKnb7aQ4doGgYA",
-			// RETRY_COUNT);
-
 			res.setContentType("text/plain");
 			res.getWriter().println("Result=" + result);
 		} else if ("sendAll".equals(action)) {

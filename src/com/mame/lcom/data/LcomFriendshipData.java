@@ -13,19 +13,13 @@ public class LcomFriendshipData {
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key mKey;
+	private long mUserId = 0;
 
 	@Persistent
-	private int mFirstUserId = 0;
+	private long mFriendUserId = 0;
 
 	@Persistent
-	private String mFirstUserName = null;
-
-	@Persistent
-	private int mSecondUserId = 0;
-
-	@Persistent
-	private String mSecondUserName = null;
+	private String mFriendUserName = null;
 
 	@Persistent
 	private String mLastMessage = null;
@@ -41,36 +35,34 @@ public class LcomFriendshipData {
 	 * we correct latest information if the user requests this data. Therefore,
 	 * we need not to store to Datastore.
 	 */
-	@Persistent
-	private int mNumOfNewMessage = 0;
+	// @Persistent
+	// private int mNumOfNewMessage = 0;
 
-	public LcomFriendshipData(int firstUserId, String firstUserName,
-			int secondUserId, String secondUserName, String lastMessage,
-			long expireTime, int numOfNewMessage) {
-		mFirstUserId = firstUserId;
-		mFirstUserName = firstUserName;
-		mSecondUserId = secondUserId;
-		mSecondUserName = secondUserName;
+	public LcomFriendshipData(long userId, long friendUserId,
+			String friendUserName, String lastMessage, long expireTime) {
+		mUserId = userId;
+		mFriendUserId = friendUserId;
+		mFriendUserName = friendUserName;
 		mLastMessage = lastMessage;
 		mLastExpireTime = expireTime;
-		mNumOfNewMessage = numOfNewMessage;
+		// mNumOfNewMessage = numOfNewMessage;
 
 	}
 
-	public int getFirstUserId() {
-		return mFirstUserId;
+	public long getFirstUserId() {
+		return mUserId;
 	}
 
-	public int getSecondUserId() {
-		return mSecondUserId;
+	public long getSecondUserId() {
+		return mFriendUserId;
 	}
 
-	public String getFirstUserName() {
-		return mFirstUserName;
-	}
+	// public String getFirstUserName() {
+	// return mUserName;
+	// }
 
 	public String getSecondUserName() {
-		return mSecondUserName;
+		return mFriendUserName;
 	}
 
 	public String getLatestMessage() {
@@ -81,24 +73,24 @@ public class LcomFriendshipData {
 		return mLastExpireTime;
 	}
 
-	public int getNumOfNewMessage() {
-		return mNumOfNewMessage;
+	// public int getNumOfNewMessage() {
+	// return mNumOfNewMessage;
+	// }
+
+	public void setFirstUserId(long userId) {
+		mUserId = userId;
 	}
 
-	public void setFirstUserId(int firstUserId) {
-		mFirstUserId = firstUserId;
+	public void setSecondUserId(long friendUserId) {
+		mFriendUserId = friendUserId;
 	}
 
-	public void setSecondUserId(int secondUserId) {
-		mSecondUserId = secondUserId;
-	}
+	// public void setFirstUserName(String userName) {
+	// mUserName = userName;
+	// }
 
-	public void setFirstUserName(String firstUserName) {
-		mFirstUserName = firstUserName;
-	}
-
-	public void setSecondUserName(String secondUserName) {
-		mSecondUserName = secondUserName;
+	public void setSecondUserName(String friendUserName) {
+		mFriendUserName = friendUserName;
 	}
 
 	public void setLatestMessage(String lastMessage) {
@@ -109,7 +101,7 @@ public class LcomFriendshipData {
 		mLastExpireTime = time;
 	}
 
-	public void setNumOfNewMessage(int numOfNewMessage) {
-		mNumOfNewMessage = numOfNewMessage;
-	}
+	// public void setNumOfNewMessage(int numOfNewMessage) {
+	// mNumOfNewMessage = numOfNewMessage;
+	// }
 }

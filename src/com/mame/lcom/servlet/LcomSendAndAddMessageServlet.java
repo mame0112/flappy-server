@@ -59,9 +59,9 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 
 			// Update Friendship table so that we can show it in
 			// FrinedListActivity
-			manager.updateLatestMessageInfoOnFriendshipTable(
-					Integer.valueOf(userId), Integer.valueOf(targetUserId),
-					message, Long.valueOf(date));
+//			manager.updateLatestMessageInfoOnFriendshipTable(
+//					Integer.valueOf(userId), Integer.valueOf(targetUserId),
+//					message, Long.valueOf(date));
 
 			// Send message data to friend via GCM
 			String regId = manager.getDeviceIdForGCMPush(Integer

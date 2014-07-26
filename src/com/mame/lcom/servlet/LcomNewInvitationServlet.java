@@ -49,7 +49,7 @@ public class LcomNewInvitationServlet extends HttpServlet {
 		// int userId = LcomConst.NO_USER;
 
 		String existingUsername = null;
-		int existingUserId = LcomConst.NO_USER;
+		long existingUserId = LcomConst.NO_USER;
 
 		if (origin != null && userId != null && userName != null
 				&& mailAddress != null && apiLevel != null) {
@@ -61,7 +61,7 @@ public class LcomNewInvitationServlet extends HttpServlet {
 			// }
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
-			int targetUserId = manager.getUserIdByMailAddress(mailAddress);
+			long targetUserId = manager.getUserIdByMailAddress(mailAddress);
 
 			log.log(Level.INFO, "id from mail address:" + targetUserId);
 

@@ -44,50 +44,53 @@ public class LcomNewMessageServlet extends HttpServlet {
 			long currentTime = TimeUtil.getCurrentDate();
 
 			List<LcomFriendshipData> friendListData = manager
-					.getFriendListData(Integer.valueOf(userId), currentTime);
+					.getFriendListData(Long.valueOf(userId), currentTime);
 
 			if (friendListData != null && friendListData.size() != 0) {
 
-				// If user name is not available, we use mail address instead.
-				for (LcomFriendshipData data : friendListData) {
-					log.log(Level.INFO, "currentTime:" + currentTime);
-					log.log(Level.INFO, "data.getLastMessageExpireTime():"
-							+ data.getLastMessageExpireTime());
-					// Not to send already expire data
-					// if (currentTime < data.getLastMessageExpireTime()) {
-					int firstUserId = data.getFirstUserId();
-
-					// If first user is user himself (meaning friend is
-					// second
-					// user)
-					if (firstUserId == Integer.valueOf(userId)) {
-						String friendName = data.getSecondUserName();
-						log.log(Level.INFO, "getSecondUserName: " + friendName);
-						if (friendName == null || friendName.equals("")
-								|| friendName.equals(LcomConst.NULL)) {
-							log.log(Level.INFO, "data.getSecondUserId():"
-									+ data.getSecondUserId());
-							LcomUserData friendData = manager.getUserData(data
-									.getSecondUserId());
-							data.setSecondUserName(friendData.getMailAddress());
-						}
-					} else {
-						// If second user is user (meaning friend is first
-						// user)
-						String friendName = data.getFirstUserName();
-						log.log(Level.INFO, "getFirstUserName: " + friendName);
-						if (friendName == null || friendName.equals("")
-								|| friendName.equals(LcomConst.NULL)) {
-							log.log(Level.INFO,
-									"data.getFirstUserId():"
-											+ data.getFirstUserId());
-							LcomUserData friendData = manager.getUserData(data
-									.getFirstUserId());
-							data.setSecondUserName(friendData.getMailAddress());
-						}
-					}
-					// }
-				}
+				// long firstUserId = LcomConst.NO_USER;
+				//
+				// // If user name is not available, we use mail address
+				// instead.
+				// for (LcomFriendshipData data : friendListData) {
+				// log.log(Level.INFO, "currentTime:" + currentTime);
+				// log.log(Level.INFO, "data.getLastMessageExpireTime():"
+				// + data.getLastMessageExpireTime());
+				// // Not to send already expire data
+				// // if (currentTime < data.getLastMessageExpireTime()) {
+				// firstUserId = data.getFirstUserId();
+				//
+				// // If first user is user himself (meaning friend is
+				// // second
+				// // user)
+				// if (firstUserId == Integer.valueOf(userId)) {
+				// String friendName = data.getSecondUserName();
+				// log.log(Level.INFO, "getSecondUserName: " + friendName);
+				// if (friendName == null || friendName.equals("")
+				// || friendName.equals(LcomConst.NULL)) {
+				// log.log(Level.INFO, "data.getSecondUserId():"
+				// + data.getSecondUserId());
+				// LcomUserData friendData = manager.getUserData(data
+				// .getSecondUserId());
+				// data.setSecondUserName(friendData.getMailAddress());
+				// }
+				// } else {
+				// // If second user is user (meaning friend is first
+				// // user)
+				// String friendName = data.getFirstUserName();
+				// log.log(Level.INFO, "getFirstUserName: " + friendName);
+				// if (friendName == null || friendName.equals("")
+				// || friendName.equals(LcomConst.NULL)) {
+				// log.log(Level.INFO,
+				// "data.getFirstUserId():"
+				// + data.getFirstUserId());
+				// LcomUserData friendData = manager.getUserData(data
+				// .getFirstUserId());
+				// data.setSecondUserName(friendData.getMailAddress());
+				// }
+				// }
+				// // }
+				// }
 
 				String result = DatastoreUtil.parseFriendListData(
 						Integer.valueOf(userId), friendListData);

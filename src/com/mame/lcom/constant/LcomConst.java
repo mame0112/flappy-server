@@ -51,6 +51,40 @@ public class LcomConst {
 
 	public final static String MESSAGE_EXPIRED = "EXPIRED";
 
+	public final static String KIND_ALL_USER_DATA = "LcomAllUserData";
+
+	public final static String KIND_USER_DATA = "LcomUserData";
+
+	public final static String KIND_FRIENDSHIP_DATA = "LcomFriendshipData";
+
+	public final static String ENTITY_TOTAL_USER_NUM = "mTotalUserNum";
+
+	public final static String ENTITY_USER_ID = "mUserId";
+
+	public final static String ENTITY_USER_NAME = "mUserName";
+
+	public final static String ENTITY_PASSWORD = "mPassword";
+
+	public final static String ENTITY_MAIL_ADDRESS = "mMailAddress";
+
+	public final static String ENTITY_THUMBNAIL = "mThumbnail";
+
+	public final static String ENTITY_DEVICE_ID = "mDeviceId";
+
+	public final static String ENTITY_FRIENDSHIP_USER_ID = "mUserId";
+
+	public final static String ENTITY_FRIENDSHIP_USER_NAME = "mUserName";
+
+	public final static String ENTITY_FRIENDSHIP_FRIEND_ID = "mFriendUserId";
+
+	public final static String ENTITY_FRIENDSHIP_FRIEND_NAME = "mFriendUserName";
+
+	public final static String ENTITY_FRIENDSHIP_RECEIVE_MESSAGE = "mReceiveMessage";
+
+	public final static String ENTITY_FRIENDSHIP_POSTED_TIME = "mPostedTime";
+	
+	public final static String ENTITY_FRIENDSHIP_EXPIRE_TIME = "mExpireTime";
+
 	// public final static String SERVLET_CONTEXT_IDENTIFIER =
 	// "servlet_identifier";
 

@@ -79,12 +79,12 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 
 				manager.addNewFriendshipInfo(Integer.valueOf(userId), userName,
 						Integer.valueOf(targetUserId), targetUserName, message,
-						currentTime, 0);
+						currentTime);
 
-				long currentDate = TimeUtil.getCurrentDate();
-				manager.addNewMessageInfo(Integer.valueOf(userId),
-						Integer.valueOf(targetUserId), userName, null, message,
-						currentDate);
+				// long currentDate = TimeUtil.getCurrentDate();
+				// manager.addNewMessageInfo(Integer.valueOf(userId),
+				// Integer.valueOf(targetUserId), userName, null, message,
+				// currentDate);
 
 				// Send back targetUserId
 				list.add(targetUserId);
@@ -96,7 +96,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 				list.add(message);
 
 				// Send back date info
-				list.add(String.valueOf(currentDate));
+				list.add(String.valueOf(currentTime));
 
 				// Set result
 				list.add(String.valueOf(result));
@@ -114,7 +114,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 						userName, message, language);
 
 				long currentTime = TimeUtil.getCurrentDate();
-				int newUserId = LcomConst.NO_USER;
+				long newUserId = LcomConst.NO_USER;
 
 				if (mailResult) {
 					result = LcomConst.INVITATION_CONFIRMED_RESULT_OK;
@@ -127,19 +127,19 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 					newUserId = manager.addNewUserData(data);
 
 					// If user and targer user is not friend yet.
-					if (!manager.isUsersAreFriend(Integer.valueOf(userId),
+					if (!manager.isUsersAreFriend(Long.parseLong(userId),
 							newUserId)) {
 						// manager.addNewFriendshipInfo(Integer.valueOf(userId),
 						// newUserId);
 
-						manager.addNewFriendshipInfo(Integer.valueOf(userId),
-								userName, Integer.valueOf(newUserId),
-								targetUserName, message, currentTime, 0);
+						manager.addNewFriendshipInfo(Long.parseLong(userId),
+								userName, Long.valueOf(newUserId),
+								targetUserName, message, currentTime);
 
+					} else {
+						manager.addNewMessageInfo(Long.valueOf(userId),
+								newUserId, userName, null, message, currentTime);
 					}
-
-					manager.addNewMessageInfo(Integer.valueOf(userId),
-							newUserId, userName, null, message, currentTime);
 				}
 
 				// Send back targetUserId

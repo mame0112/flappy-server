@@ -95,47 +95,36 @@ public class DatastoreUtil {
 
 	public static String parseNewMessage(LcomNewMessageData data) {
 		String parsed = null;
-		int userId = data.getUserId();
-		String userName = data.getUserName();
-		int targetUserId = data.getTargetUserId();
+		long userId = data.getUserId();
+		// String userName = data.getUserName();
+		long targetUserId = data.getTargetUserId();
 		String targetUserName = data.getTargetUserName();
-		String message = data.getMessage();
-		long postDate = data.getPostedDate();
+		List<String> message = data.getMessage();
+		List<Long> postDate = data.getPostedDate();
 
-		if (userName == null) {
-			userName = "unknown";
-		}
 		if (targetUserName == null) {
 			targetUserName = "unknown";
 		}
-		if (message == null) {
-			message = "unknown";
-		}
 
-		if (postDate == 0L) {
-			postDate = TimeUtil.getCurrentDate();
-		}
-
-		parsed = userId + LcomConst.SEPARATOR + userName + LcomConst.SEPARATOR
-				+ targetUserId + LcomConst.SEPARATOR + targetUserName
-				+ LcomConst.SEPARATOR + message + LcomConst.SEPARATOR
-				+ String.valueOf(postDate);
+		parsed = userId + LcomConst.SEPARATOR + +targetUserId
+				+ LcomConst.SEPARATOR + targetUserName + LcomConst.SEPARATOR
+				+ message + LcomConst.SEPARATOR + String.valueOf(postDate);
 		return parsed;
 	}
 
-	public static String parseNewMessage(int userId, LcomFriendshipData data) {
+	public static String parseNewMessage(long userId, LcomFriendshipData data) {
 		String parsed = null;
-		int firstUserId = data.getFirstUserId();
-		String firstUserName = data.getFirstUserName();
-		int secondUserId = data.getSecondUserId();
+		// int firstUserId = data.getFirstUserId();
+		// String firstUserName = data.getFirstUserName();
+		long secondUserId = data.getSecondUserId();
 		String secondUserName = data.getSecondUserName();
 		String message = data.getLatestMessage();
 		long expireDate = data.getLastMessageExpireTime();
-		int numOfMessage = data.getNumOfNewMessage();
+		// int numOfMessage = data.getNumOfNewMessage();
 
-		if (firstUserName == null) {
-			firstUserName = "unknown";
-		}
+		// if (firstUserName == null) {
+		// firstUserName = "unknown";
+		// }
 		if (secondUserName == null) {
 			secondUserName = "unknown";
 		}
@@ -147,19 +136,9 @@ public class DatastoreUtil {
 			expireDate = TimeUtil.getCurrentDate() + 1;
 		}
 
-		if (userId == firstUserId) {
-			parsed = firstUserId + LcomConst.SEPARATOR + firstUserName
-					+ LcomConst.SEPARATOR + secondUserId + LcomConst.SEPARATOR
-					+ secondUserName + LcomConst.SEPARATOR + message
-					+ LcomConst.SEPARATOR + String.valueOf(expireDate)
-					+ LcomConst.SEPARATOR + numOfMessage;
-		} else {
-			parsed = secondUserId + LcomConst.SEPARATOR + secondUserName
-					+ LcomConst.SEPARATOR + firstUserId + LcomConst.SEPARATOR
-					+ firstUserName + LcomConst.SEPARATOR + message
-					+ LcomConst.SEPARATOR + String.valueOf(expireDate)
-					+ LcomConst.SEPARATOR + numOfMessage;
-		}
+		parsed = secondUserId + LcomConst.SEPARATOR + secondUserName
+				+ LcomConst.SEPARATOR + message + LcomConst.SEPARATOR
+				+ String.valueOf(expireDate);
 
 		return parsed;
 	}

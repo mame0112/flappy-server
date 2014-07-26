@@ -33,7 +33,7 @@ public class LcomLoginServlet extends HttpServlet {
 		list.add(origin);
 
 		int result = LcomConst.LOGIN_RESULT_OK;
-		int userId = LcomConst.NO_USER;
+		long userId = LcomConst.NO_USER;
 
 		if (origin != null && userName != null && password != null
 				&& apiLevel != null) {

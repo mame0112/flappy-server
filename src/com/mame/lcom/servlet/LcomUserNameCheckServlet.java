@@ -33,7 +33,7 @@ public class LcomUserNameCheckServlet extends HttpServlet {
 		List<String> list = new ArrayList<String>();
 
 		int result = LcomConst.CREATE_ACCOUNT_RESULT_OK;
-		int userId = LcomConst.NO_USER;
+		long userId = LcomConst.NO_USER;
 
 		list.add(origin);
 

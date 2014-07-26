@@ -1,100 +1,67 @@
 package com.mame.lcom.data;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
-
-import javax.jdo.annotations.IdentityType;
-
-import com.google.appengine.api.datastore.Key;
-
-@PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class LcomNewMessageData {
-	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key mKey;
+	private long mUserId = 0;
 
-	@Persistent
-	private int mUserId = 0;
+	private long mTargetUserId = 0;
 
-	@Persistent
-	private int mTargetUserId = 0;
-
-	@Persistent
-	private String mUserName = null;
-
-	@Persistent
 	private String mTargetUserName = null;
 
-	@Persistent
-	private String mMessage = null;
+	private List<String> mMessage = new ArrayList<String>();
 
-	/**
-	 * This date should be stored as UTC.
-	 */
-	@Persistent
-	private long mPostedDate = 0L;
+	private List<Long> mPostedDate = new ArrayList<Long>();
 
-	/**
-	 * Expire time. This message will be expired at this time. And this date
-	 * should be stored as UTC.
-	 */
-	@Persistent
-	private long mExpireTime = 0L;
-
-	@Persistent
-	private boolean mIsRead = false;
+	private List<Long> mExpireTime = new ArrayList<Long>();
 
 	/**
 	 * Constructor
 	 */
-	public LcomNewMessageData(int userId, int targetUserId, String userName,
-			String targetUserName, String message, long postedDate,
-			long expireTime, boolean isRead) {
+	public LcomNewMessageData(long userId, long targetUserId,
+			String targetUserName, List<String> message, List<Long> postedDate,
+			List<Long> expireTime) {
 		mUserId = userId;
 		mTargetUserId = targetUserId;
-		mUserName = userName;
+		// mUserName = userName;
 		mTargetUserName = targetUserName;
 		mMessage = message;
 		mPostedDate = postedDate;
 		mExpireTime = expireTime;
-		mIsRead = isRead;
 	}
 
-	public int getUserId() {
+	public long getUserId() {
 		return mUserId;
 	}
 
-	public int getTargetUserId() {
+	public long getTargetUserId() {
 		return mTargetUserId;
 	}
 
-	public String getUserName() {
-		return mUserName;
-	}
+	// public String getUserName() {
+	// return mUserName;
+	// }
 
 	public String getTargetUserName() {
 		return mTargetUserName;
 	}
 
-	public String getMessage() {
+	public List<String> getMessage() {
 		return mMessage;
 	}
 
-	public long getPostedDate() {
+	public List<Long> getPostedDate() {
 		return mPostedDate;
 	}
 
-	public long getExpireDate() {
+	public List<Long> getExpireDate() {
 		return mExpireTime;
 	}
 
-	public boolean isMessageRead() {
-		return mIsRead;
-	}
+	// public boolean isMessageRead() {
+	// return mIsRead;
+	// }
 
 	public void setUserId(int userId) {
 		mUserId = userId;
@@ -104,28 +71,28 @@ public class LcomNewMessageData {
 		mTargetUserId = targetUserId;
 	}
 
-	public void setUserName(String userName) {
-		mUserName = userName;
-	}
+	// public void setUserName(String userName) {
+	// mUserName = userName;
+	// }
 
 	public void setTargetUserName(String targetUserName) {
 		mTargetUserName = targetUserName;
 	}
 
-	public void setMessage(String message) {
+	public void setMessage(List<String> message) {
 		mMessage = message;
 	}
 
-	public void setPostedDate(long postedDate) {
+	public void setPostedDate(List<Long> postedDate) {
 		mPostedDate = postedDate;
 	}
 
-	public void setExpireTime(long expireTime) {
+	public void setExpireTime(List<Long> expireTime) {
 		mExpireTime = expireTime;
 	}
 
-	public void setReadState(boolean isRead) {
-		mIsRead = isRead;
-	}
+	// public void setReadState(boolean isRead) {
+	// mIsRead = isRead;
+	// }
 
 }
