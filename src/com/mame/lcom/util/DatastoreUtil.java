@@ -54,23 +54,24 @@ public class DatastoreUtil {
 			// + parseNewMessage(data));
 			if (data != null) {
 				if (isFirstTime) {
-					result = parseNewMessage(data) + LcomConst.ITEM_SEPARATOR;
+					result = parseNewMessage(data);
 					isFirstTime = false;
 				} else {
-					result = result + parseNewMessage(data)
-							+ LcomConst.ITEM_SEPARATOR;
+					result = result + LcomConst.ITEM_SEPARATOR
+							+ parseNewMessage(data);
 				}
 				log.log(Level.WARNING, "result: " + result);
 			}
 		}
 		// Remove last separator
-		result = result.substring(0,
-				result.length() - LcomConst.ITEM_SEPARATOR.length());
+		// result = result.substring(0,
+		// result.length() - LcomConst.ITEM_SEPARATOR.length());
 		return result;
 	}
 
 	public static String parseFriendListData(int userId,
 			List<LcomFriendshipData> friendListData) {
+		log.log(Level.WARNING, "parseFriendListData ");
 		String result = null;
 		boolean isFirstTime = true;
 		for (LcomFriendshipData data : friendListData) {
@@ -99,16 +100,44 @@ public class DatastoreUtil {
 		// String userName = data.getUserName();
 		long targetUserId = data.getTargetUserId();
 		String targetUserName = data.getTargetUserName();
-		List<String> message = data.getMessage();
+		List<String> messages = data.getMessage();
 		List<Long> postDate = data.getPostedDate();
 
 		if (targetUserName == null) {
 			targetUserName = "unknown";
 		}
 
+		String parsedMessage = null;
+		if (messages != null && messages.size() != 0) {
+			boolean isFirst = true;
+			for (String msg : messages) {
+				if (isFirst) {
+					parsedMessage = msg;
+					isFirst = false;
+				} else {
+					parsedMessage = parsedMessage + LcomConst.MESSAGE_SEPARATOR
+							+ msg;
+				}
+			}
+		}
+
+		String parsedDate = null;
+		if (postDate != null && postDate.size() != 0) {
+			boolean isFirst = true;
+			for (Long date : postDate) {
+				if (isFirst) {
+					parsedDate = String.valueOf(date);
+					isFirst = false;
+				} else {
+					parsedDate = parsedDate + LcomConst.MESSAGE_SEPARATOR
+							+ date;
+				}
+			}
+		}
+
 		parsed = userId + LcomConst.SEPARATOR + +targetUserId
 				+ LcomConst.SEPARATOR + targetUserName + LcomConst.SEPARATOR
-				+ message + LcomConst.SEPARATOR + String.valueOf(postDate);
+				+ parsedMessage + LcomConst.SEPARATOR + parsedDate;
 		return parsed;
 	}
 
@@ -118,8 +147,8 @@ public class DatastoreUtil {
 		// String firstUserName = data.getFirstUserName();
 		long secondUserId = data.getSecondUserId();
 		String secondUserName = data.getSecondUserName();
-		String message = data.getLatestMessage();
-		long expireDate = data.getLastMessageExpireTime();
+		List<String> messages = data.getLatestMessage();
+		List<Long> expireDate = data.getLastMessageExpireTime();
 		// int numOfMessage = data.getNumOfNewMessage();
 
 		// if (firstUserName == null) {
@@ -128,17 +157,48 @@ public class DatastoreUtil {
 		if (secondUserName == null) {
 			secondUserName = "unknown";
 		}
-		if (message == null) {
-			message = "unknown";
+		// if (messages == null) {
+		// messages = "unknown";
+		// }
+
+		// if (expireDate == 0L) {
+		// expireDate = TimeUtil.getCurrentDate() + 1;
+		// }
+
+		String parsedMessage = null;
+		if (messages != null && messages.size() != 0) {
+			boolean isFirst = true;
+			for (String msg : messages) {
+				if (isFirst) {
+					parsedMessage = msg;
+					isFirst = false;
+				} else {
+					parsedMessage = parsedMessage + LcomConst.MESSAGE_SEPARATOR
+							+ msg;
+				}
+			}
 		}
 
-		if (expireDate == 0L) {
-			expireDate = TimeUtil.getCurrentDate() + 1;
+		String parsedDate = null;
+		if (expireDate != null && expireDate.size() != 0) {
+			boolean isFirst = true;
+			for (Long date : expireDate) {
+				if (isFirst) {
+					parsedDate = String.valueOf(date);
+					isFirst = false;
+				} else {
+					parsedDate = parsedDate + LcomConst.MESSAGE_SEPARATOR
+							+ date;
+				}
+			}
 		}
+
+		log.log(Level.WARNING, "parsedMessage: " + parsedMessage);
+		log.log(Level.WARNING, "parsedDate: " + parsedDate);
 
 		parsed = secondUserId + LcomConst.SEPARATOR + secondUserName
-				+ LcomConst.SEPARATOR + message + LcomConst.SEPARATOR
-				+ String.valueOf(expireDate);
+				+ LcomConst.SEPARATOR + parsedMessage + LcomConst.SEPARATOR
+				+ parsedDate;
 
 		return parsed;
 	}

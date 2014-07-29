@@ -1,5 +1,7 @@
 package com.mame.lcom.data;
 
+import java.util.List;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
@@ -22,13 +24,13 @@ public class LcomFriendshipData {
 	private String mFriendUserName = null;
 
 	@Persistent
-	private String mLastMessage = null;
+	private List<String> mNewMessage = null;
 
 	/**
 	 * Time that last messag is sent
 	 */
 	@Persistent
-	private long mLastExpireTime = 0L;
+	private List<Long> mExpireTime = null;
 
 	/**
 	 * This will be used to send the number of new message to client side. Then,
@@ -39,12 +41,13 @@ public class LcomFriendshipData {
 	// private int mNumOfNewMessage = 0;
 
 	public LcomFriendshipData(long userId, long friendUserId,
-			String friendUserName, String lastMessage, long expireTime) {
+			String friendUserName, List<String> newMessage,
+			List<Long> expireTime) {
 		mUserId = userId;
 		mFriendUserId = friendUserId;
 		mFriendUserName = friendUserName;
-		mLastMessage = lastMessage;
-		mLastExpireTime = expireTime;
+		mNewMessage = newMessage;
+		mExpireTime = expireTime;
 		// mNumOfNewMessage = numOfNewMessage;
 
 	}
@@ -65,12 +68,12 @@ public class LcomFriendshipData {
 		return mFriendUserName;
 	}
 
-	public String getLatestMessage() {
-		return mLastMessage;
+	public List<String> getLatestMessage() {
+		return mNewMessage;
 	}
 
-	public long getLastMessageExpireTime() {
-		return mLastExpireTime;
+	public List<Long> getLastMessageExpireTime() {
+		return mExpireTime;
 	}
 
 	// public int getNumOfNewMessage() {
@@ -93,12 +96,12 @@ public class LcomFriendshipData {
 		mFriendUserName = friendUserName;
 	}
 
-	public void setLatestMessage(String lastMessage) {
-		mLastMessage = lastMessage;
+	public void setLatestMessage(List<String> newMessage) {
+		mNewMessage = newMessage;
 	}
 
-	public void setLastMessageExpireTime(long time) {
-		mLastExpireTime = time;
+	public void setLastMessageExpireTime(List<Long> expireTime) {
+		mExpireTime = expireTime;
 	}
 
 	// public void setNumOfNewMessage(int numOfNewMessage) {

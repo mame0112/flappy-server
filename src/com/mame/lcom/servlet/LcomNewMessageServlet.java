@@ -44,7 +44,7 @@ public class LcomNewMessageServlet extends HttpServlet {
 			long currentTime = TimeUtil.getCurrentDate();
 
 			List<LcomFriendshipData> friendListData = manager
-					.getFriendListData(Long.valueOf(userId), currentTime);
+					.getNewMessageData(Long.valueOf(userId), currentTime);
 
 			if (friendListData != null && friendListData.size() != 0) {
 
@@ -97,6 +97,8 @@ public class LcomNewMessageServlet extends HttpServlet {
 
 				log.log(Level.INFO, "result::" + result);
 				list.add(result);
+			} else {
+				log.log(Level.INFO, "friendListData is null or 0");
 			}
 		}
 

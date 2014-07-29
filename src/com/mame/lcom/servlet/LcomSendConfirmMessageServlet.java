@@ -125,21 +125,25 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 					LcomUserData data = new LcomUserData(LcomConst.NO_USER,
 							null, null, mailAddress, null);
 					newUserId = manager.addNewUserData(data);
+					
+					
+					manager.addNewMessageInfo(Long.valueOf(userId), newUserId,
+							userName, null, message, currentTime);
 
-					// If user and targer user is not friend yet.
-					if (!manager.isUsersAreFriend(Long.parseLong(userId),
-							newUserId)) {
-						// manager.addNewFriendshipInfo(Integer.valueOf(userId),
-						// newUserId);
-
-						manager.addNewFriendshipInfo(Long.parseLong(userId),
-								userName, Long.valueOf(newUserId),
-								targetUserName, message, currentTime);
-
-					} else {
-						manager.addNewMessageInfo(Long.valueOf(userId),
-								newUserId, userName, null, message, currentTime);
-					}
+//					// If user and targer user is not friend yet.
+//					if (!manager.isUsersAreFriend(Long.parseLong(userId),
+//							newUserId)) {
+//						// manager.addNewFriendshipInfo(Integer.valueOf(userId),
+//						// newUserId);
+//
+//						manager.addNewFriendshipInfo(Long.parseLong(userId),
+//								userName, Long.valueOf(newUserId),
+//								targetUserName, message, currentTime);
+//
+//					} else {
+//						manager.addNewMessageInfo(Long.valueOf(userId),
+//								newUserId, userName, null, message, currentTime);
+//					}
 				}
 
 				// Send back targetUserId

@@ -8,4 +8,8 @@
 		source="manual">
 		<property name="mThumbnail" direction="asc" />
 	</datastore-index>
+	<datastore-index kind="LcomFriendshipData" ancestor="true"
+		source="manual">
+		<property name="mReceiveMessage" direction="asc" />
+	</datastore-index>
 </datastore-indexes>

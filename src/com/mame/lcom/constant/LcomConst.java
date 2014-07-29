@@ -82,7 +82,7 @@ public class LcomConst {
 	public final static String ENTITY_FRIENDSHIP_RECEIVE_MESSAGE = "mReceiveMessage";
 
 	public final static String ENTITY_FRIENDSHIP_POSTED_TIME = "mPostedTime";
-	
+
 	public final static String ENTITY_FRIENDSHIP_EXPIRE_TIME = "mExpireTime";
 
 	// public final static String SERVLET_CONTEXT_IDENTIFIER =
@@ -140,7 +140,7 @@ public class LcomConst {
 	/**
 	 * Constant for message expire time.
 	 */
-	public final static long MESSAGE_EXPIRE_PERIOD = 1 * 60 * 1000; //
+	public final static long MESSAGE_EXPIRE_PERIOD = 30 * 60 * 1000;
 	// 30min*60sec*1000msec
 	// public final static int MESSAGE_EXPIRE_PERIOD = 30; // 30min
 
@@ -148,6 +148,8 @@ public class LcomConst {
 	 * Separator between each item within message
 	 */
 	public final static String SEPARATOR = "@@";
+
+	public final static String MESSAGE_SEPARATOR = "__";
 
 	public final static String ITEM_SEPARATOR = "##";
 
