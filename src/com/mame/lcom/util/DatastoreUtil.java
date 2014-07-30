@@ -187,7 +187,6 @@ public class DatastoreUtil {
 				}
 			}
 		}
-
 		String parsedDate = null;
 		if (expireDate != null && expireDate.size() != 0) {
 			boolean isFirst = true;
