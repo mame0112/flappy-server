@@ -74,23 +74,30 @@ public class DatastoreUtil {
 		log.log(Level.WARNING, "parseFriendListData ");
 		String result = null;
 		boolean isFirstTime = true;
-		for (LcomFriendshipData data : friendListData) {
-			// log.log(Level.INFO, "parseNewMessage(data):"
-			// + parseNewMessage(data));
-			if (data != null) {
-				if (isFirstTime) {
-					result = parseNewMessage(userId, data)
-							+ LcomConst.ITEM_SEPARATOR;
-					isFirstTime = false;
-				} else {
-					result = result + parseNewMessage(userId, data)
-							+ LcomConst.ITEM_SEPARATOR;
+
+		if (friendListData != null && friendListData.size() != 0) {
+			// Reverse order so that newest message shall be shown up top
+			// for (int i = friendListData.size() - 1; i >= 0; i--) {
+			// LcomFriendshipData data = friendListData.get(i);
+			for (LcomFriendshipData data : friendListData) {
+				// log.log(Level.INFO, "parseNewMessage(data):"
+				// + parseNewMessage(data));
+				if (data != null) {
+					if (isFirstTime) {
+						result = parseNewMessage(userId, data)
+								+ LcomConst.ITEM_SEPARATOR;
+						isFirstTime = false;
+					} else {
+						result = result + parseNewMessage(userId, data)
+								+ LcomConst.ITEM_SEPARATOR;
+					}
 				}
 			}
+			// Remove last separator
+			result = result.substring(0, result.length()
+					- LcomConst.ITEM_SEPARATOR.length());
 		}
-		// Remove last separator
-		result = result.substring(0,
-				result.length() - LcomConst.ITEM_SEPARATOR.length());
+
 		return result;
 	}
 
@@ -168,7 +175,9 @@ public class DatastoreUtil {
 		String parsedMessage = null;
 		if (messages != null && messages.size() != 0) {
 			boolean isFirst = true;
-			for (String msg : messages) {
+			for (int i = messages.size() - 1; i >= 0; i--) {
+				String msg = messages.get(i);
+				// for (String msg : messages) {
 				if (isFirst) {
 					parsedMessage = msg;
 					isFirst = false;
@@ -182,7 +191,9 @@ public class DatastoreUtil {
 		String parsedDate = null;
 		if (expireDate != null && expireDate.size() != 0) {
 			boolean isFirst = true;
-			for (Long date : expireDate) {
+			// for (Long date : expireDate) {
+			for (int j = expireDate.size() - 1; j >= 0; j--) {
+				long date = expireDate.get(j);
 				if (isFirst) {
 					parsedDate = String.valueOf(date);
 					isFirst = false;

@@ -2,7 +2,7 @@
 <datastore-indexes autoGenerate="false">
 	<datastore-index kind="LcomFriendshipData" ancestor="true"
 		source="manual">
-		<property name="mExpireTime" direction="asc" />
+		<property name="mExpireTime" direction="desc" />
 	</datastore-index>
 	<datastore-index kind="LcomUserData" ancestor="true"
 		source="manual">
