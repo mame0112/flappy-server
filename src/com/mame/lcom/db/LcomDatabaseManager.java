@@ -620,7 +620,7 @@ public class LcomDatabaseManager {
 				List<Long> validMessageTime = new ArrayList<Long>();
 				List<Long> validPostedTime = new ArrayList<Long>();
 
-				boolean isRemoved = false;
+				// boolean isRemoved = false;
 
 				if (messageTimeArray != null && messageTimeArray.size() != 0) {
 					for (int i = 0; i < messageTimeArray.size(); i++) {
@@ -632,22 +632,23 @@ public class LcomDatabaseManager {
 							validMessageTime.add(t);
 							validPostedTime.add(postedT);
 
-						} else {
-							isRemoved = true;
 						}
+						// else {
+						// isRemoved = true;
+						// }
 					}
 				}
 
 				// Remove read message
-				if (isRemoved == true) {
-					entity.setProperty(
-							LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE, null);
-					entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-							null);
-					entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-							null);
-					ds.put(entity);
-				}
+				// if (isRemoved == true) {
+				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+						null);
+				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+						null);
+				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+						null);
+				ds.put(entity);
+				// }
 
 				LcomNewMessageData data = new LcomNewMessageData(userId,
 						friendUserId, targetUserName, validMessage,
