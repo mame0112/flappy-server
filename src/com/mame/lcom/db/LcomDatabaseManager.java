@@ -738,6 +738,7 @@ public class LcomDatabaseManager {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	public synchronized void addNewFriendshipInfo(long userId, String userName,
 			long friendUserId, String friendUserName, String lastMessage,
 			long time) {
@@ -747,12 +748,112 @@ public class LcomDatabaseManager {
 
 		Transaction tx = ds.beginTransaction();
 		try {
-			Key ancKey1 = KeyFactory.createKey(LcomConst.KIND_ALL_USER_DATA,
-					LcomConst.ENTITY_TOTAL_USER_NUM);
-			Key ancKey2 = KeyFactory.createKey(ancKey1,
-					LcomConst.KIND_USER_DATA, userId);
-			Key key = KeyFactory.createKey(ancKey2,
-					LcomConst.KIND_FRIENDSHIP_DATA, userId);
+			Key userKey = getUserDataKey(friendUserId);
+			// Key key = KeyFactory.createKey(ancKey,
+			// LcomConst.KIND_FRIENDSHIP_DATA, friendUserId);
+
+			Filter userIdFilter = new FilterPredicate(
+					LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+					FilterOperator.EQUAL, userId);
+
+			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
+			// query.setKeysOnly();
+			query.setFilter(userIdFilter);
+			PreparedQuery pQuery = ds.prepare(query);
+			Entity entity = pQuery.asSingleEntity();
+
+			// If target entity itself is already registered
+			if (entity != null) {
+				query.clearKeysOnly();
+				// query.setFilter(userIdFilter);
+				pQuery = ds.prepare(query);
+				Entity userEntity = pQuery.asSingleEntity();
+				// If target user has already been registerd
+				if (userEntity != null) {
+					log.log(Level.WARNING, "target entity and user data exists");
+					// List<Long> friendUserIdArray = (List<Long>) entity
+					// .getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+					List<String> messageArray = (List<String>) userEntity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+					List<Long> expireTimeArray = (List<Long>) userEntity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+					List<Long> postedTimeArray = (List<Long>) userEntity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
+					if (expireTimeArray != null && messageArray != null
+							&& postedTimeArray != null) {
+						// First check if message is still valid
+						long currentTime = TimeUtil.getCurrentDate();
+						for (int i = 0; i < expireTimeArray.size(); i++) {
+							long expireTime = expireTimeArray.get(i);
+							// If message is still valid
+							if (expireTime < currentTime) {
+								expireTimeArray.remove(i);
+								messageArray.remove(i);
+								postedTimeArray.remove(i);
+							}
+						}
+						// Then, we add new message
+						long expireDate = TimeUtil.getExpireDate(time);
+						expireTimeArray.add(expireDate);
+						messageArray.add(lastMessage);
+						postedTimeArray.add(time);
+
+						userEntity.setProperty(
+								LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+								messageArray);
+						userEntity.setProperty(
+								LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+								postedTimeArray);
+						userEntity.setProperty(
+								LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+								expireTimeArray);
+						ds.put(userEntity);
+					}
+				} else {
+					// If target entity exists but target user data has not been
+					// registered
+					log.log(Level.WARNING, "new friend id");
+					List<Long> friendUserIdArray = (List<Long>) entity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+					List<String> messageArray = (List<String>) entity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+					List<Long> expireTimeArray = (List<Long>) entity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+					List<Long> postedTimeArray = (List<Long>) entity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
+
+					long expireDate = TimeUtil.getExpireDate(time);
+
+					friendUserIdArray.add(friendUserId);
+					messageArray.add(lastMessage);
+					expireTimeArray.add(expireDate);
+					postedTimeArray.add(time);
+
+				}
+			} else {
+				log.log(Level.WARNING, "target entity itself doesn't exist");
+				// If targetUser entity doesn't exist
+				// Add friendship
+				long expireDate = TimeUtil.getExpireDate(time);
+				Entity newEntity = new Entity(LcomConst.KIND_FRIENDSHIP_DATA,
+						friendUserId, userKey);
+				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID,
+						friendUserId);
+				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME,
+						friendUserName);
+				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+						Arrays.asList(userId));
+				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+						Arrays.asList(userName));
+				newEntity.setProperty(
+						LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+						Arrays.asList(lastMessage));
+				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+						Arrays.asList(time));
+				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+						Arrays.asList(expireDate));
+				ds.put(newEntity);
+			}
 
 			// Check if already friendship is added
 			// Filter friendFilter = new FilterPredicate(
@@ -764,45 +865,6 @@ public class LcomDatabaseManager {
 			// query.setKeysOnly();
 			// PreparedQuery pQuery = ds.prepare(query);
 			// Entity entity = pQuery.asSingleEntity();
-			//
-			// // If friend is not added (meaning new user)
-			// if (entity == null) {
-			// //
-			// } else {
-			// // Just add frienddata
-			// }
-
-			// Update the number of total user
-			// try {
-			// Entity totalEntity = ds.get(ancKey1);
-			// int num = (int) totalEntity.getKey().getId();
-			// int newNum = num + 1;
-			// totalEntity
-			// .setProperty(LcomConst.ENTITY_TOTAL_USER_NUM, newNum);
-			// ds.put(totalEntity);
-			// } catch (EntityNotFoundException e) {
-			// log.log(Level.WARNING,
-			// "EntityNotFoundException: " + e.getMessage());
-			// }
-
-			// TODO Need to query and update message
-
-			// Add friendship
-			long expireDate = TimeUtil.getExpireDate(time);
-			Entity entity = new Entity(key);
-			entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, userId);
-			entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, userName);
-			entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-					friendUserId);
-			entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
-					friendUserName);
-			entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-					Arrays.asList(lastMessage));
-			entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-					Arrays.asList(time));
-			entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-					Arrays.asList(expireDate));
-			ds.put(entity);
 
 			tx.commit();
 		} catch (ConcurrentModificationException e) {
@@ -933,10 +995,11 @@ public class LcomDatabaseManager {
 			long currentTime) {
 		log.log(Level.INFO, "getNewMessageData");
 
+		List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
+
 		if (userId != LcomConst.NO_USER && currentTime > 0) {
 
 			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-			List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
 
 			Filter messageFilter = new FilterPredicate(
 					LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
@@ -944,94 +1007,127 @@ public class LcomDatabaseManager {
 
 			Key userKey = getUserDataKey(userId);
 			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
-			// TODO
-			// query.setFilter(messageFilter);
+			query.setFilter(messageFilter);
 			PreparedQuery pQuery = ds.prepare(query);
+			Entity e = pQuery.asSingleEntity();
 
-			FetchOptions option = FetchOptions.Builder.withOffset(0);
-			List<Entity> allEntities = pQuery.asList(option);
+			if (e != null) {
+				List<Long> friendId = (List<Long>) e
+						.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+				List<String> friendName = (List<String>) e
+						.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+				List<String> messageArray = (List<String>) e
+						.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+				ArrayList<String> messageTimeArray = (ArrayList<String>) e
+						.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+				ArrayList<String> postedTimeArray = (ArrayList<String>) e
+						.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
+				// String[] message = messageArray.split(",");
+				// String[] time = messageTimeArray.split(",");
 
-			if (allEntities != null) {
-				log.log(Level.INFO, "allEntities size: " + allEntities.size());
-			}
+				boolean isRemoved = false;
 
-			if (allEntities != null && allEntities.size() != 0) {
+				if (messageArray != null) {
+					log.log(Level.INFO,
+							"messageArray size: " + messageArray.size());
+				} else {
+					log.log(Level.INFO, "messageArray is null");
+				}
 
-				List<String> validMessage = new ArrayList<String>();
-				List<Long> validTime = new ArrayList<Long>();
-				List<Long> validPostedTime = new ArrayList<Long>();
-
-				for (Entity e : allEntities) {
-					Long friendId = (Long) e
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-					String friendName = (String) e
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
-					List<String> messageArray = (List<String>) e
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
-					ArrayList<Long> messageTimeArray = (ArrayList<Long>) e
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
-					ArrayList<Long> postedTimeArray = (ArrayList<Long>) e
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
-					// String[] message = messageArray.split(",");
-					// String[] time = messageTimeArray.split(",");
-
-					boolean isRemoved = false;
-
-					log.log(Level.INFO, "friendId: " + friendId);
-					log.log(Level.INFO, "friendName: " + friendName);
-
+				if (friendId != null && friendId.size() != 0) {
+					log.log(Level.WARNING, "AA");
 					if (messageArray != null) {
-						log.log(Level.INFO, "messageArray size: "
-								+ messageArray.size());
-					} else {
-						log.log(Level.INFO, "messageArray is null");
-					}
 
-					if (postedTimeArray != null && postedTimeArray.size() != 0) {
-						log.log(Level.INFO, "postedTimeArray: "
-								+ postedTimeArray.get(0));
-					}
+						List<String> validMessage = new ArrayList<String>();
+						List<String> validTime = new ArrayList<String>();
+						List<String> validPostedTime = new ArrayList<String>();
 
-					if (messageArray != null && messageArray.size() != 0) {
-						log.log(Level.WARNING, "AA");
-						for (int i = 0; i < messageArray.size(); i++) {
+						// Get each friend's message info
+						for (int i = 0; i < friendId.size(); i++) {
 							log.log(Level.WARNING, "BB");
-							long t = messageTimeArray.get(i);
-							long postT = postedTimeArray.get(i);
-							log.log(Level.WARNING, "t: " + t);
-							log.log(Level.WARNING, "currentTime: "
-									+ currentTime);
-							// If message is valid
-							if (t > currentTime) {
-								log.log(Level.WARNING, "CC");
-								validMessage.add(messageArray.get(i));
-								validTime.add(t);
-								validPostedTime.add(postT);
 
-							} else {
-								log.log(Level.WARNING, "DD");
-								// If message has already been expired
-								// Nothing to do
-								isRemoved = true;
+							List<String> validMessageForReply = new ArrayList<String>();
+							List<Long> validTimeForReply = new ArrayList<Long>();
+
+							String msgOriginal = messageArray.get(i);
+							// If for this friend's message is not null
+							if (msgOriginal != null) {
+
+								// Get time information
+								String tOriginal = String
+										.valueOf(messageTimeArray.get(i));
+								String postTOriginal = String
+										.valueOf(postedTimeArray.get(i));
+
+								// And parse message and time information
+								String[] msg = msgOriginal
+										.split(LcomConst.SEPARATOR);
+								String[] t = tOriginal
+										.split(LcomConst.SEPARATOR);
+								String[] postT = postTOriginal
+										.split(LcomConst.SEPARATOR);
+								String validMsgForThisUser = "a";
+								String validExpireTimeForThisUser = "a";
+								String validPostedTimeForThisUser = "a";
+
+								// Look into each message and time info
+								for (int j = 0; j < msg.length; j++) {
+									// If message is still valid
+									if (Long.valueOf(t[j]) > currentTime) {
+										log.log(Level.WARNING, "CC");
+										validMsgForThisUser = validMsgForThisUser
+												+ LcomConst.SEPARATOR + msg[j];
+										validExpireTimeForThisUser = validExpireTimeForThisUser
+												+ LcomConst.SEPARATOR + t[j];
+										validPostedTimeForThisUser = validPostedTimeForThisUser
+												+ LcomConst.SEPARATOR
+												+ postT[j];
+
+										validMessageForReply.add(msg[j]);
+										validTimeForReply.add(Long
+												.valueOf(t[j]));
+
+									} else {
+										log.log(Level.WARNING, "DD");
+										// If message has already been expired
+										// Nothing to do
+										isRemoved = true;
+									}
+								}
+
+								// Create response
+								LcomFriendshipData data = new LcomFriendshipData(
+										userId, friendId.get(i),
+										friendName.get(i),
+										validMessageForReply, validTimeForReply);
+								result.add(data);
+
+								// Remove unncessary first 3 characters ("a" and
+								// Separetor)
+								if (isRemoved == true) {
+									if (validMsgForThisUser != null
+											&& validMsgForThisUser.length() > (1 + LcomConst.SEPARATOR
+													.length())) {
+										validMsgForThisUser = validMsgForThisUser
+												.substring(1 + LcomConst.SEPARATOR
+														.length());
+										validExpireTimeForThisUser = validExpireTimeForThisUser
+												.substring(1 + LcomConst.SEPARATOR
+														.length());
+										validPostedTimeForThisUser = validPostedTimeForThisUser
+												.substring(1 + LcomConst.SEPARATOR
+														.length());
+										validMessage.add(validMsgForThisUser);
+										validTime
+												.add(validExpireTimeForThisUser);
+										validPostedTime
+												.add(validPostedTimeForThisUser);
+									}
+								}
 							}
 						}
-					}
 
-					// If more than 1 message is new message
-					if (validMessage != null && validMessage.size() != 0) {
-						log.log(Level.WARNING, "validMessage size: "
-								+ validMessage.size());
-						LcomFriendshipData data = new LcomFriendshipData(
-								userId, friendId, friendName, validMessage,
-								validTime);
-						result.add(data);
-					} else {
-						log.log(Level.WARNING, "validMessage is null or size 0");
-					}
-
-					// TODO Need to update user name because it may be empty.
-
-					if (isRemoved == true) {
+						// Update datastore
 						e.setProperty(
 								LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 								validMessage);
@@ -1039,16 +1135,13 @@ public class LcomDatabaseManager {
 								validTime);
 						e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
 								validPostedTime);
-						// TODO need to have this function later on.
-						// ds.put(e);
 
+						ds.put(e);
 					}
 				}
 			}
-			return result;
-		} else {
-			return null;
 		}
+		return result;
 	}
 
 	// public synchronized List<LcomFriendshipData> getFriendshipDataForUser(

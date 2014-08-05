@@ -22,6 +22,7 @@ public class LcomDatabaseManagerHelper {
 	private final Logger log = Logger.getLogger(LcomDatabaseManagerHelper.class
 			.getName());
 
+
 	// public void putUserDataToMemCache(LcomUserData data) {
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomUserData.class.getSimpleName());
