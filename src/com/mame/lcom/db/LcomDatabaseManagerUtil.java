@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -393,5 +394,218 @@ public class LcomDatabaseManagerUtil {
 		}
 
 		return null;
+	}
+
+	public Entity getConversationEntity(long targetUserId, DatastoreService ds) {
+		log.log(Level.INFO, "getConversationEntity");
+
+		if (targetUserId != LcomConst.NO_USER) {
+			Key targetUserKey = LcomDatabaseManagerUtil
+					.getUserDataKey(targetUserId);
+
+			Filter messageFilter = new FilterPredicate(
+					LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+					FilterOperator.NOT_EQUAL, null);
+
+			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA,
+					targetUserKey);
+			query.setFilter(messageFilter);
+			PreparedQuery pQuery = ds.prepare(query);
+			Entity entity = pQuery.asSingleEntity();
+			return entity;
+
+		}
+
+		return null;
+	}
+
+	public boolean isConversationDataForTargetUserExist(long targetUserId,
+			DatastoreService ds) {
+		log.log(Level.INFO, "isConversationDataForTargetUserExist");
+
+		if (targetUserId != LcomConst.NO_USER) {
+			Key targetUserKey = LcomDatabaseManagerUtil
+					.getUserDataKey(targetUserId);
+
+			Filter messageFilter = new FilterPredicate(
+					LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+					FilterOperator.NOT_EQUAL, null);
+
+			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA,
+					targetUserKey);
+			query.setKeysOnly();
+			query.setFilter(messageFilter);
+			PreparedQuery pQuery = ds.prepare(query);
+			Entity entity = pQuery.asSingleEntity();
+			if (entity != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isUserIdExistInFriendshipKind(long userId, Entity e) {
+		log.log(Level.INFO, "isUserIdExistInFriendshipKind");
+
+		if (e != null && userId != LcomConst.NO_USER) {
+			@SuppressWarnings("unchecked")
+			ArrayList<Long> friendList = (ArrayList<Long>) e
+					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+			if (friendList != null && friendList.size() != 0) {
+				log.log(Level.INFO, "friendList is not null");
+				if (friendList.contains(userId)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void addNewUserDataToFriendshipKind(long userId, String userName,
+			long postTime, long expireTime, String message, Entity e,
+			DatastoreService ds) {
+		log.log(Level.INFO, "addNewUserDataToFriendshipKind");
+
+		if (userId != LcomConst.NO_USER && e != null) {
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+					Arrays.asList(expireTime));
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+					Arrays.asList(postTime));
+
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+					Arrays.asList(userId));
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+					Arrays.asList(userName));
+
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+					Arrays.asList(message));
+
+			ds.put(e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void addMessageToFriendshipKind(long userId, String userName,
+			long postTime, long expireTime, String message, Entity e,
+			DatastoreService ds) {
+		log.log(Level.INFO, "addMessageToFriendshipKind");
+
+		ArrayList<Long> friendList = (ArrayList<Long>) e
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+		ArrayList<String> messageList = (ArrayList<String>) e
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		ArrayList<String> postDateList = (ArrayList<String>) e
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
+		ArrayList<String> expireDateList = (ArrayList<String>) e
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+
+		int index = friendList.indexOf(userId);
+
+		if (messageList != null && postDateList != null
+				&& expireDateList != null) {
+			String messages = messageList.get(index);
+			String postDates = postDateList.get(index);
+			String expireDates = expireDateList.get(index);
+
+			String[] msg = messages.split(LcomConst.SEPARATOR);
+			String[] postDate = postDates.split(LcomConst.SEPARATOR);
+			String[] expireDate = expireDates.split(LcomConst.SEPARATOR);
+
+			String validMsg = "a";
+			String validPostDate = "a";
+			String validExpireDate = "a";
+
+			long currentTime = TimeUtil.getCurrentDate();
+
+			for (int i = 0; i < msg.length; i++) {
+				if (Long.valueOf(expireDate[i]) > currentTime) {
+					validMsg = validMsg + LcomConst.SEPARATOR + msg[i];
+					validPostDate = validPostDate + LcomConst.SEPARATOR
+							+ postDate[i];
+					validExpireDate = validExpireDate + LcomConst.SEPARATOR
+							+ expireDate[i];
+				}
+			}
+
+			// Add new message
+			validMsg = validMsg + LcomConst.SEPARATOR + message;
+			validPostDate = validPostDate + LcomConst.SEPARATOR
+					+ String.valueOf(postTime);
+			validExpireDate = validExpireDate + LcomConst.SEPARATOR
+					+ String.valueOf(expireTime);
+
+			String validMsg2 = null;
+			String validPostDate2 = null;
+			String validExpireDate2 = null;
+
+			// Remove unnecessary characters
+			if (validMsg != null
+					&& (validMsg.length() > (1 + LcomConst.SEPARATOR).length())) {
+				validMsg2 = validMsg.substring((1 + LcomConst.SEPARATOR
+						.length()));
+			}
+
+			if (validPostDate != null
+					&& (validPostDate.length() > (1 + LcomConst.SEPARATOR)
+							.length())) {
+				validPostDate2 = validPostDate
+						.substring((1 + LcomConst.SEPARATOR.length()));
+			}
+
+			if (validExpireDate != null
+					&& (validExpireDate.length() > (1 + LcomConst.SEPARATOR)
+							.length())) {
+				validExpireDate2 = validExpireDate
+						.substring((1 + LcomConst.SEPARATOR.length()));
+			}
+
+			if (validMsg != null && validMsg.length() > 0) {
+				// Update original List
+				messageList.set(index, validMsg2);
+				postDateList.set(index, validPostDate2);
+				expireDateList.set(index, validExpireDate2);
+			} else {
+				// Update original List
+				messageList.set(index, null);
+				postDateList.set(index, null);
+				expireDateList.set(index, null);
+			}
+
+			// Update Entity
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+					messageList);
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME, postDateList);
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+					expireDateList);
+
+			// Put to DatastoreService
+			ds.put(e);
+
+		}
+	}
+
+	public void createNewEntity(long userId, String userName,
+			long targetUserId, long postTime, long expireTime, String message,
+			DatastoreService ds) {
+		log.log(Level.INFO, "createNewEntity");
+
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(targetUserId);
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, targetUserId,
+				userKey);
+
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(userId));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(userName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(postTime)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(message));
+
+		ds.put(e);
+
 	}
 }
