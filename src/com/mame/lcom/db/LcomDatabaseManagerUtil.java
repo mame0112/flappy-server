@@ -331,8 +331,6 @@ public class LcomDatabaseManagerUtil {
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
 			ArrayList<String> messageTimeArray = (ArrayList<String>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
-			// ArrayList<String> postedTimeArray = (ArrayList<String>) e
-			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
 
 			if (friendIdArray != null && friendIdArray.size() != 0) {
 				for (int i = 0; i < friendIdArray.size(); i++) {
@@ -352,7 +350,8 @@ public class LcomDatabaseManagerUtil {
 
 							long currentTime = TimeUtil.getCurrentDate();
 
-							// TODO Need to remove obsolete message
+							// Old message should be removed when the user goes
+							// to Conversation activity
 							for (int j = 0; j < msgParsed.length; j++) {
 								long t = Long.valueOf(timeParsed[j]);
 								if (t > currentTime) {
@@ -367,11 +366,32 @@ public class LcomDatabaseManagerUtil {
 						}
 					}
 				}
-
 			}
 
 		}
 
 		return result;
+	}
+
+	public Entity getEntityForTargetUser(long userId, long targetUserId,
+			DatastoreService ds) {
+
+		if (userId != LcomConst.NO_USER && targetUserId != LcomConst.NO_USER) {
+			Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
+			Key key = KeyFactory.createKey(userKey,
+					LcomConst.KIND_FRIENDSHIP_DATA, userId);
+
+			// Filter friendFilter = new FilterPredicate(
+			// LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+			// FilterOperator.EQUAL, targetUserId);
+
+			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, key);
+			// query.setFilter(friendFilter);
+			PreparedQuery pQuery = ds.prepare(query);
+			Entity entity = pQuery.asSingleEntity();
+			return entity;
+		}
+
+		return null;
 	}
 }
