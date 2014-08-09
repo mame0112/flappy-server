@@ -88,7 +88,7 @@ public class LcomDatabaseManager {
 			Filter nameFilter = new FilterPredicate(LcomConst.ENTITY_USER_NAME,
 					FilterOperator.EQUAL, userName);
 
-			Key ancKey = getAllUserDataKey();
+			Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
 			Query query = new Query(LcomConst.KIND_USER_DATA, ancKey);
 			query.setKeysOnly();
 			query.setFilter(nameFilter);
@@ -147,7 +147,7 @@ public class LcomDatabaseManager {
 			// PreparedQuery pQuery = ds.prepare(query);
 			// Entity entity = pQuery.asSingleEntity();
 
-			Key ancKey = getAllUserDataKey();
+			Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
 			Entity entity = null;
 			try {
 				entity = ds.get(ancKey);
@@ -245,19 +245,6 @@ public class LcomDatabaseManager {
 		return userId;
 	}
 
-	private Key getAllUserDataKey() {
-		Key ancKey = KeyFactory.createKey(LcomConst.KIND_ALL_USER_DATA,
-				LcomConst.ENTITY_TOTAL_USER_NUM);
-		return ancKey;
-	}
-
-	private Key getUserDataKey(long userId) {
-		Key ancKey = getAllUserDataKey();
-		Key key = KeyFactory
-				.createKey(ancKey, LcomConst.KIND_USER_DATA, userId);
-		return key;
-	}
-
 	/**
 	 * This will NOT use datastore read ops. Just use small ops.
 	 * 
@@ -265,7 +252,7 @@ public class LcomDatabaseManager {
 	 */
 	private int getAllUserDataNum() {
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-		Key ancKey = getAllUserDataKey();
+		Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
 
 		Query query = new Query(LcomUserData.class.getSimpleName());
 		query.setKeysOnly();
@@ -347,7 +334,7 @@ public class LcomDatabaseManager {
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
-		Key key = getUserDataKey(userId);
+		Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
 		Entity entity = null;
 		try {
 			entity = ds.get(key);
@@ -398,7 +385,7 @@ public class LcomDatabaseManager {
 					FilterOperator.EQUAL, userId);
 
 			// Key ancKey = getAllUserDataKey();
-			Key key = getUserDataKey(userId);
+			Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
 			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, key);
 			query.setFilter(friendIdFilter);
 			PreparedQuery pQuery = ds.prepare(query);
@@ -585,7 +572,7 @@ public class LcomDatabaseManager {
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
 
 		if (userId != LcomConst.NO_USER && friendUserId != LcomConst.NO_USER) {
-			Key userKey = getUserDataKey(userId);
+			Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
 			Key key = KeyFactory.createKey(userKey,
 					LcomConst.KIND_FRIENDSHIP_DATA, userId);
 
@@ -699,7 +686,7 @@ public class LcomDatabaseManager {
 					LcomConst.ENTITY_MAIL_ADDRESS, FilterOperator.EQUAL,
 					address);
 
-			Key ancKey = getAllUserDataKey();
+			Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
 			Query query = new Query(LcomConst.KIND_USER_DATA, ancKey);
 			query.setFilter(mailFilter);
 			query.setKeysOnly();
@@ -719,7 +706,7 @@ public class LcomDatabaseManager {
 		if (userId != LcomConst.NO_USER) {
 
 			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-			Key key = getUserDataKey(userId);
+			Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
 			Entity entity = null;
 			try {
 				entity = ds.get(key);
@@ -738,140 +725,75 @@ public class LcomDatabaseManager {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
-	public synchronized void addNewFriendshipInfo(long userId, String userName,
-			long friendUserId, String friendUserName, String lastMessage,
-			long time) {
-		log.log(Level.WARNING, "addNewFriendshipInfo");
+	public synchronized void addNewUserAndFriendshipInfo(LcomUserData data,
+			long senderUserId, String senderName, String lastMessage,
+			long currentTime) {
+		log.log(Level.WARNING, "addNewUserAndFriendshipInfo");
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
+		// Start transaction
 		Transaction tx = ds.beginTransaction();
+
 		try {
-			Key userKey = getUserDataKey(friendUserId);
-			// Key key = KeyFactory.createKey(ancKey,
-			// LcomConst.KIND_FRIENDSHIP_DATA, friendUserId);
 
-			Filter userIdFilter = new FilterPredicate(
-					LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-					FilterOperator.EQUAL, userId);
+			long newUserId = addNewUserData(data);
 
-			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
-			// query.setKeysOnly();
-			query.setFilter(userIdFilter);
-			PreparedQuery pQuery = ds.prepare(query);
-			Entity entity = pQuery.asSingleEntity();
-
-			// If target entity itself is already registered
-			if (entity != null) {
-				query.clearKeysOnly();
-				// query.setFilter(userIdFilter);
-				pQuery = ds.prepare(query);
-				Entity userEntity = pQuery.asSingleEntity();
-				// If target user has already been registerd
-				if (userEntity != null) {
-					log.log(Level.WARNING, "target entity and user data exists");
-					// List<Long> friendUserIdArray = (List<Long>) entity
-					// .getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-					List<String> messageArray = (List<String>) userEntity
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
-					List<Long> expireTimeArray = (List<Long>) userEntity
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
-					List<Long> postedTimeArray = (List<Long>) userEntity
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
-					if (expireTimeArray != null && messageArray != null
-							&& postedTimeArray != null) {
-						// First check if message is still valid
-						long currentTime = TimeUtil.getCurrentDate();
-						for (int i = 0; i < expireTimeArray.size(); i++) {
-							long expireTime = expireTimeArray.get(i);
-							// If message is still valid
-							if (expireTime < currentTime) {
-								expireTimeArray.remove(i);
-								messageArray.remove(i);
-								postedTimeArray.remove(i);
-							}
-						}
-						// Then, we add new message
-						long expireDate = TimeUtil.getExpireDate(time);
-						expireTimeArray.add(expireDate);
-						messageArray.add(lastMessage);
-						postedTimeArray.add(time);
-
-						userEntity.setProperty(
-								LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-								messageArray);
-						userEntity.setProperty(
-								LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-								postedTimeArray);
-						userEntity.setProperty(
-								LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-								expireTimeArray);
-						ds.put(userEntity);
-					}
-				} else {
-					// If target entity exists but target user data has not been
-					// registered
-					log.log(Level.WARNING, "new friend id");
-					List<Long> friendUserIdArray = (List<Long>) entity
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-					List<String> messageArray = (List<String>) entity
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
-					List<Long> expireTimeArray = (List<Long>) entity
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
-					List<Long> postedTimeArray = (List<Long>) entity
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
-
-					long expireDate = TimeUtil.getExpireDate(time);
-
-					friendUserIdArray.add(friendUserId);
-					messageArray.add(lastMessage);
-					expireTimeArray.add(expireDate);
-					postedTimeArray.add(time);
-
-				}
-			} else {
-				log.log(Level.WARNING, "target entity itself doesn't exist");
-				// If targetUser entity doesn't exist
-				// Add friendship
-				long expireDate = TimeUtil.getExpireDate(time);
-				Entity newEntity = new Entity(LcomConst.KIND_FRIENDSHIP_DATA,
-						friendUserId, userKey);
-				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID,
-						friendUserId);
-				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME,
-						friendUserName);
-				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-						Arrays.asList(userId));
-				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
-						Arrays.asList(userName));
-				newEntity.setProperty(
-						LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-						Arrays.asList(lastMessage));
-				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-						Arrays.asList(time));
-				newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-						Arrays.asList(expireDate));
-				ds.put(newEntity);
-			}
-
-			// Check if already friendship is added
-			// Filter friendFilter = new FilterPredicate(
-			// LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-			// FilterOperator.EQUAL, friendUserId);
-			//
-			// Query query = new Query(LcomConst.KIND_USER_DATA);
-			// query.setFilter(friendFilter);
-			// query.setKeysOnly();
-			// PreparedQuery pQuery = ds.prepare(query);
-			// Entity entity = pQuery.asSingleEntity();
-
+			addNewFriendshipInfo(senderUserId, senderName, newUserId, null,
+					lastMessage, currentTime);
+			// Finish transaction
 			tx.commit();
 		} catch (ConcurrentModificationException e) {
 			if (tx.isActive()) {
 				tx.rollback();
 			}
 		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public synchronized void addNewFriendshipInfo(long senderUserId,
+			String senderName, long keyUserId, String keyUserName,
+			String lastMessage, long currentTime) {
+		log.log(Level.WARNING, "addNewFriendshipData");
+
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+
+		LcomDatabaseManagerUtil util = new LcomDatabaseManagerUtil();
+
+		// If entity itself exists
+		if (util.isEntityForKeyUserIdExist(keyUserId, ds)) {
+			// If targetUserId already exist (meaning this user has already
+			// sent message)
+
+			// Get whole enttiy
+			Entity entity = util.getEntityForKeyUser(keyUserId, ds);
+
+			if (entity != null) {
+				// If sender User data exist in entity
+				if (util.isFriendUserIdExistInEntity(entity, senderUserId)) {
+					// Add and update only message
+					util.addMessageForFriendUser(entity, senderUserId,
+							senderName, keyUserId, keyUserName, lastMessage,
+							currentTime, ds);
+				} else {
+					// If entity itself exist but it is new to send message
+					// to this user
+					// Add new user data and message
+					util.addNewUserDataAndMessageToFriendship(entity,
+							senderUserId, senderName, keyUserId, keyUserName,
+							lastMessage, currentTime, ds);
+				}
+			} else {
+				// Something wrong. (this should not be happen)
+			}
+		} else {
+			// If entity itself doesn't exist
+			// Create new entity
+			util.addNewEntiyInFriendshipTable(senderUserId, senderName,
+					keyUserId, keyUserName, lastMessage, currentTime, ds);
+		}
+
 	}
 
 	// public synchronized void updateLatestMessageInfoOnFriendshipTable(
@@ -974,7 +896,7 @@ public class LcomDatabaseManager {
 				LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID, FilterOperator.EQUAL,
 				targetUserId);
 
-		Key userKey = getUserDataKey(userId);
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
 		// Key friendshipKey = KeyFactory.createKey(userKey,
 		// LcomConst.KIND_FRIENDSHIP_DATA, userId);
 		Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
@@ -1005,7 +927,7 @@ public class LcomDatabaseManager {
 					LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
 					FilterOperator.NOT_EQUAL, null);
 
-			Key userKey = getUserDataKey(userId);
+			Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
 			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
 			query.setFilter(messageFilter);
 			PreparedQuery pQuery = ds.prepare(query);
@@ -1136,7 +1058,8 @@ public class LcomDatabaseManager {
 						e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
 								validPostedTime);
 
-						ds.put(e);
+						// TODO
+						// ds.put(e);
 					}
 				}
 			}
@@ -1209,7 +1132,8 @@ public class LcomDatabaseManager {
 
 		// Get friend Key (Because we need to put message data onto target user
 		// kind)
-		Key targetUserKey = getUserDataKey(targetUserId);
+		Key targetUserKey = LcomDatabaseManagerUtil
+				.getUserDataKey(targetUserId);
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
@@ -1421,7 +1345,7 @@ public class LcomDatabaseManager {
 
 		if (friendsId != null && friendsId.size() != 0) {
 			for (String id : friendsId) {
-				Key key = getAllUserDataKey();
+				Key key = LcomDatabaseManagerUtil.getAllUserDataKey();
 
 				DatastoreService ds = DatastoreServiceFactory
 						.getDatastoreService();
@@ -1665,7 +1589,7 @@ public class LcomDatabaseManager {
 		DatastoreService datastoreService = DatastoreServiceFactory
 				.getDatastoreService();
 
-		Key key = getUserDataKey(userId);
+		Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
 		try {
 			Entity entity = datastoreService.get(key);
 			deviceId = (String) entity.getProperty(LcomConst.ENTITY_DEVICE_ID);
