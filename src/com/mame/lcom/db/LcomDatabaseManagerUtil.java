@@ -305,6 +305,7 @@ public class LcomDatabaseManagerUtil {
 	}
 
 	public Entity getFriendshipEntityForUserId(long userId, DatastoreService ds) {
+		log.log(Level.WARNING, "getFriendshipEntityForUserId");
 		Filter messageFilter = new FilterPredicate(
 				LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
 				FilterOperator.NOT_EQUAL, null);
@@ -320,6 +321,7 @@ public class LcomDatabaseManagerUtil {
 	@SuppressWarnings("unchecked")
 	public List<LcomFriendshipData> getAllValidFriendshipData(Entity e,
 			DatastoreService ds, long userId) {
+		log.log(Level.WARNING, "getAllValidFriendshipData");
 
 		List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
 
@@ -376,6 +378,7 @@ public class LcomDatabaseManagerUtil {
 
 	public Entity getEntityForTargetUser(long userId, long targetUserId,
 			DatastoreService ds) {
+		log.log(Level.WARNING, "getEntityForTargetUser");
 
 		if (userId != LcomConst.NO_USER && targetUserId != LcomConst.NO_USER) {
 			Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
@@ -502,74 +505,80 @@ public class LcomDatabaseManagerUtil {
 
 		int index = friendList.indexOf(userId);
 
+		// TODO need to care in case of messageList null case
 		if (messageList != null && postDateList != null
 				&& expireDateList != null) {
 			String messages = messageList.get(index);
 			String postDates = postDateList.get(index);
 			String expireDates = expireDateList.get(index);
 
-			String[] msg = messages.split(LcomConst.SEPARATOR);
-			String[] postDate = postDates.split(LcomConst.SEPARATOR);
-			String[] expireDate = expireDates.split(LcomConst.SEPARATOR);
+			if (messages != null && postDates != null && expireDates != null) {
 
-			String validMsg = "a";
-			String validPostDate = "a";
-			String validExpireDate = "a";
+				String[] msg = messages.split(LcomConst.SEPARATOR);
+				String[] postDate = postDates.split(LcomConst.SEPARATOR);
+				String[] expireDate = expireDates.split(LcomConst.SEPARATOR);
 
-			long currentTime = TimeUtil.getCurrentDate();
+				String validMsg = "a";
+				String validPostDate = "a";
+				String validExpireDate = "a";
 
-			for (int i = 0; i < msg.length; i++) {
-				if (Long.valueOf(expireDate[i]) > currentTime) {
-					validMsg = validMsg + LcomConst.SEPARATOR + msg[i];
-					validPostDate = validPostDate + LcomConst.SEPARATOR
-							+ postDate[i];
-					validExpireDate = validExpireDate + LcomConst.SEPARATOR
-							+ expireDate[i];
+				long currentTime = TimeUtil.getCurrentDate();
+
+				for (int i = 0; i < msg.length; i++) {
+					if (Long.valueOf(expireDate[i]) > currentTime) {
+						validMsg = validMsg + LcomConst.SEPARATOR + msg[i];
+						validPostDate = validPostDate + LcomConst.SEPARATOR
+								+ postDate[i];
+						validExpireDate = validExpireDate + LcomConst.SEPARATOR
+								+ expireDate[i];
+					}
 				}
-			}
 
-			// Add new message
-			validMsg = validMsg + LcomConst.SEPARATOR + message;
-			validPostDate = validPostDate + LcomConst.SEPARATOR
-					+ String.valueOf(postTime);
-			validExpireDate = validExpireDate + LcomConst.SEPARATOR
-					+ String.valueOf(expireTime);
+				// Add new message
+				validMsg = validMsg + LcomConst.SEPARATOR + message;
+				validPostDate = validPostDate + LcomConst.SEPARATOR
+						+ String.valueOf(postTime);
+				validExpireDate = validExpireDate + LcomConst.SEPARATOR
+						+ String.valueOf(expireTime);
 
-			String validMsg2 = null;
-			String validPostDate2 = null;
-			String validExpireDate2 = null;
+				String validMsg2 = null;
+				String validPostDate2 = null;
+				String validExpireDate2 = null;
 
-			// Remove unnecessary characters
-			if (validMsg != null
-					&& (validMsg.length() > (1 + LcomConst.SEPARATOR).length())) {
-				validMsg2 = validMsg.substring((1 + LcomConst.SEPARATOR
-						.length()));
-			}
+				// Remove unnecessary characters
+				if (validMsg != null
+						&& (validMsg.length() > (1 + LcomConst.SEPARATOR
+								.length()))) {
+					validMsg2 = validMsg.substring((1 + LcomConst.SEPARATOR
+							.length()));
+				}
 
-			if (validPostDate != null
-					&& (validPostDate.length() > (1 + LcomConst.SEPARATOR)
-							.length())) {
-				validPostDate2 = validPostDate
-						.substring((1 + LcomConst.SEPARATOR.length()));
-			}
+				if (validPostDate != null
+						&& (validPostDate.length() > (1 + LcomConst.SEPARATOR
+								.length()))) {
+					validPostDate2 = validPostDate
+							.substring((1 + LcomConst.SEPARATOR.length()));
+				}
 
-			if (validExpireDate != null
-					&& (validExpireDate.length() > (1 + LcomConst.SEPARATOR)
-							.length())) {
-				validExpireDate2 = validExpireDate
-						.substring((1 + LcomConst.SEPARATOR.length()));
-			}
+				if (validExpireDate != null
+						&& (validExpireDate.length() > (1 + LcomConst.SEPARATOR
+								.length()))) {
+					validExpireDate2 = validExpireDate
+							.substring((1 + LcomConst.SEPARATOR.length()));
+				}
 
-			if (validMsg != null && validMsg.length() > 0) {
-				// Update original List
-				messageList.set(index, validMsg2);
-				postDateList.set(index, validPostDate2);
-				expireDateList.set(index, validExpireDate2);
-			} else {
-				// Update original List
-				messageList.set(index, null);
-				postDateList.set(index, null);
-				expireDateList.set(index, null);
+				if (validMsg2 != null && validMsg2.length() > 0) {
+					log.log(Level.INFO, "validMsg2: " + validMsg2);
+					// Update original List
+					messageList.set(index, validMsg2);
+					postDateList.set(index, validPostDate2);
+					expireDateList.set(index, validExpireDate2);
+				} else {
+					// Update original List
+					messageList.set(index, null);
+					postDateList.set(index, null);
+					expireDateList.set(index, null);
+				}
 			}
 
 			// Update Entity
@@ -581,8 +590,8 @@ public class LcomDatabaseManagerUtil {
 
 			// Put to DatastoreService
 			ds.put(e);
-
 		}
+
 	}
 
 	public void createNewEntity(long userId, String userName,

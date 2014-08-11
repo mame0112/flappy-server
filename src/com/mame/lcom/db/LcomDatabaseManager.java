@@ -462,104 +462,11 @@ public class LcomDatabaseManager {
 		return userNum;
 	}
 
-	// public synchronized List<LcomNewMessageData> getNewMessages(int userId) {
-	// log.log(Level.WARNING, "getNewMessages");
-	//
-	// List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
-	//
-	// LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
-	// List<LcomNewMessageData> unreadMessages = null;
-	// try {
-	// result = helper.getNewMessageFromMemcache(userId);
-	// unreadMessages = changeNewMessageReadState(result);
-	//
-	// // `Put new messages to memcache
-	// helper.removeNewMessagesFromMemCache(userId);
-	// helper.putNewMessagesToMemCache(userId, unreadMessages);
-	//
-	// if (unreadMessages != null && unreadMessages.size() != 0) {
-	// // cache exist. It means we should not store it to cache again.
-	// log.log(Level.WARNING, "Cache exists result: " + unreadMessages);
-	// return unreadMessages;
-	// } else {
-	// // cache exist
-	// log.log(Level.WARNING, "Cache could be strange status");
-	// }
-	// } catch (LcomMemcacheException e) {
-	// // Cache doesn't exit. It means we need to put it to cache.
-	// log.log(Level.WARNING, "LcomMemcacheException: " + e.getMessage());
-	// // If we can't get message from memcache, we try to get it from
-	// // datastore
-	// if (result == null || result.size() == 0) {
-	// log.log(Level.INFO, "Data from datastore");
-	// PersistenceManager pm = LcomPersistenceManagerFactory.get()
-	// .getPersistenceManager();
-	//
-	// // query messages its target user is me
-	// String queryFromOthers = "select from "
-	// + LcomNewMessageData.class.getName()
-	// + " where mTargetUserId == " + userId;
-	// result = (List<LcomNewMessageData>) pm
-	// .newQuery(queryFromOthers).execute();
-	//
-	// pm.close();
-	//
-	// // Put data to memcache
-	// if (result != null && result.size() != 0) {
-	// try {
-	// unreadMessages = changeNewMessageReadState(result);
-	// if (unreadMessages != null
-	// && unreadMessages.size() != 0) {
-	// helper.putNewMessagesToMemCache(userId,
-	// unreadMessages);
-	// }
-	// } catch (LcomMemcacheException e1) {
-	// log.log(Level.WARNING,
-	// "LcomMemcacheException: " + e1.getMessage());
-	// }
-	// }
-	// return unreadMessages;
-	// } else {
-	// // Nothing to do
-	// log.log(Level.INFO,
-	// "result is not null or 0 (From memcache, could be strange status");
-	// }
-	// }
-	//
-	// return null;
-	// }
-
-	// private List<LcomNewMessageData> changeNewMessageReadState(
-	// List<LcomNewMessageData> input) {
-	// log.log(Level.INFO, "changeNewMessageReadState");
-	// // Store message to memcache
-	// if (input != null && input.size() != 0) {
-	//
-	// log.log(Level.INFO, "resultsize::: " + input.size());
-	// List<LcomNewMessageData> unreadMessages = new
-	// ArrayList<LcomNewMessageData>();
-	// for (LcomNewMessageData message : input) {
-	// boolean isRead = message.isMessageRead();
-	// if (isRead == false) {
-	// log.log(Level.INFO, "message with already read:: "
-	// + message.getMessage());
-	// unreadMessages.add(message);
-	// }
-	// }
-	//
-	// return unreadMessages;
-	//
-	// } else {
-	// log.log(Level.INFO, "result is null or 0 A");
-	// }
-	//
-	// return null;
-	// }
-
 	@SuppressWarnings("unchecked")
 	public synchronized List<LcomNewMessageData> getNewMessagesWithTargetUser(
 			long userId, long friendUserId, long currentTime) {
-		log.log(Level.WARNING, "getNewMessagesWithTargetUser");
+		log.log(Level.WARNING, "getNewMessagesWithTargetUser: " + userId
+				+ " / " + friendUserId);
 
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
 
@@ -589,117 +496,109 @@ public class LcomDatabaseManager {
 
 			if (friendId != null && messageArray != null
 					&& messageTimeArray != null) {
-				log.log(Level.WARNING, "B");
-				for (int i = 0; i < friendId.size(); i++) {
-					log.log(Level.WARNING, "C");
+
+				int index = friendId.indexOf(friendUserId);
+				if (index >= 0) {
 					// If the data is for the friendUserId
-					if (friendId.get(i) == friendUserId) {
-						targetUserName = targetUserNameArray.get(i);
-						String messages = messageArray.get(i);
-						String messageTimes = messageTimeArray.get(i);
-						String messagePostTimes = messagePostedArray.get(i);
+					targetUserName = targetUserNameArray.get(index);
+					String messages = messageArray.get(index);
+					String messageTimes = messageTimeArray.get(index);
+					String messagePostTimes = messagePostedArray.get(index);
 
-						if (messages != null && messageTimes != null
-								&& messagePostTimes != null) {
-							log.log(Level.WARNING, "D");
-							String[] msg = messages.split(LcomConst.SEPARATOR);
-							String[] t = messageTimes
-									.split(LcomConst.SEPARATOR);
-							String[] postT = messagePostTimes
-									.split(LcomConst.SEPARATOR);
+					if (messages != null && messageTimes != null
+							&& messagePostTimes != null) {
+						String[] msg = messages.split(LcomConst.SEPARATOR);
+						String[] t = messageTimes.split(LcomConst.SEPARATOR);
+						String[] postT = messagePostTimes
+								.split(LcomConst.SEPARATOR);
 
-							String validString = "a";
-							String validTimeString = "a";
-							String validPostTimeString = "a";
+						// String validString = "a";
+						// String validTimeString = "a";
+						// String validPostTimeString = "a";
+						//
+						// String validString2 = null;
+						// String validTimeString2 = null;
+						// String validPostTimeString2 = null;
 
-							String validString2 = null;
-							String validTimeString2 = null;
-							String validPostTimeString2 = null;
+						// If message is valid
+						if (msg != null) {
+							for (int j = 0; j < msg.length; j++) {
+								if (Long.valueOf(t[j]) > currentTime) {
+									// Keep valid message and time
+									// validString = validString
+									// + LcomConst.SEPARATOR + msg[j];
+									// validTimeString = validTimeString
+									// + LcomConst.SEPARATOR + t[j];
+									// validPostTimeString = validPostTimeString
+									// + LcomConst.SEPARATOR + postT[j];
 
-							// If message is valid
-							if (msg != null) {
-								log.log(Level.WARNING, "E");
-								for (int j = 0; j < msg.length; j++) {
-									log.log(Level.WARNING, "F");
-									if (Long.valueOf(t[j]) > currentTime) {
-										log.log(Level.WARNING, "G");
-
-										// Keep valid message and time
-										validString = validString
-												+ LcomConst.SEPARATOR + msg[j];
-										validTimeString = validTimeString
-												+ LcomConst.SEPARATOR + t[j];
-										validPostTimeString = validPostTimeString
-												+ LcomConst.SEPARATOR
-												+ postT[j];
-
-										// Put only valid data to return array
-										validMessage.add(msg[j]);
-										validMessageTime
-												.add(Long.valueOf(t[j]));
-										validPostedTime.add(Long
-												.valueOf(postT[j]));
-									}
+									// Put only valid data to return array
+									validMessage.add(msg[j]);
+									validMessageTime.add(Long.valueOf(t[j]));
+									validPostedTime.add(Long.valueOf(postT[j]));
 								}
-
-								// Remove unncessary characters
-								// If more than message is valid (meaning more
-								// than
-								// 1 Message is added to validString)
-								if (validString != null
-										&& (validString.length() > (1 + LcomConst.SEPARATOR)
-												.length())) {
-									validString2 = validString
-											.substring((1 + LcomConst.SEPARATOR)
-													.length());
-								}
-
-								if (validTimeString != null
-										&& (validTimeString.length() > (1 + LcomConst.SEPARATOR)
-												.length())) {
-									validTimeString2 = validTimeString
-											.substring((1 + LcomConst.SEPARATOR)
-													.length());
-								}
-
-								if (validPostTimeString != null
-										&& (validPostTimeString.length() > (1 + LcomConst.SEPARATOR)
-												.length())) {
-									validPostTimeString2 = validPostTimeString
-											.substring((1 + LcomConst.SEPARATOR)
-													.length());
-								}
-
-								if (validString2 != null
-										&& validString2.length() > 0) {
-									// Set valid message and time to Original
-									// List
-									messageArray.set(i, validString2);
-									messageTimeArray.set(i, validTimeString2);
-									messagePostedArray.set(i,
-											validPostTimeString2);
-								} else {
-									// Set valid message and time to Original
-									// List
-									messageArray.set(i, null);
-									messageTimeArray.set(i, null);
-									messagePostedArray.set(i, null);
-								}
-
 							}
+
+							// Remove unncessary characters
+							// If more than message is valid (meaning more
+							// than
+							// 1 Message is added to validString)
+							// if (validString != null
+							// && (validString.length() > (1 +
+							// LcomConst.SEPARATOR
+							// .length()))) {
+							// validString2 = validString
+							// .substring((1 + LcomConst.SEPARATOR
+							// .length()));
+							// }
+							//
+							// if (validTimeString != null
+							// && (validTimeString.length() > (1 +
+							// LcomConst.SEPARATOR
+							// .length()))) {
+							// validTimeString2 = validTimeString
+							// .substring((1 + LcomConst.SEPARATOR
+							// .length()));
+							// }
+							//
+							// if (validPostTimeString != null
+							// && (validPostTimeString.length() > (1 +
+							// LcomConst.SEPARATOR
+							// .length()))) {
+							// validPostTimeString2 = validPostTimeString
+							// .substring((1 + LcomConst.SEPARATOR
+							// .length()));
+							// }
+
+							// if (validString2 != null
+							// && validString2.length() > 0) {
+							// // Set valid message and time to Original
+							// // List
+							// messageArray.set(index, validString2);
+							// messageTimeArray.set(index, validTimeString2);
+							// messagePostedArray.set(index,
+							// validPostTimeString2);
+							// } else {
+							// Set valid message and time to Original
+							// List
+							messageArray.set(index, null);
+							messageTimeArray.set(index, null);
+							messagePostedArray.set(index, null);
+							// }
+
 						}
 					}
 				}
 
 				// Update entity
 				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-						null);
+						messageArray);
 				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-						null);
+						messageTimeArray);
 				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-						null);
-				// TODO
-				// ds.put(entity);
+						messagePostedArray);
+
+				ds.put(entity);
 
 				if (validMessage != null && validMessage.size() != 0) {
 					LcomNewMessageData data = new LcomNewMessageData(userId,
