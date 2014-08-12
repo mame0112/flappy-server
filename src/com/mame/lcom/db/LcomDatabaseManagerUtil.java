@@ -137,75 +137,68 @@ public class LcomDatabaseManagerUtil {
 			try {
 				if (friendUserIdArray != null && friendUserIdArray.size() != 0) {
 
-					for (int i = 0; i < friendUserIdArray.size(); i++) {
-						if (friendUserIdArray.get(i) == senderUserId) {
+					int index = friendUserIdArray.indexOf(senderUserId);
+					if (index >= 0) {
+						// If message already exist
+						if (messageArray != null && expireTimeArray != null
+								&& postedTimeArray != null
+								&& postedTimeArray != null) {
 
-							// If message already exist
-							if (messageArray != null && expireTimeArray != null
-									&& postedTimeArray != null
-									&& postedTimeArray != null) {
+							long expireDate = TimeUtil
+									.getExpireDate(currentTime);
 
-								long expireDate = TimeUtil
-										.getExpireDate(currentTime);
+							String message = messageArray.get(index);
+							String expireTime = expireTimeArray.get(index);
+							String postedTime = postedTimeArray.get(index);
 
-								String message = messageArray.get(i);
-								String expireTime = expireTimeArray.get(i);
-								String postedTime = postedTimeArray.get(i);
-
+							if (message != null
+									&& !message.equals(LcomConst.NULL)) {
 								message = message + LcomConst.SEPARATOR
 										+ lastMessage;
-								expireTime = expireTime + LcomConst.SEPARATOR
-										+ expireDate;
-								postedTime = postedTime + LcomConst.SEPARATOR
-										+ currentTime;
-
-								// Update array
-								messageArray.set(i, message);
-								expireTimeArray.set(i, expireTime);
-								postedTimeArray.set(i, postedTime);
-
-								// Update entity
-								e.setProperty(
-										LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-										messageArray);
-								e.setProperty(
-										LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-										postedTimeArray);
-								e.setProperty(
-										LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-										expireTimeArray);
-								ds.put(e);
-
-								// TODO
-								// if (expireTime != null && postedTime != null)
-								// {
-								//
-								// String[] t = expireTime
-								// .split(LcomConst.SEPARATOR);
-								// String[] postT = postedTime
-								// .split(LcomConst.SEPARATOR);
-								//
-								// long currentTime = TimeUtil
-								// .getCurrentDate();
-								//
-								// // Remove expire message
-								// for (int j = 0; j < t.length; j++) {
-								// // If message is still valid
-								// if (Long.valueOf(t[j]) < currentTime) {
-								//
-								// }
-								// }
-								//
-								// }
 							} else {
-								// If message is empty
-								// TODO need error handling
-								return false;
+								message = lastMessage;
 							}
 
-							return true;
+							if (expireTime != null
+									&& !expireTime.equals(LcomConst.NULL)) {
+								expireTime = expireTime + LcomConst.SEPARATOR
+										+ expireDate;
+							} else {
+								expireTime = String.valueOf(expireDate);
+							}
+
+							if (postedTime != null
+									&& !postedTime.equals(LcomConst.NULL)) {
+								postedTime = postedTime + LcomConst.SEPARATOR
+										+ currentTime;
+							} else {
+								postedTime = String.valueOf(currentTime);
+							}
+
+							// Update array
+							messageArray.set(index, message);
+							expireTimeArray.set(index, expireTime);
+							postedTimeArray.set(index, postedTime);
+
+							// Update entity
+							e.setProperty(
+									LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+									messageArray);
+							e.setProperty(
+									LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+									postedTimeArray);
+							e.setProperty(
+									LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+									expireTimeArray);
+							ds.put(e);
+						} else {
+							// If message is empty
+							// TODO need error handling
+							return false;
 						}
 					}
+
+					return true;
 
 				}
 			} catch (IndexOutOfBoundsException e1) {
@@ -355,17 +348,23 @@ public class LcomDatabaseManagerUtil {
 
 							// Old message should be removed when the user goes
 							// to Conversation activity
-							for (int j = 0; j < msgParsed.length; j++) {
-								long t = Long.valueOf(timeParsed[j]);
-								if (t > currentTime) {
-									validMessage.add(msgParsed[j]);
-									validExpireTime.add(t);
+							try {
+								for (int j = 0; j < msgParsed.length; j++) {
+									long t = Long.valueOf(timeParsed[j]);
+									if (t > currentTime) {
+										validMessage.add(msgParsed[j]);
+										validExpireTime.add(t);
+									}
 								}
+								LcomFriendshipData data = new LcomFriendshipData(
+										userId, friendId, friendName,
+										validMessage, validExpireTime);
+								result.add(data);
+							} catch (NumberFormatException e1) {
+								log.log(Level.WARNING,
+										"NumberFormatException: "
+												+ e1.getMessage());
 							}
-							LcomFriendshipData data = new LcomFriendshipData(
-									userId, friendId, friendName, validMessage,
-									validExpireTime);
-							result.add(data);
 						}
 					}
 				}

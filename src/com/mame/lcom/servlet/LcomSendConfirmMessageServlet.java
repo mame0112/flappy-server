@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
+import com.mame.lcom.gcm.GCMIntentManager;
 import com.mame.lcom.invitation.LcomMail;
 import com.mame.lcom.util.TimeUtil;
 
@@ -104,6 +105,17 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 				// Send back mail address (to be shown before the target user
 				// set his/her user name)
 				list.add(mailAddress);
+
+				// Push message
+				String regId = manager.getDeviceIdForGCMPush(Integer
+						.valueOf(targetUserId));
+				if (regId != null && !regId.isEmpty()) {
+					long expireDate = TimeUtil.getExpireDate(currentTime);
+					GCMIntentManager pushManager = new GCMIntentManager();
+					pushManager.pushGCMNotification(Integer.valueOf(userId),
+							Integer.valueOf(targetUserId), userName,
+							targetUserName, message, regId, expireDate);
+				}
 
 			} else {
 				// If the target user has NOT been registered. (= new user)
