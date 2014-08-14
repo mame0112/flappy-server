@@ -76,11 +76,18 @@ public class LcomDatabaseManagerUtil {
 		List<Long> friendUserIdArray = (List<Long>) entity
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
 
-		for (long id : friendUserIdArray) {
-			if (id == friendUserId) {
+		if (friendUserIdArray != null) {
+			int index = friendUserIdArray.indexOf(friendUserId);
+			if (index >= 0) {
 				return true;
 			}
 		}
+
+		// for (long id : friendUserIdArray) {
+		// if (id == friendUserId) {
+		// return true;
+		// }
+		// }
 
 		return false;
 	}
@@ -335,6 +342,9 @@ public class LcomDatabaseManagerUtil {
 					String messageForUser = messageArray.get(i);
 					String msgTimeForUser = messageTimeArray.get(i);
 
+					log.log(Level.WARNING, "messageForUser: " + messageForUser);
+					log.log(Level.WARNING, "msgTimeForUser: " + msgTimeForUser);
+
 					if (messageForUser != null) {
 						String[] msgParsed = messageForUser
 								.split(LcomConst.SEPARATOR);
@@ -356,10 +366,16 @@ public class LcomDatabaseManagerUtil {
 										validExpireTime.add(t);
 									}
 								}
-								LcomFriendshipData data = new LcomFriendshipData(
-										userId, friendId, friendName,
-										validMessage, validExpireTime);
-								result.add(data);
+
+								// If no message is valid, should avoid to
+								// return
+								if (validMessage != null
+										&& validMessage.size() != 0) {
+									LcomFriendshipData data = new LcomFriendshipData(
+											userId, friendId, friendName,
+											validMessage, validExpireTime);
+									result.add(data);
+								}
 							} catch (NumberFormatException e1) {
 								log.log(Level.WARNING,
 										"NumberFormatException: "

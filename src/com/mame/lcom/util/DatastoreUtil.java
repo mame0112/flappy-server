@@ -71,7 +71,7 @@ public class DatastoreUtil {
 
 	public static String parseFriendListData(int userId,
 			List<LcomFriendshipData> friendListData) {
-		log.log(Level.WARNING, "parseFriendListData ");
+		log.log(Level.WARNING, "parseFriendListData");
 		String result = null;
 		boolean isFirstTime = true;
 
@@ -149,6 +149,7 @@ public class DatastoreUtil {
 	}
 
 	public static String parseNewMessage(long userId, LcomFriendshipData data) {
+		log.log(Level.WARNING, "parseNewMessage");
 		String parsed = null;
 		// int firstUserId = data.getFirstUserId();
 		// String firstUserName = data.getFirstUserName();
@@ -174,9 +175,12 @@ public class DatastoreUtil {
 
 		String parsedMessage = null;
 		if (messages != null && messages.size() != 0) {
+			log.log(Level.WARNING, "A1");
 			boolean isFirst = true;
 			for (int i = messages.size() - 1; i >= 0; i--) {
+				log.log(Level.WARNING, "A2");
 				String msg = messages.get(i);
+				log.log(Level.WARNING, "msg: " + msg);
 				// for (String msg : messages) {
 				if (isFirst) {
 					parsedMessage = msg;
@@ -189,10 +193,13 @@ public class DatastoreUtil {
 		}
 		String parsedDate = null;
 		if (expireDate != null && expireDate.size() != 0) {
+			log.log(Level.WARNING, "B1");
 			boolean isFirst = true;
 			// for (Long date : expireDate) {
 			for (int j = expireDate.size() - 1; j >= 0; j--) {
+				log.log(Level.WARNING, "B2");
 				long date = expireDate.get(j);
+				log.log(Level.WARNING, "date: " + date);
 				if (isFirst) {
 					parsedDate = String.valueOf(date);
 					isFirst = false;
