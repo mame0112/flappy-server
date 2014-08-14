@@ -528,7 +528,6 @@ public class LcomDatabaseManagerUtil {
 			String expireDates = expireDateList.get(index);
 
 			if (messages != null && postDates != null && expireDates != null) {
-
 				String[] msg = messages.split(LcomConst.SEPARATOR);
 				String[] postDate = postDates.split(LcomConst.SEPARATOR);
 				String[] expireDate = expireDates.split(LcomConst.SEPARATOR);
@@ -594,6 +593,12 @@ public class LcomDatabaseManagerUtil {
 					postDateList.set(index, null);
 					expireDateList.set(index, null);
 				}
+			} else {
+				// If already registered message is null
+				log.log(Level.INFO, "registered message is null");
+				messageList.set(index, message);
+				postDateList.set(index, String.valueOf(postTime));
+				expireDateList.set(index, String.valueOf(expireTime));
 			}
 
 			// Update Entity
