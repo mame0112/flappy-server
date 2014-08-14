@@ -265,9 +265,9 @@ public class LcomDatabaseManagerUtil {
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 					Arrays.asList(lastMessage));
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-					Arrays.asList(currentTime));
+					Arrays.asList(String.valueOf(currentTime)));
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-					Arrays.asList(expireDate));
+					Arrays.asList(String.valueOf(expireDate)));
 			ds.put(e);
 		}
 
@@ -487,9 +487,9 @@ public class LcomDatabaseManagerUtil {
 
 		if (userId != LcomConst.NO_USER && e != null) {
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-					Arrays.asList(expireTime));
+					Arrays.asList(String.valueOf(expireTime)));
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-					Arrays.asList(postTime));
+					Arrays.asList(String.valueOf(postTime)));
 
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
 					Arrays.asList(userId));
