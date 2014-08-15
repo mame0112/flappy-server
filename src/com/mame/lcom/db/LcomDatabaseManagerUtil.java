@@ -115,13 +115,16 @@ public class LcomDatabaseManagerUtil {
 	// }
 
 	/**
-	 * add message for friend user.
 	 * 
+	 * @param e
+	 * @param senderUserId
+	 * @param senderName
 	 * @param keyUserId
-	 * @param friendUserId
+	 * @param keyUserName
+	 * @param lastMessage
+	 * @param currentTime
 	 * @param ds
-	 * @param isRemoveOldMessage
-	 * @return true if success to add. Otherwise, return false
+	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean addMessageForFriendUser(Entity e, long senderUserId,
@@ -200,9 +203,22 @@ public class LcomDatabaseManagerUtil {
 							ds.put(e);
 						} else {
 							// If message is empty
-							// TODO need error handling
-							return false;
+							// Entity e, String userId, String userName,
+							// String message, String postTime, String
+							// expireTime
+							long expireTime = TimeUtil
+									.getExpireDate(currentTime);
+							putNewMessageInfoToEntity(e, senderUserId,
+									senderName, lastMessage,
+									String.valueOf(currentTime),
+									String.valueOf(expireTime));
+							ds.put(e);
+							return true;
 						}
+					} else {
+						log.log(Level.WARNING,
+								"friend id exist but no friend Id here. something wrong.");
+						return false;
 					}
 
 					return true;
@@ -213,6 +229,35 @@ public class LcomDatabaseManagerUtil {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * This method put necessary information onto target entity. Note that this
+	 * method doesn't put entity to DatastoreService
+	 * 
+	 * @param e
+	 * @param senderUserId
+	 * @param senderUserName
+	 * @param message
+	 * @param postTime
+	 * @param expireTime
+	 */
+	private void putNewMessageInfoToEntity(Entity e, long senderUserId,
+			String senderUserName, String message, String postTime,
+			String expireTime) {
+		log.log(Level.WARNING, "putNewMessageInfoToEntity");
+		if (e != null) {
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+					Arrays.asList(expireTime));
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+					Arrays.asList(senderUserId));
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+					Arrays.asList(senderUserName));
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+					Arrays.asList(postTime));
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+					Arrays.asList(message));
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -258,17 +303,20 @@ public class LcomDatabaseManagerUtil {
 
 		} else {
 			// In case of first user case
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-					Arrays.asList(senderUserId));
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
-					Arrays.asList(senderName));
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-					Arrays.asList(lastMessage));
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-					Arrays.asList(String.valueOf(currentTime)));
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-					Arrays.asList(String.valueOf(expireDate)));
+			putNewMessageInfoToEntity(e, senderUserId, senderName, lastMessage,
+					String.valueOf(currentTime), String.valueOf(expireDate));
 			ds.put(e);
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+			// Arrays.asList(senderUserId));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+			// Arrays.asList(senderName));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// Arrays.asList(lastMessage));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+			// Arrays.asList(String.valueOf(currentTime)));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+			// Arrays.asList(String.valueOf(expireDate)));
+			// ds.put(e);
 		}
 
 		return true;
@@ -285,20 +333,26 @@ public class LcomDatabaseManagerUtil {
 		long expireDate = TimeUtil.getExpireDate(time);
 		Entity newEntity = new Entity(LcomConst.KIND_FRIENDSHIP_DATA,
 				keyUserId, userKey);
-		newEntity
-				.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
-		newEntity
-				.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
-		newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-				Arrays.asList(senderUserId));
-		newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
-				Arrays.asList(senderName));
-		newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-				Arrays.asList(lastMessage));
-		newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-				Arrays.asList(String.valueOf(time)));
-		newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-				Arrays.asList(String.valueOf(expireDate)));
+
+		// Entity e, long senderUserId,
+		// String senderUserName, String message, String postTime,
+		// String expireTime
+		putNewMessageInfoToEntity(newEntity, senderUserId, senderName,
+				lastMessage, String.valueOf(time), String.valueOf(expireDate));
+		// newEntity
+		// .setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
+		// newEntity
+		// .setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
+		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+		// Arrays.asList(senderUserId));
+		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+		// Arrays.asList(senderName));
+		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+		// Arrays.asList(lastMessage));
+		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+		// Arrays.asList(String.valueOf(time)));
+		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+		// Arrays.asList(String.valueOf(expireDate)));
 		ds.put(newEntity);
 
 		return true;
@@ -486,18 +540,19 @@ public class LcomDatabaseManagerUtil {
 		log.log(Level.INFO, "addNewUserDataToFriendshipKind");
 
 		if (userId != LcomConst.NO_USER && e != null) {
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-					Arrays.asList(String.valueOf(expireTime)));
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-					Arrays.asList(String.valueOf(postTime)));
+			putNewMessageInfoToEntity(e, userId, userName, message,
+					String.valueOf(postTime), String.valueOf(expireTime));
 
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-					Arrays.asList(userId));
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
-					Arrays.asList(userName));
-
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-					Arrays.asList(message));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+			// Arrays.asList(String.valueOf(expireTime)));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+			// Arrays.asList(String.valueOf(postTime)));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+			// Arrays.asList(userId));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+			// Arrays.asList(userName));
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// Arrays.asList(message));
 
 			ds.put(e);
 		}
