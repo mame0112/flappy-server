@@ -24,12 +24,10 @@ public class TimeUtil {
 	}
 
 	public static long getExpireDate(long date) {
-		Calendar now = Calendar.getInstance();
-		long expireTime = now.getTimeInMillis()
-				+ LcomConst.MESSAGE_EXPIRE_PERIOD; // 3omin
-		// now.setTime(date);
-		// now.add(Calendar.MINUTE, LcomConst.MESSAGE_EXPIRE_PERIOD);
-		// Date time = now.getTime();
+		long expireTime = date + LcomConst.MESSAGE_EXPIRE_PERIOD; // 3omin
+		// Calendar now = Calendar.getInstance();
+		// long expireTime = now.getTimeInMillis()
+		// + LcomConst.MESSAGE_EXPIRE_PERIOD; // 3omin
 		return expireTime;
 	}
 

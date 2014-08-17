@@ -203,9 +203,6 @@ public class LcomDatabaseManagerUtil {
 							ds.put(e);
 						} else {
 							// If message is empty
-							// Entity e, String userId, String userName,
-							// String message, String postTime, String
-							// expireTime
 							long expireTime = TimeUtil
 									.getExpireDate(currentTime);
 							putNewMessageInfoToEntity(e, senderUserId,
@@ -226,6 +223,8 @@ public class LcomDatabaseManagerUtil {
 				}
 			} catch (IndexOutOfBoundsException e1) {
 				// TODO
+				log.log(Level.WARNING,
+						"IndexOutOfBoundsException: " + e1.getMessage());
 			}
 		}
 		return false;
@@ -375,7 +374,7 @@ public class LcomDatabaseManagerUtil {
 	@SuppressWarnings("unchecked")
 	public List<LcomFriendshipData> getAllValidFriendshipData(Entity e,
 			DatastoreService ds, long userId) {
-		log.log(Level.WARNING, "getAllValidFriendshipData");
+		log.log(Level.INFO, "getAllValidFriendshipData");
 
 		List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
 
@@ -386,7 +385,7 @@ public class LcomDatabaseManagerUtil {
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
 			List<String> messageArray = (List<String>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
-			ArrayList<String> messageTimeArray = (ArrayList<String>) e
+			List<String> messageTimeArray = (List<String>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 
 			if (friendIdArray != null && friendIdArray.size() != 0) {
@@ -564,13 +563,13 @@ public class LcomDatabaseManagerUtil {
 			DatastoreService ds) {
 		log.log(Level.INFO, "addMessageToFriendshipKind");
 
-		ArrayList<Long> friendList = (ArrayList<Long>) e
+		List<Long> friendList = (List<Long>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-		ArrayList<String> messageList = (ArrayList<String>) e
+		List<String> messageList = (List<String>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
-		ArrayList<String> postDateList = (ArrayList<String>) e
+		List<String> postDateList = (List<String>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
-		ArrayList<String> expireDateList = (ArrayList<String>) e
+		List<String> expireDateList = (List<String>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 
 		int index = friendList.indexOf(userId);
@@ -595,6 +594,9 @@ public class LcomDatabaseManagerUtil {
 
 				for (int i = 0; i < msg.length; i++) {
 					if (Long.valueOf(expireDate[i]) > currentTime) {
+						log.log(Level.INFO, "msg: " + msg[i]);
+						log.log(Level.INFO, "currentTime: " + currentTime);
+						log.log(Level.INFO, "expireDate[i]: " + expireDate[i]);
 						validMsg = validMsg + LcomConst.SEPARATOR + msg[i];
 						validPostDate = validPostDate + LcomConst.SEPARATOR
 								+ postDate[i];
