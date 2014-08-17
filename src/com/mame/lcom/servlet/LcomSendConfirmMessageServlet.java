@@ -137,7 +137,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 					LcomUserData data = new LcomUserData(LcomConst.NO_USER,
 							null, null, mailAddress, null);
 
-					manager.addNewUserAndFriendshipInfo(data,
+					newUserId = manager.addNewUserAndFriendshipInfo(data,
 							Long.valueOf(userId), userName, message,
 							currentTime);
 

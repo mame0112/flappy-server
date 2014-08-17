@@ -1,28 +1,34 @@
 package com.mame.lcom.db;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.memcache.InvalidValueException;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceException;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.mame.lcom.constant.LcomConst;
-import com.mame.lcom.data.LcomAllUserData;
-import com.mame.lcom.data.LcomFriendshipData;
-import com.mame.lcom.data.LcomMessageDeviceId;
-import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
-import com.mame.lcom.util.LcomMemcacheUtil;
 
 public class LcomDatabaseManagerHelper {
 
 	private final Logger log = Logger.getLogger(LcomDatabaseManagerHelper.class
 			.getName());
 
-
+	// public static void putUserDataToMemcache(Key userKey, Entity data) {
+	//
+	// if (userKey != null && data != null) {
+	// MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+	// ms.put(userKey, data);
+	// }
+	// }
+	//
+	// public static Entity getUserDataFromMemcahe(Key key) {
+	// if (key != null) {
+	// MemcacheService ms = MemcacheServiceFactory.getMemcacheService();
+	// Entity data = (Entity) ms.get(key);
+	// return data;
+	// }
+	// return null;
+	// }
 	// public void putUserDataToMemCache(LcomUserData data) {
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomUserData.class.getSimpleName());
