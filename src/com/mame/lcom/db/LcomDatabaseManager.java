@@ -857,7 +857,7 @@ public class LcomDatabaseManager {
 					}
 				} catch (EntityNotFoundException e) {
 					log.log(Level.INFO,
-							"ntityNotFoundException: " + e.getMessage());
+							"EntityNotFoundException: " + e.getMessage());
 				}
 			}
 		}

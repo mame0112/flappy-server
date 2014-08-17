@@ -33,18 +33,16 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
 
 		// Friend array as List
-		List<String> ids = parseFriendIds(friendsId);
 		List<String> list = new ArrayList<String>();
 
 		if (origin != null && friendsId != null && apiLevel != null) {
-			log.log(Level.INFO, "friendsId: " + friendsId);
+			List<String> ids = parseFriendIds(friendsId);
 			list.add(origin);
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 			HashMap<Integer, String> datas = manager.getFriendThubmnails(ids);
 			if (datas != null) {
 				String result = parseThumbnailData(datas);
-				log.log(Level.INFO, "result; " + result);
 
 				// If no thumbnail available, "null" string shall be returned.
 				list.add(result);
@@ -61,13 +59,14 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 
 	private List<String> parseFriendIds(String friendsId) {
 		if (friendsId != null) {
-			log.log(Level.INFO, "friendsId: " + friendsId);
+			log.log(Level.WARNING, "parseFriendIds");
 			String[] idArray = friendsId.split(LcomConst.SEPARATOR);
 			if (idArray != null && idArray.length != 0) {
+				log.log(Level.WARNING, "A");
 				List<String> result = Arrays.asList(idArray);
 
 				for (String str : result) {
-					log.log(Level.INFO, "str: " + str);
+					log.log(Level.WARNING, "str: " + str);
 				}
 
 				return result;
@@ -77,7 +76,6 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 	}
 
 	private String parseThumbnailData(HashMap<Integer, String> datas) {
-
 		if (datas != null && datas.size() != 0) {
 			String result = "a";
 			for (Iterator<?> it = datas.entrySet().iterator(); it.hasNext();) {
@@ -85,18 +83,20 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 				Map.Entry entry = (Map.Entry) it.next();
 				Integer friendId = (Integer) entry.getKey();
 				String friendThumb = (String) entry.getValue();
-				if (friendThumb != null) {
-					result = result + friendId + LcomConst.SEPARATOR
-							+ friendThumb + LcomConst.SEPARATOR
-							+ LcomConst.ITEM_SEPARATOR;
+				if (friendThumb != null && friendThumb.length() != 0) {
+					result = result + LcomConst.ITEM_SEPARATOR + friendId
+							+ LcomConst.SEPARATOR + friendThumb;
 				}
 			}
 
-			if (result != null) {
-				// Remove first "a"
-				int end = result.length() - LcomConst.SEPARATOR.length()
-						- LcomConst.ITEM_SEPARATOR.length();
-				result = result.substring(1, end);
+			// If more than one thumbnail is registered
+			if (result != null && result.length() > 1) {
+				result = result.substring(
+						(1 + LcomConst.ITEM_SEPARATOR.length()),
+						result.length());
+			} else {
+				// If no thumbnail is registered, we return null
+				result = null;
 			}
 
 			return result;
