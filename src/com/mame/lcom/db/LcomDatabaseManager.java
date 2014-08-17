@@ -827,39 +827,37 @@ public class LcomDatabaseManager {
 	 */
 	public synchronized HashMap<Integer, String> getFriendThubmnails(
 			List<String> friendsId) {
-		PersistenceManager pm = LcomPersistenceManagerFactory.get()
-				.getPersistenceManager();
+
+		log.log(Level.INFO, "getFriendThubmnails");
 
 		HashMap<Integer, String> result = new HashMap<Integer, String>();
 
 		if (friendsId != null && friendsId.size() != 0) {
+
+			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+
 			for (String id : friendsId) {
-				Key key = LcomDatabaseManagerUtil.getAllUserDataKey();
-
-				DatastoreService ds = DatastoreServiceFactory
-						.getDatastoreService();
-
-				Filter nullFilter = new FilterPredicate(
-						LcomConst.ENTITY_THUMBNAIL, FilterOperator.NOT_EQUAL,
-						null);
-
-				Query query = new Query(LcomConst.KIND_USER_DATA, key);
-				query.setFilter(nullFilter);
-				PreparedQuery pQuery = ds.prepare(query);
-				Entity entity = pQuery.asSingleEntity();
-
-				// If thumbnail is available
-				if (entity != null) {
-					Blob thumbnail = (Blob) entity
-							.getProperty(LcomConst.ENTITY_THUMBNAIL);
-					if (thumbnail != null) {
-						String thumbStr = DatastoreUtil
-								.transcodeBlob2String(thumbnail);
-						result.put(Integer.valueOf(id), thumbStr);
-					} else {
-						// If thumbnail is not available (null)
-						// Nothing to do
+				Key key = LcomDatabaseManagerUtil.getUserDataKey(Long
+						.valueOf(id));
+				Entity entity = null;
+				try {
+					entity = ds.get(key);
+					// If thumbnail is available
+					if (entity != null) {
+						Blob thumbnail = (Blob) entity
+								.getProperty(LcomConst.ENTITY_THUMBNAIL);
+						if (thumbnail != null) {
+							String thumbStr = DatastoreUtil
+									.transcodeBlob2String(thumbnail);
+							result.put(Integer.valueOf(id), thumbStr);
+						} else {
+							// If thumbnail is not available (null)
+							// Nothing to do
+						}
 					}
+				} catch (EntityNotFoundException e) {
+					log.log(Level.INFO,
+							"ntityNotFoundException: " + e.getMessage());
 				}
 			}
 		}
