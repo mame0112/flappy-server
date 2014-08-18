@@ -357,6 +357,17 @@ public class LcomDatabaseManagerUtil {
 		return true;
 	}
 
+	public Entity getFriendshipEntityForUserIdWituhoutFilter(long userId,
+			DatastoreService ds) {
+		log.log(Level.WARNING, "getFriendshipEntityForUserIdWituhoutFilter");
+
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
+		Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
+		PreparedQuery pQuery = ds.prepare(query);
+		Entity e = pQuery.asSingleEntity();
+		return e;
+	}
+
 	public Entity getFriendshipEntityForUserId(long userId, DatastoreService ds) {
 		log.log(Level.WARNING, "getFriendshipEntityForUserId");
 		Filter messageFilter = new FilterPredicate(
@@ -369,6 +380,79 @@ public class LcomDatabaseManagerUtil {
 		PreparedQuery pQuery = ds.prepare(query);
 		Entity e = pQuery.asSingleEntity();
 		return e;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<LcomFriendshipData> getAllFriendshipData(Entity e,
+			DatastoreService ds, long userId) {
+		log.log(Level.INFO, "getAllFriendshipData");
+
+		List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
+
+		if (e != null) {
+
+			List<Long> friendIdArray = (List<Long>) e
+					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+			List<String> friendNameArray = (List<String>) e
+					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+			List<String> messageArray = (List<String>) e
+					.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			List<String> messageTimeArray = (List<String>) e
+					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+
+			if (friendIdArray != null && friendIdArray.size() != 0) {
+				for (int i = 0; i < friendIdArray.size(); i++) {
+					long friendId = friendIdArray.get(i);
+					String friendName = friendNameArray.get(i);
+					String messageForUser = messageArray.get(i);
+					String msgTimeForUser = messageTimeArray.get(i);
+
+					log.log(Level.WARNING, "messageForUser: " + messageForUser);
+					log.log(Level.WARNING, "msgTimeForUser: " + msgTimeForUser);
+
+					if (messageForUser != null) {
+						String[] msgParsed = messageForUser
+								.split(LcomConst.SEPARATOR);
+						String[] timeParsed = msgTimeForUser
+								.split(LcomConst.SEPARATOR);
+						if (msgParsed != null && msgParsed.length != 0) {
+							List<String> validMessage = new ArrayList<String>();
+							List<Long> validExpireTime = new ArrayList<Long>();
+
+							try {
+								for (int j = 0; j < msgParsed.length; j++) {
+									long t = Long.valueOf(timeParsed[j]);
+									validMessage.add(msgParsed[j]);
+									validExpireTime.add(t);
+								}
+
+								// If no message is valid, should avoid to
+								// return
+								if (validMessage != null
+										&& validMessage.size() != 0) {
+									LcomFriendshipData data = new LcomFriendshipData(
+											userId, friendId, friendName,
+											validMessage, validExpireTime);
+									result.add(data);
+								} else {
+									LcomFriendshipData data = new LcomFriendshipData(
+											userId, friendId, friendName, null,
+											null);
+									result.add(data);
+								}
+							} catch (NumberFormatException e1) {
+								log.log(Level.WARNING,
+										"NumberFormatException: "
+												+ e1.getMessage());
+							}
+						}
+					}
+				}
+			}
+
+		}
+
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")

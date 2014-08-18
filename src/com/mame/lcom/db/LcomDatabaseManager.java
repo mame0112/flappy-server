@@ -679,6 +679,27 @@ public class LcomDatabaseManager {
 		return result;
 	}
 
+	public synchronized List<LcomFriendshipData> getAllFriendshipData(
+			long userId) {
+		log.log(Level.INFO, "getAllFriendshipData");
+
+		List<LcomFriendshipData> result = null;
+
+		if (userId != LcomConst.NO_USER) {
+
+			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+
+			LcomDatabaseManagerUtil util = new LcomDatabaseManagerUtil();
+			Entity entity = util.getFriendshipEntityForUserIdWituhoutFilter(
+					userId, ds);
+			if (entity != null) {
+				result = util.getAllFriendshipData(entity, ds, userId);
+			}
+		}
+
+		return result;
+	}
+
 	@SuppressWarnings("unchecked")
 	public synchronized List<LcomFriendshipData> getNewMessageData(long userId,
 			long currentTime) {

@@ -47,6 +47,8 @@ public class LcomConst {
 
 	public final static String SERVLET_API_LEVEL = "servlet_api_level";
 
+	public final static String SERVLET_ALL_DATA_REQUIRE = "servlet_all_data_require";
+
 	public final static String SERVLET_INQUERY_CATEGORY = "servlet_inquery_category";
 
 	public final static String MESSAGE_EXPIRED = "EXPIRED";
