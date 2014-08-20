@@ -359,7 +359,8 @@ public class LcomDatabaseManagerUtil {
 
 	public Entity getFriendshipEntityForUserIdWituhoutFilter(long userId,
 			DatastoreService ds) {
-		log.log(Level.WARNING, "getFriendshipEntityForUserIdWituhoutFilter");
+		log.log(Level.WARNING, "getFriendshipEntityForUserIdWituhoutFilter: "
+				+ userId);
 
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
 		Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
@@ -401,8 +402,14 @@ public class LcomDatabaseManagerUtil {
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 
 			if (friendIdArray != null && friendIdArray.size() != 0) {
+
+				long current = TimeUtil.getCurrentDate();
+
 				for (int i = 0; i < friendIdArray.size(); i++) {
 					long friendId = friendIdArray.get(i);
+
+					log.log(Level.INFO, "friendId: " + friendId);
+
 					String friendName = friendNameArray.get(i);
 					String messageForUser = messageArray.get(i);
 					String msgTimeForUser = messageTimeArray.get(i);
@@ -410,35 +417,22 @@ public class LcomDatabaseManagerUtil {
 					log.log(Level.WARNING, "messageForUser: " + messageForUser);
 					log.log(Level.WARNING, "msgTimeForUser: " + msgTimeForUser);
 
+					List<String> validMessage = new ArrayList<String>();
+					List<Long> validExpireTime = new ArrayList<Long>();
+
 					if (messageForUser != null) {
 						String[] msgParsed = messageForUser
 								.split(LcomConst.SEPARATOR);
 						String[] timeParsed = msgTimeForUser
 								.split(LcomConst.SEPARATOR);
 						if (msgParsed != null && msgParsed.length != 0) {
-							List<String> validMessage = new ArrayList<String>();
-							List<Long> validExpireTime = new ArrayList<Long>();
-
 							try {
 								for (int j = 0; j < msgParsed.length; j++) {
 									long t = Long.valueOf(timeParsed[j]);
-									validMessage.add(msgParsed[j]);
-									validExpireTime.add(t);
-								}
-
-								// If no message is valid, should avoid to
-								// return
-								if (validMessage != null
-										&& validMessage.size() != 0) {
-									LcomFriendshipData data = new LcomFriendshipData(
-											userId, friendId, friendName,
-											validMessage, validExpireTime);
-									result.add(data);
-								} else {
-									LcomFriendshipData data = new LcomFriendshipData(
-											userId, friendId, friendName, null,
-											null);
-									result.add(data);
+									if (t > current) {
+										validMessage.add(msgParsed[j]);
+										validExpireTime.add(t);
+									}
 								}
 							} catch (NumberFormatException e1) {
 								log.log(Level.WARNING,
@@ -447,6 +441,11 @@ public class LcomDatabaseManagerUtil {
 							}
 						}
 					}
+
+					LcomFriendshipData data = new LcomFriendshipData(userId,
+							friendId, friendName, validMessage, validExpireTime);
+					result.add(data);
+
 				}
 			}
 
