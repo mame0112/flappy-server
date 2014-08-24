@@ -912,33 +912,129 @@ public class LcomDatabaseManager {
 
 		if (allEntities != null && allEntities.size() != 0) {
 
-			long current = TimeUtil.getCurrentDate();
+			log.log(Level.INFO, "A2 size: " + allEntities.size());
 
-			log.log(Level.INFO, "A2");
+			for (Entity e : allEntities) {
 
-			// for (Entity e : allEntities) {
-			//
-			// log.log(Level.INFO, "B");
-			//
-			// String userId = e.getKey().toString();
-			//
-			// Key key = KeyFactory.createKey(ancKey,
-			// LcomConst.KIND_FRIENDSHIP_DATA, userId);
-			// Query queryFS = new Query(LcomConst.KIND_USER_DATA, key);
-			// queryFS.setFilter(messageFilter);
-			// PreparedQuery pQueryFS = ds.prepare(queryFS);
-			// Entity entity = pQueryFS.asSingleEntity();
-			//
-			// List<String> expireDateList = (List<String>) entity
-			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
-			// for (String expires : expireDateList) {
-			// log.log(Level.INFO, "expires: " + expires);
-			// // TODO
-			// }
-			// }
+				Key userKey = e.getKey();
+
+				Query queryFS = new Query(LcomConst.KIND_FRIENDSHIP_DATA,
+						userKey);
+				queryFS.setFilter(messageFilter);
+				PreparedQuery pQueryFS = ds.prepare(queryFS);
+				Entity entity = pQueryFS.asSingleEntity();
+
+				if (entity != null) {
+					List<String> messageArray = (List<String>) entity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+					List<String> expireTimeArray = (List<String>) entity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+					List<String> messagePostedArray = (List<String>) entity
+							.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
+
+					List<String> validMessageArray = new ArrayList<String>();
+					List<String> validExpireTimeArray = new ArrayList<String>();
+					List<String> validPostTimeArray = new ArrayList<String>();
+
+					for (int i = 0; i < expireTimeArray.size(); i++) {
+
+						String tmpMessageString = "a";
+						String tmpExpireString = "a";
+						String tmpPostString = "a";
+
+						String messageString = messageArray.get(i);
+						String expireTimeString = expireTimeArray.get(i);
+						String postTimeString = messagePostedArray.get(i);
+
+						if (expireTimeString != null && messageString != null
+								&& postTimeString != null) {
+
+							String[] expire = expireTimeString
+									.split(LcomConst.SEPARATOR);
+							String[] msg = messageString
+									.split(LcomConst.SEPARATOR);
+							String[] post = postTimeString
+									.split(LcomConst.SEPARATOR);
+
+							for (int j = 0; j < expire.length; j++) {
+								// If message has already expired
+								if (Long.valueOf(expire[j]) > currentTime) {
+									tmpMessageString = tmpMessageString
+											+ LcomConst.SEPARATOR + msg[j];
+									tmpExpireString = tmpExpireString
+											+ LcomConst.SEPARATOR + expire[j];
+									tmpPostString = tmpPostString
+											+ LcomConst.SEPARATOR + post[j];
+								}
+							}
+
+							// If more than 1 message has been registered
+							if (tmpMessageString != null
+									&& (tmpMessageString.length() > (1 + LcomConst.SEPARATOR
+											.length()))) {
+								tmpMessageString = tmpMessageString
+										.substring((1 + LcomConst.SEPARATOR
+												.length()));
+								log.log(Level.INFO, "tmpMessageString: "
+										+ tmpMessageString);
+								validMessageArray.add(tmpMessageString);
+							}
+
+							if (tmpExpireString != null
+									&& (tmpExpireString.length() > (1 + LcomConst.SEPARATOR
+											.length()))) {
+								tmpExpireString = tmpExpireString
+										.substring((1 + LcomConst.SEPARATOR
+												.length()));
+								validExpireTimeArray.add(tmpExpireString);
+							}
+
+							if (tmpPostString != null
+									&& (tmpPostString.length() > (1 + LcomConst.SEPARATOR
+											.length()))) {
+								tmpPostString = tmpPostString
+										.substring((1 + LcomConst.SEPARATOR
+												.length()));
+								validPostTimeArray.add(tmpPostString);
+							}
+
+							// If the number of message is changed (meaning some
+							// old message is contained)
+
+							if (validMessageArray == null
+									|| messageArray.size() > validMessageArray
+											.size()) {
+								if (validMessageArray != null) {
+									log.log(Level.INFO,
+											"validMessageArray size:"
+													+ validMessageArray.size());
+								} else {
+									log.log(Level.INFO,
+											"validMessageArray is null");
+								}
+
+								// Set updated parameters to Entity
+								e.setProperty(
+										LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+										validMessageArray);
+								e.setProperty(
+										LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+										validPostTimeArray);
+								e.setProperty(
+										LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+										validExpireTimeArray);
+								// TODO
+								// ds.put(e);
+							} else {
+								log.log(Level.INFO,
+										"validMessageArray is not null or size not changed");
+							}
+						}
+					}
+
+				}
+			}
 		}
-		// }
-
 	}
 
 	private static synchronized List<LcomExpiredMessageData> backupToExpiredTable(
