@@ -906,10 +906,6 @@ public class LcomDatabaseManager {
 		List<Entity> allEntities = pQuery.asList(option);
 		log.log(Level.INFO, "A");
 
-		// for (Entity entity : pQuery.asIterable()) {
-		// log.log(Level.INFO, "B");
-		// }
-
 		if (allEntities != null && allEntities.size() != 0) {
 
 			log.log(Level.INFO, "A2 size: " + allEntities.size());

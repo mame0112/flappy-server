@@ -71,6 +71,15 @@
 	</servlet-mapping>
 	
 	<servlet>
+		<servlet-name>all_user_data</servlet-name>
+		<servlet-class>com.mame.lcom.servlet.LcomAllUserDataServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>all_user_data</servlet-name>
+		<url-pattern>/servlet/all_user_data</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
 		<servlet-name>send_add_message</servlet-name>
 		<servlet-class>com.mame.lcom.servlet.LcomSendAndAddMessageServlet</servlet-class>
 	</servlet>

@@ -33,29 +33,20 @@ public class LcomNewMessageServlet extends HttpServlet {
 		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
 		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
 		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
-		String isAllDataRequire = req
-				.getParameter(LcomConst.SERVLET_ALL_DATA_REQUIRE);
 
 		List<String> list = new ArrayList<String>();
 		list.add(origin);
 
-		if (userId != null && apiLevel != null && isAllDataRequire != null) {
+		if (userId != null && apiLevel != null) {
 			log.log(Level.INFO, "userId:" + userId);
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 
 			long currentTime = TimeUtil.getCurrentDate();
 
-			boolean isAllData = Boolean.valueOf(isAllDataRequire);
-
 			List<LcomFriendshipData> friendListData = null;
 
-			if (isAllData) {
-				friendListData = manager.getAllFriendshipData(Long
-						.valueOf(userId));
-			} else {
-				friendListData = manager.getNewMessageData(
-						Long.valueOf(userId), currentTime);
-			}
+			friendListData = manager.getNewMessageData(Long.valueOf(userId),
+					currentTime);
 
 			if (friendListData != null && friendListData.size() != 0) {
 				String result = DatastoreUtil.parseFriendListData(
