@@ -730,6 +730,7 @@ public class LcomDatabaseManager {
 
 		LcomDatabaseManagerUtil util = new LcomDatabaseManagerUtil();
 
+		// Check if Entity for target user exists or not
 		boolean isExist = util.isConversationDataForTargetUserExist(
 				targetUserId, ds);
 		if (isExist) {

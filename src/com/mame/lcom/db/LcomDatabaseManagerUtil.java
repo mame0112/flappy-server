@@ -550,6 +550,13 @@ public class LcomDatabaseManagerUtil {
 		return null;
 	}
 
+	/**
+	 * Get Entity for target user id
+	 * 
+	 * @param targetUserId
+	 * @param ds
+	 * @return
+	 */
 	public Entity getConversationEntity(long targetUserId, DatastoreService ds) {
 		log.log(Level.INFO, "getConversationEntity");
 
@@ -557,13 +564,13 @@ public class LcomDatabaseManagerUtil {
 			Key targetUserKey = LcomDatabaseManagerUtil
 					.getUserDataKey(targetUserId);
 
-			Filter messageFilter = new FilterPredicate(
-					LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-					FilterOperator.NOT_EQUAL, null);
+			// Filter messageFilter = new FilterPredicate(
+			// LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// FilterOperator.NOT_EQUAL, null);
 
 			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA,
 					targetUserKey);
-			query.setFilter(messageFilter);
+			// query.setFilter(messageFilter);
 			PreparedQuery pQuery = ds.prepare(query);
 			Entity entity = pQuery.asSingleEntity();
 			return entity;
@@ -573,6 +580,14 @@ public class LcomDatabaseManagerUtil {
 		return null;
 	}
 
+	/**
+	 * Check if entity for target user exists or not. This method doesn't care
+	 * about message. (Just check entity)
+	 * 
+	 * @param targetUserId
+	 * @param ds
+	 * @return
+	 */
 	public boolean isConversationDataForTargetUserExist(long targetUserId,
 			DatastoreService ds) {
 		log.log(Level.INFO, "isConversationDataForTargetUserExist");
@@ -581,14 +596,14 @@ public class LcomDatabaseManagerUtil {
 			Key targetUserKey = LcomDatabaseManagerUtil
 					.getUserDataKey(targetUserId);
 
-			Filter messageFilter = new FilterPredicate(
-					LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-					FilterOperator.NOT_EQUAL, null);
+			// Filter messageFilter = new FilterPredicate(
+			// LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// FilterOperator.NOT_EQUAL, null);
 
 			Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA,
 					targetUserKey);
 			query.setKeysOnly();
-			query.setFilter(messageFilter);
+			// query.setFilter(messageFilter);
 			PreparedQuery pQuery = ds.prepare(query);
 			Entity entity = pQuery.asSingleEntity();
 			if (entity != null) {
