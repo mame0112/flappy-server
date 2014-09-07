@@ -25,15 +25,7 @@ public class TimeUtil {
 
 	public static long getExpireDate(long date) {
 		long expireTime = date + LcomConst.MESSAGE_EXPIRE_PERIOD; // 3omin
-		// Calendar now = Calendar.getInstance();
-		// long expireTime = now.getTimeInMillis()
-		// + LcomConst.MESSAGE_EXPIRE_PERIOD; // 3omin
 		return expireTime;
 	}
 
-	// public static long getDateInDateFormat(String date) throws ParseException
-	// {
-	// Date result = new SimpleDateFormat(LcomConst.DATE_PATTERN).parse(date);
-	// return result;
-	// }
 }

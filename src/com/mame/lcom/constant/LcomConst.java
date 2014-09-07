@@ -140,7 +140,7 @@ public class LcomConst {
 	/**
 	 * Constant for message expire time.
 	 */
-	public final static long MESSAGE_EXPIRE_PERIOD = 30 * 60 * 1000;
+	public final static long MESSAGE_EXPIRE_PERIOD = 1 * 60 * 1000;
 	// 30min*60sec*1000msec
 	// public final static int MESSAGE_EXPIRE_PERIOD = 30; // 30min
 
