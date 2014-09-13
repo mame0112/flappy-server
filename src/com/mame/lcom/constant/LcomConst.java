@@ -85,6 +85,8 @@ public class LcomConst {
 
 	public final static String ENTITY_FRIENDSHIP_EXPIRE_TIME = "mExpireTime";
 
+	public final static String MEMCACHE_KEY_DEVICEID = "memcache_device_id";
+
 	// public final static String SERVLET_CONTEXT_IDENTIFIER =
 	// "servlet_identifier";
 

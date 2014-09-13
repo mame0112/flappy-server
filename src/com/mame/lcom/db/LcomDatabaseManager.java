@@ -1092,6 +1092,11 @@ public class LcomDatabaseManager {
 				entity = datastoreService.get(key);
 				entity.setProperty(LcomConst.ENTITY_DEVICE_ID, deviceId);
 				datastoreService.put(entity);
+
+				// Try to put device id to memcache
+				LcomDatabaseManagerHelper.putDeviceIdForGCMPush(userId,
+						deviceId);
+
 			} catch (EntityNotFoundException e1) {
 				log.log(Level.WARNING,
 						"EntityNotFoundException: " + e1.getMessage());
@@ -1101,37 +1106,44 @@ public class LcomDatabaseManager {
 				// String userName = (String) entity.getProperty("mUserName");
 				entity.setProperty(LcomConst.ENTITY_DEVICE_ID, deviceId);
 				datastoreService.put(entity);
-			}
 
-			// Try to set memcache
-			// LcomDatabaseManagerHelper helper = new
-			// LcomDatabaseManagerHelper();
-			// try {
-			// helper.putPushDevceIdToMemCache(userId, deviceId);
-			// } catch (LcomMemcacheException e) {
-			// log.log(Level.INFO, "LcomMemcacheException: " + e.getMessage());
-			// }
+				// Try to put deviceId to memcache
+
+			}
 		}
 	}
 
 	public String getDeviceIdForGCMPush(long userId) {
 		log.log(Level.INFO, "getDeviceIdForGCMPush");
 
-		String deviceId = null;
-
 		if (userId == LcomConst.NO_USER) {
 			return null;
 		}
 
-		DatastoreService datastoreService = DatastoreServiceFactory
-				.getDatastoreService();
+		String deviceId = LcomDatabaseManagerHelper
+				.getDeviceIdForGCMPush(userId);
 
-		Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
-		try {
-			Entity entity = datastoreService.get(key);
-			deviceId = (String) entity.getProperty(LcomConst.ENTITY_DEVICE_ID);
-		} catch (EntityNotFoundException e) {
-			log.log(Level.INFO, "EntityNotFoundException: " + e.getMessage());
+		// If memcache doesn't exist
+		if (deviceId == null) {
+
+			DatastoreService datastoreService = DatastoreServiceFactory
+					.getDatastoreService();
+
+			Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
+			try {
+				Entity entity = datastoreService.get(key);
+				deviceId = (String) entity
+						.getProperty(LcomConst.ENTITY_DEVICE_ID);
+
+				// Try to put device id to memcache
+				LcomDatabaseManagerHelper.putDeviceIdForGCMPush(userId,
+						deviceId);
+
+			} catch (EntityNotFoundException e) {
+				log.log(Level.INFO,
+						"EntityNotFoundException: " + e.getMessage());
+			}
+
 		}
 
 		return deviceId;

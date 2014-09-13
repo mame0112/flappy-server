@@ -1,18 +1,49 @@
 package com.mame.lcom.db;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.memcache.InvalidValueException;
 import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceException;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.mame.lcom.data.LcomUserData;
+import com.mame.lcom.constant.LcomConst;
 
 public class LcomDatabaseManagerHelper {
 
-	private final Logger log = Logger.getLogger(LcomDatabaseManagerHelper.class
-			.getName());
+	private final static Logger log = Logger
+			.getLogger(LcomDatabaseManagerHelper.class.getName());
 
+	public static String getDeviceIdForGCMPush(long userId) {
+		log.log(Level.INFO, "getDeviceIdForGCMPush");
+
+		MemcacheService ms = MemcacheServiceFactory
+				.getMemcacheService(LcomConst.MEMCACHE_KEY_DEVICEID);
+
+		String deviceId = null;
+		try {
+			deviceId = (String) ms.get(userId);
+		} catch (IllegalArgumentException e1) {
+			log.log(Level.INFO, "IllegalArgumentException: " + e1.getMessage());
+		} catch (InvalidValueException e2) {
+			log.log(Level.INFO, "InvalidValueException: " + e2.getMessage());
+		}
+
+		return deviceId;
+	}
+
+	public static void putDeviceIdForGCMPush(long userId, String deviceId) {
+		log.log(Level.INFO, "putDeviceIdForGCMPush");
+		MemcacheService ms = MemcacheServiceFactory
+				.getMemcacheService(LcomConst.MEMCACHE_KEY_DEVICEID);
+		try {
+			ms.put(userId, deviceId);
+		} catch (IllegalArgumentException e1) {
+			log.log(Level.INFO, "IllegalArgumentException: " + e1.getMessage());
+		} catch (MemcacheServiceException e2) {
+			log.log(Level.INFO, "MemcacheServiceException: " + e2.getMessage());
+		}
+	}
 	// public static void putUserDataToMemcache(Key userKey, Entity data) {
 	//
 	// if (userKey != null && data != null) {
