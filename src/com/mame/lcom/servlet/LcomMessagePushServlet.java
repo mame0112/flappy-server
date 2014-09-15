@@ -14,6 +14,7 @@ import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import com.mame.lcom.constant.LcomConst;
+import com.mame.lcom.util.CipherUtil;
 
 public class LcomMessagePushServlet extends HttpServlet {
 
@@ -31,11 +32,12 @@ public class LcomMessagePushServlet extends HttpServlet {
 		log.log(Level.WARNING, "doGet");
 		log.log(Level.WARNING, "req.getQueryString(): " + req.getQueryString());
 
-		String action = req.getParameter("action");
-		String registrationId = req.getParameter("regId");
-		String userId = req.getParameter("userId");
-		String msg = req.getParameter("msg");
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String action = CipherUtil.decrypt(req.getParameter("action"));
+		String registrationId = CipherUtil.decrypt(req.getParameter("regId"));
+		String userId = CipherUtil.decrypt(req.getParameter("userId"));
+		String msg = CipherUtil.decrypt(req.getParameter("msg"));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
 
 		log.log(Level.WARNING, "action: " + action);
 		log.log(Level.WARNING, "registrationId: " + registrationId);

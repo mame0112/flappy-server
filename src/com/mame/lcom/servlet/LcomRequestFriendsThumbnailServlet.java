@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.db.LcomDatabaseManager;
+import com.mame.lcom.util.CipherUtil;
 
 public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 
@@ -28,9 +29,12 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost");
 
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		String friendsId = req.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String friendsId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
 
 		// Friend array as List
 		List<String> list = new ArrayList<String>();

@@ -16,6 +16,7 @@ import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.invitation.LcomMail;
+import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.TimeUtil;
 
 /**
@@ -33,11 +34,16 @@ public class LcomNewInvitationServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
-		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
-		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String userId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_ID));
+		String userName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_NAME));
+		String mailAddress = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MAILADDRESS));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
 		// String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
 
 		List<String> list = new ArrayList<String>();

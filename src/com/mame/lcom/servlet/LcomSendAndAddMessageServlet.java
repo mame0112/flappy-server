@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.gcm.GCMIntentManager;
+import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.TimeUtil;
 
 public class LcomSendAndAddMessageServlet extends HttpServlet {
@@ -28,16 +29,22 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
-		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
-		String targetUserId = req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
-		String targetUserName = req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME);
-		String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
-		String date = req.getParameter(LcomConst.SERVLET_MESSAGE_DATE);
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String userId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_ID));
+		String userName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_NAME));
+		String targetUserId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
+		String targetUserName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME));
+		String message = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MESSAGE_BODY));
+		String date = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MESSAGE_DATE));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
 
 		List<String> list = new ArrayList<String>();
 		list.add(origin);
@@ -59,9 +66,9 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 
 			// Update Friendship table so that we can show it in
 			// FrinedListActivity
-//			manager.updateLatestMessageInfoOnFriendshipTable(
-//					Integer.valueOf(userId), Integer.valueOf(targetUserId),
-//					message, Long.valueOf(date));
+			// manager.updateLatestMessageInfoOnFriendshipTable(
+			// Integer.valueOf(userId), Integer.valueOf(targetUserId),
+			// message, Long.valueOf(date));
 
 			// Send message data to friend via GCM
 			String regId = manager.getDeviceIdForGCMPush(Integer

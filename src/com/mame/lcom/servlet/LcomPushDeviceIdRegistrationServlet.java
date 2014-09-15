@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.db.LcomDatabaseManager;
+import com.mame.lcom.util.CipherUtil;
 
 public class LcomPushDeviceIdRegistrationServlet extends HttpServlet {
 
@@ -24,10 +25,14 @@ public class LcomPushDeviceIdRegistrationServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost");
 
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
-		String deviceId = req.getParameter(LcomConst.SERVLET_DEVICE_ID);
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String userId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_ID));
+		String deviceId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_DEVICE_ID));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
 
 		List<String> list = new ArrayList<String>();
 

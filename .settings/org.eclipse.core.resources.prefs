@@ -3,4 +3,5 @@ encoding//src/com/mame/lcom/gcm/GCMIntentManager.java=UTF-8
 encoding//src/com/mame/lcom/invitation/LcomMail.java=UTF-8
 encoding//src/com/mame/lcom/servlet/LcomMessagePushServlet.java=UTF-8
 encoding//src/com/mame/lcom/servlet/LcomNewMessageServlet.java=UTF-8
+encoding//src/com/mame/lcom/util/CipherUtil.java=UTF-8
 encoding//war/test-ja.json=UTF-8

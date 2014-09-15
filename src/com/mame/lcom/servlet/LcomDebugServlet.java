@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.db.LcomDatabaseManager;
+import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.TimeUtil;
 
 public class LcomDebugServlet extends HttpServlet {
@@ -26,18 +27,25 @@ public class LcomDebugServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		log.log(Level.WARNING, "doPost:" + TimeUtil.calcResponse());
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		String requestCode = req.getParameter("requestCode");
-		String numOfUser = req.getParameter(LcomConst.SERVLET_TOTAL_USER_NUM);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String requestCode = CipherUtil
+				.decrypt(req.getParameter("requestCode"));
+		String numOfUser = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TOTAL_USER_NUM));
 
-		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
-		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
-		String targetUserId = req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
-		String targetUserName = req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME);
-		String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
-		String date = req.getParameter(LcomConst.SERVLET_MESSAGE_DATE);
+		String userId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_ID));
+		String userName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_NAME));
+		String targetUserId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
+		String targetUserName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME));
+		String message = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MESSAGE_BODY));
+		String date = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MESSAGE_DATE));
 
 		log.log(Level.WARNING, "origin:" + origin);
 		log.log(Level.WARNING, "userId:" + userId);
@@ -58,13 +66,13 @@ public class LcomDebugServlet extends HttpServlet {
 
 		// If we want to add conversation data
 		if (origin.equals("DEBUG_SEND_AND_ADD_DATA")) {
-//			long parsedDate = 0L;
-//			try {
-//				parsedDate = TimeUtil.getDateInDateFormat(date);
-//			} catch (ParseException e) {
-//				log.log(Level.WARNING, "ParseException: " + e.getMessage());
-//				// result = LcomConst.SEND_MESSAGE_DATE_CANNOT_BE_PARSED;
-//			}
+			// long parsedDate = 0L;
+			// try {
+			// parsedDate = TimeUtil.getDateInDateFormat(date);
+			// } catch (ParseException e) {
+			// log.log(Level.WARNING, "ParseException: " + e.getMessage());
+			// // result = LcomConst.SEND_MESSAGE_DATE_CANNOT_BE_PARSED;
+			// }
 
 			manager.addNewMessageInfo(Integer.valueOf(userId),
 					Integer.valueOf(targetUserId), userName, targetUserName,

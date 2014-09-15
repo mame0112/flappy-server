@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.db.LcomDatabaseManager;
+import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.DatastoreUtil;
 import com.mame.lcom.util.TimeUtil;
 
@@ -27,13 +28,14 @@ public class LcomRequestConversationServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		// String identifier = req
-		// .getParameter(LcomConst.SERVLET_CONTEXT_IDENTIFIER);
-		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
-		String friendUserId = req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String userId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_ID));
+		String friendUserId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
 
 		List<String> list = new ArrayList<String>();
 

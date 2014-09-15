@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.invitation.LcomMail;
+import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.TimeUtil;
 
 public class LcomInqueryServlet extends HttpServlet {
@@ -26,12 +27,18 @@ public class LcomInqueryServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
-		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
-		String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
-		String category = req.getParameter(LcomConst.SERVLET_INQUERY_CATEGORY);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String userName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_NAME));
+		String mailAddress = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MAILADDRESS));
+		String message = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MESSAGE_BODY));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String category = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_INQUERY_CATEGORY));
 
 		// success
 		Return_Code result = Return_Code.RESULT_OK;

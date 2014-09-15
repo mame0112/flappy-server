@@ -16,6 +16,7 @@ import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.invitation.LcomMail;
+import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.DatastoreUtil;
 import com.mame.lcom.util.TimeUtil;
 
@@ -29,13 +30,20 @@ public class LcomCreateAccountServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost" + TimeUtil.calcResponse());
 
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
-		String password = req.getParameter(LcomConst.SERVLET_PASSWORD);
-		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
-		String thumb = req.getParameter(LcomConst.SERVLET_THUMBNAIL);
-		String language = req.getParameter(LcomConst.SERVLET_LANGUAGE);
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String userName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_NAME));
+		String password = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_PASSWORD));
+		String mailAddress = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MAILADDRESS));
+		String thumb = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_THUMBNAIL));
+		String language = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_LANGUAGE));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
 
 		List<String> list = new ArrayList<String>();
 

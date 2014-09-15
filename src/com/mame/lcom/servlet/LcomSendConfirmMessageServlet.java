@@ -17,6 +17,7 @@ import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.gcm.GCMIntentManager;
 import com.mame.lcom.invitation.LcomMail;
+import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.TimeUtil;
 
 /**
@@ -38,17 +39,24 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 		// (target user id is not null)
 
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
-		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
-		String userId = req.getParameter(LcomConst.SERVLET_USER_ID);
-		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
-		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
-		String language = req.getParameter(LcomConst.SERVLET_LANGUAGE);
-		String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
-		String targetUserId = req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_ID);
-		String targetUserName = req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME);
-		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String origin = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_ORIGIN));
+		String userId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_ID));
+		String userName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_USER_NAME));
+		String mailAddress = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MAILADDRESS));
+		String language = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_LANGUAGE));
+		String message = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_MESSAGE_BODY));
+		String targetUserId = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
+		String targetUserName = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME));
+		String apiLevel = CipherUtil.decrypt(req
+				.getParameter(LcomConst.SERVLET_API_LEVEL));
 
 		int result = LcomConst.INVITATION_CONFIRMED_RESULT_OK;
 
