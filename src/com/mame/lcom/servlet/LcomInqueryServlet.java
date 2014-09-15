@@ -79,7 +79,8 @@ public class LcomInqueryServlet extends HttpServlet {
 		String url = "/contact.jsp";
 
 		HttpSession session = req.getSession();
-		session.setAttribute("result", String.valueOf(result.ordinal()));
+		session.setAttribute("result",
+				CipherUtil.encrypt(String.valueOf(result.ordinal())));
 
 		// String json = new Gson().toJson(list);
 		// resp.setContentType("application/json");

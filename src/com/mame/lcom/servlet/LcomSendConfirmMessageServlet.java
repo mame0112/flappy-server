@@ -188,7 +188,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 
 		list.add(String.valueOf(result));
 
-		String json = new Gson().toJson(list);
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

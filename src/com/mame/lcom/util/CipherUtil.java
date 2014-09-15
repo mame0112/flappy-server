@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,6 +75,20 @@ public class CipherUtil {
 		}
 
 		return strResult;
+	}
+
+	public static List<String> encryptArrayList(List<String> input) {
+
+		List<String> result = new ArrayList<String>();
+
+		if (input != null && input.size() != 0) {
+			for (String str : input) {
+				result.add(encrypt(str));
+			}
+		}
+
+		return result;
+
 	}
 
 	public static String decrypt(String text) {

@@ -54,7 +54,7 @@ public class LcomRequestConversationServlet extends HttpServlet {
 			}
 		}
 
-		String json = new Gson().toJson(list);
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);
