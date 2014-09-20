@@ -37,26 +37,29 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 		// In case of new user, target user name and target user id is null
 		// If tbe targetuser mail address is registerd, target user name is null
 		// (target user id is not null)
-
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String userId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_ID));
-		String userName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_NAME));
-		String mailAddress = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MAILADDRESS));
-		String language = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_LANGUAGE));
-		String message = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MESSAGE_BODY));
-		String targetUserId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
-		String targetUserName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String userId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_ID), secretKey);
+		String userName = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
+		String mailAddress = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MAILADDRESS), secretKey);
+		String language = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_LANGUAGE), secretKey);
+		String message = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MESSAGE_BODY), secretKey);
+		String targetUserId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_TARGET_USER_ID), secretKey);
+		String targetUserName = CipherUtil
+				.decrypt(req.getParameter(LcomConst.SERVLET_TARGET_USER_NAME),
+						secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
 		int result = LcomConst.INVITATION_CONFIRMED_RESULT_OK;
 
@@ -188,7 +191,8 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 
 		list.add(String.valueOf(result));
 
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				secretKey));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

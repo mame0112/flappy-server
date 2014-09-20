@@ -25,14 +25,16 @@ public class LcomPushDeviceIdRegistrationServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost");
 
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String userId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_ID));
-		String deviceId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_DEVICE_ID));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String userId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_ID), secretKey);
+		String deviceId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_DEVICE_ID), secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
 		List<String> list = new ArrayList<String>();
 
@@ -45,7 +47,8 @@ public class LcomPushDeviceIdRegistrationServlet extends HttpServlet {
 			manager.setDeviceIdForMessagePush(Integer.valueOf(userId), deviceId);
 		}
 
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				secretKey));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

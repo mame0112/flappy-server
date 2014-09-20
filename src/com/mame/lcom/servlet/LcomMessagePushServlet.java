@@ -32,12 +32,17 @@ public class LcomMessagePushServlet extends HttpServlet {
 		log.log(Level.WARNING, "doGet");
 		log.log(Level.WARNING, "req.getQueryString(): " + req.getQueryString());
 
-		String action = CipherUtil.decrypt(req.getParameter("action"));
-		String registrationId = CipherUtil.decrypt(req.getParameter("regId"));
-		String userId = CipherUtil.decrypt(req.getParameter("userId"));
-		String msg = CipherUtil.decrypt(req.getParameter("msg"));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+
+		String action = CipherUtil.decrypt(req.getParameter("action"),
+				secretKey);
+		String registrationId = CipherUtil.decrypt(req.getParameter("regId"),
+				secretKey);
+		String userId = CipherUtil.decrypt(req.getParameter("userId"),
+				secretKey);
+		String msg = CipherUtil.decrypt(req.getParameter("msg"), secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
 		log.log(Level.WARNING, "action: " + action);
 		log.log(Level.WARNING, "registrationId: " + registrationId);

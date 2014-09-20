@@ -27,25 +27,27 @@ public class LcomDebugServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		log.log(Level.WARNING, "doPost:" + TimeUtil.calcResponse());
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String requestCode = CipherUtil
-				.decrypt(req.getParameter("requestCode"));
-		String numOfUser = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_TOTAL_USER_NUM));
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String requestCode = CipherUtil.decrypt(
+				req.getParameter("requestCode"), secretKey);
+		String numOfUser = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_TOTAL_USER_NUM), secretKey);
 
-		String userId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_ID));
-		String userName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_NAME));
-		String targetUserId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
-		String targetUserName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME));
-		String message = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MESSAGE_BODY));
-		String date = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MESSAGE_DATE));
+		String userId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_ID), secretKey);
+		String userName = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
+		String targetUserId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_TARGET_USER_ID), secretKey);
+		String targetUserName = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_TARGET_USER_NAME),
+				secretKey);
+		String message = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MESSAGE_BODY), secretKey);
+		String date = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MESSAGE_DATE), secretKey);
 
 		log.log(Level.WARNING, "origin:" + origin);
 		log.log(Level.WARNING, "userId:" + userId);
@@ -91,7 +93,8 @@ public class LcomDebugServlet extends HttpServlet {
 
 		}
 
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				secretKey));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

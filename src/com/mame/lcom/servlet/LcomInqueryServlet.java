@@ -27,18 +27,21 @@ public class LcomInqueryServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String userName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_NAME));
-		String mailAddress = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MAILADDRESS));
-		String message = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MESSAGE_BODY));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
-		String category = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_INQUERY_CATEGORY));
+
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String userName = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
+		String mailAddress = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MAILADDRESS), secretKey);
+		String message = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MESSAGE_BODY), secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
+		String category = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_INQUERY_CATEGORY),
+				secretKey);
 
 		// success
 		Return_Code result = Return_Code.RESULT_OK;
@@ -79,8 +82,8 @@ public class LcomInqueryServlet extends HttpServlet {
 		String url = "/contact.jsp";
 
 		HttpSession session = req.getSession();
-		session.setAttribute("result",
-				CipherUtil.encrypt(String.valueOf(result.ordinal())));
+		session.setAttribute("result", CipherUtil.encrypt(
+				String.valueOf(result.ordinal()), secretKey));
 
 		// String json = new Gson().toJson(list);
 		// resp.setContentType("application/json");

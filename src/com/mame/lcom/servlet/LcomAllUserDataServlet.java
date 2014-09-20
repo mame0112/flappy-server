@@ -28,12 +28,14 @@ public class LcomAllUserDataServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String userId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_ID));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String userId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_ID), secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
 		List<String> list = new ArrayList<String>();
 		list.add(origin);
@@ -57,8 +59,8 @@ public class LcomAllUserDataServlet extends HttpServlet {
 			}
 		}
 
-		log.log(Level.INFO, "end:" + TimeUtil.calcResponse());
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				secretKey));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		// resp.setHeader("Cache-Control", "public, max-age=86400");

@@ -25,14 +25,15 @@ public class LcomLoginServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String userName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_NAME));
-		String password = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_PASSWORD));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String userName = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
+		String password = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_PASSWORD), secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
 		List<String> list = new ArrayList<String>();
 		list.add(origin);
@@ -57,7 +58,15 @@ public class LcomLoginServlet extends HttpServlet {
 		list.add(String.valueOf(userId));
 		list.add(userName);
 
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		for (int i = 0; i < list.size(); i++) {
+			String str = list.get(i);
+			log.log(Level.INFO, "str:" + str);
+			String output = CipherUtil.encrypt(str, secretKey);
+			log.log(Level.INFO, "output:" + output);
+		}
+
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				secretKey));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

@@ -29,12 +29,14 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost");
 
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String friendsId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String friendsId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_TARGET_USER_ID), secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
 		// Friend array as List
 		List<String> list = new ArrayList<String>();
@@ -54,7 +56,8 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 
 		}
 
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				secretKey));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

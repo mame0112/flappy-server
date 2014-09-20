@@ -29,22 +29,25 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String userId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_ID));
-		String userName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_NAME));
-		String targetUserId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_ID));
-		String targetUserName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_TARGET_USER_NAME));
-		String message = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MESSAGE_BODY));
-		String date = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MESSAGE_DATE));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String userId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_ID), secretKey);
+		String userName = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
+		String targetUserId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_TARGET_USER_ID), secretKey);
+		String targetUserName = CipherUtil
+				.decrypt(req.getParameter(LcomConst.SERVLET_TARGET_USER_NAME),
+						secretKey);
+		String message = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MESSAGE_BODY), secretKey);
+		String date = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MESSAGE_DATE), secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
 		List<String> list = new ArrayList<String>();
 		list.add(origin);
@@ -95,7 +98,8 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 		list.add(message);
 		list.add(date);
 
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				secretKey));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

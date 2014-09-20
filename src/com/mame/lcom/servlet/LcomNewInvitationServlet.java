@@ -33,17 +33,18 @@ public class LcomNewInvitationServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String userId = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_ID));
-		String userName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_NAME));
-		String mailAddress = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MAILADDRESS));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		String userId = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_ID), secretKey);
+		String userName = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
+		String mailAddress = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MAILADDRESS), secretKey);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 		// String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
 
 		List<String> list = new ArrayList<String>();
@@ -98,7 +99,8 @@ public class LcomNewInvitationServlet extends HttpServlet {
 		list.add(mailAddress);
 		// list.add(message);
 
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				secretKey));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

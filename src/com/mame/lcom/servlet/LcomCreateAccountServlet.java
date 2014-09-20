@@ -30,20 +30,24 @@ public class LcomCreateAccountServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost" + TimeUtil.calcResponse());
 
-		String origin = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_ORIGIN));
-		String userName = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_USER_NAME));
-		String password = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_PASSWORD));
-		String mailAddress = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_MAILADDRESS));
-		String thumb = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_THUMBNAIL));
-		String language = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_LANGUAGE));
-		String apiLevel = CipherUtil.decrypt(req
-				.getParameter(LcomConst.SERVLET_API_LEVEL));
+		String identifier = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+
+		String userName = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_USER_NAME), identifier);
+
+		String origin = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_ORIGIN), identifier);
+
+		String password = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_PASSWORD), identifier);
+		String mailAddress = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_MAILADDRESS), identifier);
+		String thumb = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_THUMBNAIL), identifier);
+		String language = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_LANGUAGE), identifier);
+		String apiLevel = CipherUtil.decrypt(
+				req.getParameter(LcomConst.SERVLET_API_LEVEL), identifier);
 
 		List<String> list = new ArrayList<String>();
 
@@ -113,7 +117,8 @@ public class LcomCreateAccountServlet extends HttpServlet {
 		list.add(String.valueOf(userId));
 		list.add(userName);
 
-		String json = new Gson().toJson(CipherUtil.encryptArrayList(list));
+		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
+				identifier));
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
 		resp.getWriter().write(json);

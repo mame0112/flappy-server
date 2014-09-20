@@ -46,6 +46,8 @@ public class LcomConst {
 	public final static String SERVLET_DEVICE_ID = "servlet_device_id";
 
 	public final static String SERVLET_API_LEVEL = "servlet_api_level";
+	
+	public final static String SERVLET_IDENTIFIER = "servlet_identifier";
 
 	public final static String SERVLET_INQUERY_CATEGORY = "servlet_inquery_category";
 
