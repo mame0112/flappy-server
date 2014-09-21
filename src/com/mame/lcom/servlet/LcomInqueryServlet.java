@@ -28,20 +28,27 @@ public class LcomInqueryServlet extends HttpServlet {
 			throws IOException {
 		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
-		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
-		String origin = CipherUtil.decrypt(
-				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
-		String userName = CipherUtil.decrypt(
-				req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
-		String mailAddress = CipherUtil.decrypt(
-				req.getParameter(LcomConst.SERVLET_MAILADDRESS), secretKey);
-		String message = CipherUtil.decrypt(
-				req.getParameter(LcomConst.SERVLET_MESSAGE_BODY), secretKey);
-		String apiLevel = CipherUtil.decrypt(
-				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
-		String category = CipherUtil.decrypt(
-				req.getParameter(LcomConst.SERVLET_INQUERY_CATEGORY),
-				secretKey);
+		// String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
+		// String origin = CipherUtil.decrypt(
+		// req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
+		// String userName = CipherUtil.decrypt(
+		// req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
+		// String mailAddress = CipherUtil.decrypt(
+		// req.getParameter(LcomConst.SERVLET_MAILADDRESS), secretKey);
+		// String message = CipherUtil.decrypt(
+		// req.getParameter(LcomConst.SERVLET_MESSAGE_BODY), secretKey);
+		// String apiLevel = CipherUtil.decrypt(
+		// req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
+		// String category = CipherUtil.decrypt(
+		// req.getParameter(LcomConst.SERVLET_INQUERY_CATEGORY),
+		// secretKey);
+
+		String origin = req.getParameter(LcomConst.SERVLET_ORIGIN);
+		String userName = req.getParameter(LcomConst.SERVLET_USER_NAME);
+		String mailAddress = req.getParameter(LcomConst.SERVLET_MAILADDRESS);
+		String message = req.getParameter(LcomConst.SERVLET_MESSAGE_BODY);
+		String apiLevel = req.getParameter(LcomConst.SERVLET_API_LEVEL);
+		String category = req.getParameter(LcomConst.SERVLET_INQUERY_CATEGORY);
 
 		// success
 		Return_Code result = Return_Code.RESULT_OK;
@@ -82,8 +89,9 @@ public class LcomInqueryServlet extends HttpServlet {
 		String url = "/contact.jsp";
 
 		HttpSession session = req.getSession();
-		session.setAttribute("result", CipherUtil.encrypt(
-				String.valueOf(result.ordinal()), secretKey));
+		session.setAttribute("result", String.valueOf(result.ordinal()));
+		// session.setAttribute("result",
+		// CipherUtil.encrypt(String.valueOf(result.ordinal()), secretKey));
 
 		// String json = new Gson().toJson(list);
 		// resp.setContentType("application/json");

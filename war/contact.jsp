@@ -93,35 +93,37 @@
 					below form.</p>
 			</div>
 			<%
-				String tmp = (String) session.getAttribute("result");
-				if (tmp != null && !tmp.equals("null")) {
-					int result = Integer.valueOf(tmp);
-					switch (result) {
-						case 0 : //result OK
+				if (session.getAttribute("result") != null) {
+					String tmp = (String) session.getAttribute("result");
+					if (tmp != null && !tmp.equals("null")) {
+						int result = Integer.valueOf(tmp);
+						switch (result) {
+							case 0 : //result OK
 			%>
 			<div class="alert alert-success"
 				data-localize="contact.result_success">Success!</div>
 			<%
 				break;
-						case 1 :
-							//Nothing to show
-							break;
-						case 2 :
-						case 3 :
-						case 4 :
-						case 5 :
-						default :
+							case 1 :
+								//Nothing to show
+								break;
+							case 2 :
+							case 3 :
+							case 4 :
+							case 5 :
+							default :
 			%>
 			<div class="alert alert-danger" data-localize="contact.result_failed">Failed
 				to send inquery message</div>
 			<%
 				break;
 
+						}
+
+						//Remove session
+						session.removeAttribute("result");
+
 					}
-
-					//Remove session
-					session.removeAttribute("result");
-
 				}
 			%>
 			<form method="post" name="inquery_form" action="servlet/inquery"
