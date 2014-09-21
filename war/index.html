@@ -38,41 +38,6 @@
 	<script type="text/javascript" src="jquery.js" charset="utf-8"></script>
 	<script type="text/javascript" src="jquery.localize.js" charset="utf-8"></script>
 
-	<script>
-		jQuery(function($) {
-			if (navigator.userAgent.indexOf('Android 2') != -1) {
-				var device = "android2x";
-				var ratio = window.devicePixelRatio;
-			}
-			$(window).on(
-					'load resize',
-					function() {
-						if (device == "android2x") { //android2x の場合
-							var sw = window.outerWidth / ratio;
-						} else {
-							if (document.all) { //ie の場合
-								var sw = document.body.clientWidth;
-							} else { //それ以外の場合
-								var sw = window.innerWidth;
-							}
-						}
-						if (sw >= 600) {
-							$("#foo img").attr(
-									"src",
-									$("img").attr("src").replace(/small/,
-											"full"));
-						}
-					});
-		});
-	</script>
-
-	<div id="foo">
-		<p>
-			<img src="image/small/test.png" alt="">
-		</p>
-	</div>
-
-
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script src="js/bootstrap.min.js"></script>
 	<div id="wrap">
