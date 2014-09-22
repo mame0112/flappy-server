@@ -1,7 +1,6 @@
 package com.mame.lcom.db;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
@@ -21,19 +20,20 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Transaction;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomAllUserData;
 import com.mame.lcom.data.LcomExpiredMessageData;
 import com.mame.lcom.data.LcomFriendshipData;
-//import com.mame.lcom.data.LcomFriendshipData;
-import com.mame.lcom.data.LcomMessageDeviceId;
 import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
+import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.DatastoreUtil;
 import com.mame.lcom.util.TimeUtil;
+
+//import com.mame.lcom.data.LcomFriendshipData;
 
 public class LcomDatabaseManager {
 
@@ -56,6 +56,10 @@ public class LcomDatabaseManager {
 
 	public static boolean isUserNameAlreadyExist(String userName) {
 		log.log(Level.WARNING, "isUserNameAlreadyExist");
+
+		CipherUtil util = new CipherUtil();
+		userName = util.encryptForInputString(userName);
+
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
 		Filter nameFilter = new FilterPredicate(LcomConst.ENTITY_USER_NAME,
@@ -83,6 +87,10 @@ public class LcomDatabaseManager {
 
 		if (userName != null && password != null) {
 
+			CipherUtil util = new CipherUtil();
+			userName = util.encryptForInputString(userName);
+			password = util.encryptForInputString(password);
+
 			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
 			Filter nameFilter = new FilterPredicate(LcomConst.ENTITY_USER_NAME,
@@ -103,6 +111,9 @@ public class LcomDatabaseManager {
 		log.log(Level.WARNING, "getUserIdByName");
 		long userId = LcomConst.NO_USER;
 		if (userName != null) {
+
+			CipherUtil util = new CipherUtil();
+			userName = util.encryptForInputString(userName);
 
 			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
@@ -134,6 +145,9 @@ public class LcomDatabaseManager {
 	public synchronized long addNewUserData(LcomUserData data) {
 		log.log(Level.INFO, "addNewUserData");
 		// int userId = LcomConst.NO_USER;
+
+		CipherUtil util = new CipherUtil();
+		data = util.encryptForInputLcomUserData(data);
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
@@ -286,23 +300,6 @@ public class LcomDatabaseManager {
 		return LcomConst.NO_USER;
 	}
 
-	// private Entity getUserDataEntity() {
-	// DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-	// Key ancKey = getAllUserDataKey();
-	// Entity entity = null;
-	// try {
-	// entity = ds.get(ancKey);
-	// } catch (EntityNotFoundException e) {
-	// // If no AllUserData exist (This shall be occur at the very first
-	// // time
-	// log.log(Level.WARNING, "EntityNotFoundException: " + e.getMessage());
-	// Entity totalEntity = new Entity(ancKey);
-	// totalEntity.setProperty(LcomConst.ENTITY_TOTAL_USER_NUM, 1);
-	// ds.put(totalEntity);
-	// }
-	// return entity;
-	// }
-
 	public void debugDeleteUserData(int userId) {
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
@@ -337,6 +334,12 @@ public class LcomDatabaseManager {
 	public synchronized void updateUserData(long userId, String userName,
 			String password, String mailAddress, Blob thumbnail) {
 		log.log(Level.INFO, "updateUserData");
+
+		CipherUtil util = new CipherUtil();
+		userName = util.encryptForInputString(userName);
+		password = util.encryptForInputString(password);
+		mailAddress = util.encryptForInputString(mailAddress);
+		thumbnail = util.encryptForInputBlob(thumbnail);
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
@@ -382,6 +385,9 @@ public class LcomDatabaseManager {
 		log.log(Level.INFO, "updateUserNameInFriendhsiopTable");
 		if (userId != LcomConst.NO_USER && userName != null) {
 			log.log(Level.INFO, "userId: " + userId + " uerName: " + userName);
+
+			CipherUtil util = new CipherUtil();
+			userName = util.encryptForInputString(userName);
 
 			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
@@ -518,6 +524,9 @@ public class LcomDatabaseManager {
 			}
 		}
 
+		CipherUtil cipherUtil = new CipherUtil();
+		cipherUtil.decryptForNewMessageData(result);
+
 		return result;
 
 	}
@@ -525,6 +534,9 @@ public class LcomDatabaseManager {
 	public synchronized long getUserIdByMailAddress(String address) {
 		log.log(Level.WARNING, "getUserIdByMailAddress");
 		long userId = LcomConst.NO_USER;
+
+		CipherUtil util = new CipherUtil();
+		address = util.encryptForInputString(address);
 
 		if (address != null) {
 			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -569,6 +581,9 @@ public class LcomDatabaseManager {
 			}
 		}
 
+		CipherUtil util = new CipherUtil();
+		util.decryptLcomUserData(result);
+
 		return result;
 	}
 
@@ -576,6 +591,11 @@ public class LcomDatabaseManager {
 			long senderUserId, String senderName, String lastMessage,
 			long currentTime) {
 		log.log(Level.WARNING, "addNewUserAndFriendshipInfo");
+
+		CipherUtil util = new CipherUtil();
+		senderName = util.encryptForInputString(senderName);
+		lastMessage = util.encryptForInputString(lastMessage);
+		data = util.encryptForInputLcomUserData(data);
 
 		long newUserId = LcomConst.NO_USER;
 
@@ -607,6 +627,11 @@ public class LcomDatabaseManager {
 			String senderName, long keyUserId, String keyUserName,
 			String lastMessage, long currentTime) {
 		log.log(Level.WARNING, "addNewFriendshipData");
+
+		CipherUtil cipherUtil = new CipherUtil();
+		senderName = cipherUtil.encryptForInputString(senderName);
+		keyUserName = cipherUtil.encryptForInputString(keyUserName);
+		lastMessage = cipherUtil.encryptForInputString(lastMessage);
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
@@ -697,6 +722,9 @@ public class LcomDatabaseManager {
 			}
 		}
 
+		CipherUtil util = new CipherUtil();
+		util.decryptForLcomFriendshipData(result);
+
 		return result;
 	}
 
@@ -718,6 +746,9 @@ public class LcomDatabaseManager {
 			}
 		}
 
+		CipherUtil util = new CipherUtil();
+		util.decryptForLcomFriendshipData(result);
+
 		return result;
 	}
 
@@ -726,6 +757,12 @@ public class LcomDatabaseManager {
 			String userName, String targetUserName, String message,
 			long currentDate) {
 		log.log(Level.INFO, "addNewMessageInfo");
+
+		CipherUtil cipherUtil = new CipherUtil();
+		userName = cipherUtil.encryptForInputString(userName);
+		targetUserName = cipherUtil.encryptForInputString(targetUserName);
+		message = cipherUtil.encryptForInputString(message);
+
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
 		LcomDatabaseManagerUtil util = new LcomDatabaseManagerUtil();
@@ -813,31 +850,6 @@ public class LcomDatabaseManager {
 		} catch (EntityNotFoundException e) {
 			log.log(Level.WARNING, "EntityNotFoundException: " + e.getMessage());
 		}
-
-		// PersistenceManager pm = LcomPersistenceManagerFactory.get()
-		// .getPersistenceManager();
-		// Query query = pm.newQuery(LcomAllUserData.class);
-		// List<LcomAllUserData> datas = (List<LcomAllUserData>)
-		// query.execute();
-		// LcomAllUserData data = null;
-		// if (datas != null && datas.size() != 0) {
-		// data = datas.get(0);
-		// data.changetTotalUserNum(numOfUser);
-		// try {
-		// pm.makePersistent(data);
-		// } finally {
-		// pm.close();
-		// }
-		// } else {
-		// // If data doesn't exist
-		// try {
-		// LcomAllUserData newData = new LcomAllUserData(numOfUser);
-		// pm.makePersistent(newData);
-		// } finally {
-		// pm.close();
-		// }
-		// }
-
 	}
 
 	/**
@@ -856,6 +868,8 @@ public class LcomDatabaseManager {
 
 		if (friendsId != null && friendsId.size() != 0) {
 
+			CipherUtil util = new CipherUtil();
+
 			DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
 			for (String id : friendsId) {
@@ -871,7 +885,10 @@ public class LcomDatabaseManager {
 						if (thumbnail != null) {
 							String thumbStr = DatastoreUtil
 									.transcodeBlob2String(thumbnail);
-							result.put(Integer.valueOf(id), thumbStr);
+							String decrypted = util
+									.decryptForInputString(thumbStr);
+							// Note that this is decrypted.
+							result.put(Integer.valueOf(id), decrypted);
 						} else {
 							// If thumbnail is not available (null)
 							// Nothing to do
@@ -1076,6 +1093,9 @@ public class LcomDatabaseManager {
 			String deviceId) {
 		log.log(Level.INFO, "setDeviceIdForMessagePush");
 
+		CipherUtil cipherUtil = new CipherUtil();
+		deviceId = cipherUtil.encryptForInputString(deviceId);
+
 		if (userId != LcomConst.NO_USER && deviceId != null) {
 			DatastoreService datastoreService = DatastoreServiceFactory
 					.getDatastoreService();
@@ -1145,6 +1165,9 @@ public class LcomDatabaseManager {
 			}
 
 		}
+
+		CipherUtil cipherUtil = new CipherUtil();
+		deviceId = cipherUtil.decryptForInputString(deviceId);
 
 		return deviceId;
 	}

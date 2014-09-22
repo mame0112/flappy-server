@@ -9,6 +9,8 @@ public class LcomConst {
 	// public final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	public final static String DATE_PATTERN = "dd-MM-yy:HH:mm:SS";
 
+	public final static boolean IS_ENCRYPT = true;
+
 	public final static String BASE_URL = "http://loosecommunication.appspot.com/";
 
 	public final static String MEMCACHE_SEPARATOR = "#@#";
@@ -46,7 +48,7 @@ public class LcomConst {
 	public final static String SERVLET_DEVICE_ID = "servlet_device_id";
 
 	public final static String SERVLET_API_LEVEL = "servlet_api_level";
-	
+
 	public final static String SERVLET_IDENTIFIER = "servlet_identifier";
 
 	public final static String SERVLET_INQUERY_CATEGORY = "servlet_inquery_category";

@@ -333,25 +333,9 @@ public class LcomDatabaseManagerUtil {
 		Entity newEntity = new Entity(LcomConst.KIND_FRIENDSHIP_DATA,
 				keyUserId, userKey);
 
-		// Entity e, long senderUserId,
-		// String senderUserName, String message, String postTime,
-		// String expireTime
 		putNewMessageInfoToEntity(newEntity, senderUserId, senderName,
 				lastMessage, String.valueOf(time), String.valueOf(expireDate));
-		// newEntity
-		// .setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
-		// newEntity
-		// .setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
-		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-		// Arrays.asList(senderUserId));
-		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
-		// Arrays.asList(senderName));
-		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-		// Arrays.asList(lastMessage));
-		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-		// Arrays.asList(String.valueOf(time)));
-		// newEntity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-		// Arrays.asList(String.valueOf(expireDate)));
+
 		ds.put(newEntity);
 
 		return true;

@@ -8,6 +8,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceException;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.mame.lcom.constant.LcomConst;
+import com.mame.lcom.util.CipherUtil;
 
 public class LcomDatabaseManagerHelper {
 
@@ -29,6 +30,9 @@ public class LcomDatabaseManagerHelper {
 			log.log(Level.INFO, "InvalidValueException: " + e2.getMessage());
 		}
 
+//		CipherUtil util = new CipherUtil();
+//		deviceId = util.decryptForInputString(deviceId);
+
 		return deviceId;
 	}
 
@@ -36,6 +40,10 @@ public class LcomDatabaseManagerHelper {
 		log.log(Level.INFO, "putDeviceIdForGCMPush");
 		MemcacheService ms = MemcacheServiceFactory
 				.getMemcacheService(LcomConst.MEMCACHE_KEY_DEVICEID);
+
+		// CipherUtil util = new CipherUtil();
+		// deviceId = util.encryptForInputString(deviceId);
+
 		try {
 			ms.put(userId, deviceId);
 		} catch (IllegalArgumentException e1) {
