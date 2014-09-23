@@ -41,6 +41,10 @@ public class CipherUtil {
 
 	private final static int AES_KEY_LENGTH = 16;
 
+	private SecretKeySpec mKey = null;
+
+	private IvParameterSpec mIv = null;
+
 	public CipherUtil() {
 		try {
 
@@ -49,14 +53,11 @@ public class CipherUtil {
 			byte[] byteIv = ENCRYPT_IV.getBytes("UTF-8");
 
 			// Create object for decode key and initialize vector
-			SecretKeySpec key = new SecretKeySpec(byteKey, "AES");
-			IvParameterSpec iv = new IvParameterSpec(byteIv);
+			mKey = new SecretKeySpec(byteKey, "AES");
+			mIv = new IvParameterSpec(byteIv);
 
 			// Create Cipher object
 			mCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-
-			// Initialize Cipher object
-			mCipher.init(Cipher.ENCRYPT_MODE, key, iv);
 
 		} catch (UnsupportedEncodingException e) {
 			DbgUtil.showLog(TAG,
@@ -65,11 +66,6 @@ public class CipherUtil {
 			DbgUtil.showLog(TAG, "NoSuchAlgorithmException: " + e.getMessage());
 		} catch (NoSuchPaddingException e) {
 			DbgUtil.showLog(TAG, "NoSuchPaddingException: " + e.getMessage());
-		} catch (InvalidKeyException e) {
-			DbgUtil.showLog(TAG, "InvalidKeyException: " + e.getMessage());
-		} catch (InvalidAlgorithmParameterException e) {
-			DbgUtil.showLog(TAG,
-					"InvalidAlgorithmParameterException: " + e.getMessage());
 		}
 	}
 
@@ -82,7 +78,13 @@ public class CipherUtil {
 			if (input != null && mCipher != null) {
 				// Decode base64 to byte array
 				try {
+
+					mCipher.init(Cipher.ENCRYPT_MODE, mKey, mIv);
+
 					byte[] byteText = input.getBytes("UTF-8");
+
+					String test = new String(byteText, "UTF-8");
+					DbgUtil.showLog(TAG, "test:" + test);
 
 					// Get cipher result
 					byte[] byteResult;
@@ -101,12 +103,20 @@ public class CipherUtil {
 				} catch (BadPaddingException e) {
 					DbgUtil.showLog(TAG,
 							"BadPaddingException: " + e.getMessage());
+				} catch (InvalidKeyException e) {
+					DbgUtil.showLog(TAG,
+							"InvalidKeyException: " + e.getMessage());
+				} catch (InvalidAlgorithmParameterException e) {
+					DbgUtil.showLog(TAG, "InvalidAlgorithmParameterException: "
+							+ e.getMessage());
 				}
 			}
 		} else {
 			// If debug is true, just output input parameter
 			output = input;
 		}
+
+		DbgUtil.showLog(TAG, "output: " + output);
 
 		return output;
 	}
@@ -118,6 +128,10 @@ public class CipherUtil {
 		if (LcomConst.IS_ENCRYPT) {
 			if (input != null && mCipher != null) {
 				try {
+
+					// Initialize Cipher object
+					mCipher.init(Cipher.DECRYPT_MODE, mKey, mIv);
+
 					// Decode base64 to byte array
 					byte[] byteText = Base64.decodeBase64(input);
 
@@ -136,6 +150,12 @@ public class CipherUtil {
 				} catch (BadPaddingException e) {
 					DbgUtil.showLog(TAG,
 							"BadPaddingException: " + e.getMessage());
+				} catch (InvalidKeyException e) {
+					DbgUtil.showLog(TAG,
+							"InvalidKeyException: " + e.getMessage());
+				} catch (InvalidAlgorithmParameterException e) {
+					DbgUtil.showLog(TAG, "InvalidAlgorithmParameterException: "
+							+ e.getMessage());
 				}
 			}
 		} else {
