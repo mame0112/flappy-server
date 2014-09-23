@@ -139,12 +139,15 @@ public class LcomDatabaseManager {
 	 * 
 	 * @param data
 	 */
-	public synchronized long addNewUserData(LcomUserData data) {
+	public synchronized long addNewUserData(LcomUserData data,
+			boolean isNeedEncryption) {
 		DbgUtil.showLog(TAG, "addNewUserData");
 		// int userId = LcomConst.NO_USER;
 
-		CipherUtil util = new CipherUtil();
-		data = util.encryptForInputLcomUserData(data);
+		if (isNeedEncryption) {
+			CipherUtil util = new CipherUtil();
+			data = util.encryptForInputLcomUserData(data);
+		}
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
@@ -366,7 +369,7 @@ public class LcomDatabaseManager {
 			DbgUtil.showLog(TAG, "EntityNotFoundException: " + e.getMessage());
 			LcomUserData data = new LcomUserData(userId, userName, password,
 					mailAddress, thumbnail);
-			addNewUserData(data);
+			addNewUserData(data, false);
 		}
 	}
 
@@ -589,10 +592,12 @@ public class LcomDatabaseManager {
 			long currentTime) {
 		DbgUtil.showLog(TAG, "addNewUserAndFriendshipInfo");
 
-		CipherUtil util = new CipherUtil();
-		senderName = util.encryptForInputString(senderName);
-		lastMessage = util.encryptForInputString(lastMessage);
-		data = util.encryptForInputLcomUserData(data);
+		// Encryption should be done by other methods those are called from
+		// here.
+		// CipherUtil util = new CipherUtil();
+		// senderName = util.encryptForInputString(senderName);
+		// lastMessage = util.encryptForInputString(lastMessage);
+		// data = util.encryptForInputLcomUserData(data);
 
 		long newUserId = LcomConst.NO_USER;
 
@@ -603,7 +608,7 @@ public class LcomDatabaseManager {
 
 		try {
 
-			newUserId = addNewUserData(data);
+			newUserId = addNewUserData(data, true);
 
 			addNewFriendshipInfo(senderUserId, senderName, newUserId, null,
 					lastMessage, currentTime);
@@ -720,7 +725,7 @@ public class LcomDatabaseManager {
 		}
 
 		CipherUtil util = new CipherUtil();
-		util.decryptForLcomFriendshipData(result);
+		result = util.decryptForLcomFriendshipData(result);
 
 		return result;
 	}
@@ -744,7 +749,7 @@ public class LcomDatabaseManager {
 		}
 
 		CipherUtil util = new CipherUtil();
-		util.decryptForLcomFriendshipData(result);
+		result = util.decryptForLcomFriendshipData(result);
 
 		return result;
 	}

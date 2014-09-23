@@ -86,7 +86,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 					result = LcomConst.CREATE_ACCOUNT_RESULT_OK;
 					LcomUserData data = new LcomUserData(userIdByMail,
 							userName, password, mailAddress, thumbnail);
-					userId = manager.addNewUserData(data);
+					userId = manager.addNewUserData(data, true);
 					LcomMail mail = new LcomMail();
 					mail.sendServiceWelcomeMail(mailAddress, userName, language);
 

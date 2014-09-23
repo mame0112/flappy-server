@@ -173,6 +173,9 @@ public class CipherUtil {
 		if (LcomConst.IS_ENCRYPT) {
 			if (input != null && mCipher != null) {
 				try {
+
+					mCipher.init(Cipher.DECRYPT_MODE, mKey, mIv);
+
 					// Decode base64 to byte array
 					byte[] byteText = input.getBytes();
 
@@ -188,6 +191,12 @@ public class CipherUtil {
 				} catch (BadPaddingException e) {
 					DbgUtil.showLog(TAG,
 							"BadPaddingException: " + e.getMessage());
+				} catch (InvalidKeyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvalidAlgorithmParameterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		} else {
@@ -244,11 +253,24 @@ public class CipherUtil {
 
 		if (LcomConst.IS_ENCRYPT) {
 			if (input != null && input.size() != 0 && mCipher != null) {
+
+				output = new ArrayList<LcomFriendshipData>();
+
 				for (LcomFriendshipData data : input) {
-					decryptInputStringList(data.getLatestMessage());
-					decryptForInputString(data.getSecondUserName());
+					List<String> messages = decryptInputStringList(data
+							.getLatestMessage());
+					String name = decryptForInputString(data
+							.getSecondUserName());
+
+					data.setLatestMessage(messages);
+					data.setSecondUserName(name);
+
+					output.add(data);
+
 				}
 			}
+		} else {
+			output = input;
 		}
 
 		return output;
@@ -263,6 +285,9 @@ public class CipherUtil {
 			if (input != null && mCipher != null) {
 				// Decode base64 to byte array
 				try {
+
+					mCipher.init(Cipher.ENCRYPT_MODE, mKey, mIv);
+
 					byte[] byteText = input.getBytes();
 
 					// Get cipher result
@@ -277,6 +302,12 @@ public class CipherUtil {
 				} catch (BadPaddingException e) {
 					DbgUtil.showLog(TAG,
 							"BadPaddingException: " + e.getMessage());
+				} catch (InvalidKeyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvalidAlgorithmParameterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		} else {
@@ -314,6 +345,7 @@ public class CipherUtil {
 
 		if (text != null && secretKey != null) {
 			try {
+
 				// Decode base64 to byte array
 				byte[] byteText = text.getBytes("UTF-8");
 
