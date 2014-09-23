@@ -1,6 +1,7 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+import com.mame.lcom.util.DbgUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -24,7 +25,7 @@ public class LcomLoginServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 		String origin = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
@@ -44,8 +45,8 @@ public class LcomLoginServlet extends HttpServlet {
 		if (origin != null && userName != null && password != null
 				&& apiLevel != null) {
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
-			log.log(Level.INFO, "userName:" + userName);
-			log.log(Level.INFO, "password:" + password);
+			DbgUtil.showLog(Level.INFO, "userName:" + userName);
+			DbgUtil.showLog(Level.INFO, "password:" + password);
 			userId = manager.getUserIdByNameAndPassword(userName, password);
 			if (userId == LcomConst.NO_USER) {
 				result = LcomConst.LOGIN_RESULT_LOGIN_FAILED;
@@ -60,9 +61,9 @@ public class LcomLoginServlet extends HttpServlet {
 
 		for (int i = 0; i < list.size(); i++) {
 			String str = list.get(i);
-			log.log(Level.INFO, "str:" + str);
+			DbgUtil.showLog(Level.INFO, "str:" + str);
 			String output = CipherUtil.encrypt(str, secretKey);
-			log.log(Level.INFO, "output:" + output);
+			DbgUtil.showLog(Level.INFO, "output:" + output);
 		}
 
 		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
@@ -76,7 +77,7 @@ public class LcomLoginServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.WARNING, "doGet");
+		DbgUtil.showLog(Level.WARNING, "doGet");
 	}
 
 }

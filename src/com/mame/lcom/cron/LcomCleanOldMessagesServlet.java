@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.util.TimeUtil;
 
+import com.mame.lcom.util.DbgUtil;
+
 public class LcomCleanOldMessagesServlet extends HttpServlet {
 
 	private final static Logger log = Logger
@@ -20,7 +22,7 @@ public class LcomCleanOldMessagesServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.WARNING, "Clean message doGet");
+		DbgUtil.showLog(Level.WARNING, "Clean message doGet");
 
 		LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 		long currentTime = TimeUtil.getCurrentDate();

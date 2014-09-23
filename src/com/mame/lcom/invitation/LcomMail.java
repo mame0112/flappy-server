@@ -13,6 +13,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.mame.lcom.constant.LcomConst;
+import com.mame.lcom.util.DbgUtil;
 
 public class LcomMail {
 
@@ -25,7 +26,7 @@ public class LcomMail {
 
 	public boolean sendServiceWelcomeMail(String address, String userName,
 			String language) throws UnsupportedEncodingException {
-		log.log(Level.INFO, "sendServiceWelcomeMail");
+		DbgUtil.showLog(Level.INFO, "sendServiceWelcomeMail");
 		if (userName != null) {
 			Properties props = new Properties();
 			Session session = Session.getDefaultInstance(props, null);
@@ -72,10 +73,11 @@ public class LcomMail {
 				msg.setText(msgBody);
 				msg.setContent(msgBody, "text/html");
 				Transport.send(msg);
-				log.log(Level.INFO, "Successfully sent message.");
+				DbgUtil.showLog(Level.INFO, "Successfully sent message.");
 				return true;
 			} catch (MessagingException e) {
-				log.log(Level.INFO, "MessagingException:: " + e.getMessage());
+				DbgUtil.showLog(Level.INFO,
+						"MessagingException:: " + e.getMessage());
 				return false;
 			}
 		}
@@ -85,7 +87,7 @@ public class LcomMail {
 	public boolean sendInvitationMail(String address, String fromUserName,
 			String message, String language)
 			throws UnsupportedEncodingException {
-		log.log(Level.INFO, "sendInvitationMail");
+		DbgUtil.showLog(Level.INFO, "sendInvitationMail");
 		if (address != null) {
 			Properties props = new Properties();
 			Session session = Session.getDefaultInstance(props, null);
@@ -173,10 +175,11 @@ public class LcomMail {
 				msg.setText(msgBody);
 				msg.setContent(msgBody, "text/html");
 				Transport.send(msg);
-				log.log(Level.INFO, "Successfully sent message.");
+				DbgUtil.showLog(Level.INFO, "Successfully sent message.");
 				return true;
 			} catch (MessagingException e) {
-				log.log(Level.INFO, "MessagingException:: " + e.getMessage());
+				DbgUtil.showLog(Level.INFO,
+						"MessagingException:: " + e.getMessage());
 				return false;
 			}
 		}
@@ -186,7 +189,7 @@ public class LcomMail {
 	public boolean sendInqueryMail(String address, String category,
 			String userName, String message)
 			throws UnsupportedEncodingException {
-		log.log(Level.INFO, "sendInqueryMail");
+		DbgUtil.showLog(Level.INFO, "sendInqueryMail");
 		if (address != null) {
 			Properties props = new Properties();
 			Session session = Session.getDefaultInstance(props, null);
@@ -204,10 +207,11 @@ public class LcomMail {
 				msg.setText(msgBody);
 				msg.setContent(msgBody, "text/html");
 				Transport.send(msg);
-				log.log(Level.INFO, "Successfully sent message.");
+				DbgUtil.showLog(Level.INFO, "Successfully sent message.");
 				return true;
 			} catch (MessagingException e) {
-				log.log(Level.INFO, "MessagingException:: " + e.getMessage());
+				DbgUtil.showLog(Level.INFO,
+						"MessagingException:: " + e.getMessage());
 				return false;
 			}
 		}

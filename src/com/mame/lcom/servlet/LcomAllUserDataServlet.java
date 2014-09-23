@@ -17,6 +17,7 @@ import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.DatastoreUtil;
 import com.mame.lcom.util.TimeUtil;
+import com.mame.lcom.util.DbgUtil;
 
 public class LcomAllUserDataServlet extends HttpServlet {
 
@@ -26,7 +27,7 @@ public class LcomAllUserDataServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -41,7 +42,7 @@ public class LcomAllUserDataServlet extends HttpServlet {
 		list.add(origin);
 
 		if (userId != null && apiLevel != null) {
-			log.log(Level.INFO, "userId:" + userId);
+			DbgUtil.showLog(Level.INFO, "userId:" + userId);
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 
 			List<LcomFriendshipData> friendListData = null;
@@ -52,10 +53,10 @@ public class LcomAllUserDataServlet extends HttpServlet {
 				String result = DatastoreUtil.parseFriendListData(
 						Integer.valueOf(userId), friendListData);
 
-				log.log(Level.INFO, "result::" + result);
+				DbgUtil.showLog(Level.INFO, "result::" + result);
 				list.add(result);
 			} else {
-				log.log(Level.INFO, "friendListData is null or 0");
+				DbgUtil.showLog(Level.INFO, "friendListData is null or 0");
 			}
 		}
 

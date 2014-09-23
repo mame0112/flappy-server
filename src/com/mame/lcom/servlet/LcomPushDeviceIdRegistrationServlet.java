@@ -1,6 +1,7 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+import com.mame.lcom.util.DbgUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,7 +24,7 @@ public class LcomPushDeviceIdRegistrationServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.INFO, "doPost");
+		DbgUtil.showLog(Level.INFO, "doPost");
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 

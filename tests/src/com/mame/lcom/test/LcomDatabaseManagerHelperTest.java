@@ -519,7 +519,7 @@ public class LcomDatabaseManagerHelperTest {
 	 */
 	@Test
 	public void testPutFriendListDataToMemCache1() {
-		log.log(Level.INFO, "testPutFriendListDataToMemCache1");
+		DbgUtil.showLog(Level.INFO, "testPutFriendListDataToMemCache1");
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 		long current = TimeUtil.getCurrentDate();
 		long expire = current - 10000;
@@ -562,7 +562,7 @@ public class LcomDatabaseManagerHelperTest {
 	 */
 	@Test
 	public void testPutFriendListDataToMemCache2() {
-		log.log(Level.INFO, "testPutFriendListDataToMemCache2");
+		DbgUtil.showLog(Level.INFO, "testPutFriendListDataToMemCache2");
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 		long current = TimeUtil.getCurrentDate();
 		long expire = current - 10000;

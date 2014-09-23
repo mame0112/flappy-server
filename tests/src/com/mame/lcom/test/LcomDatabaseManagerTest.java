@@ -443,7 +443,7 @@ public class LcomDatabaseManagerTest {
 	 */
 	@Test
 	public void testGetNewMessagesWithTargetUser1() {
-		log.log(Level.INFO, "testGetNewMessagesWithTargetUser1");
+		DbgUtil.showLog(Level.INFO, "testGetNewMessagesWithTargetUser1");
 		mManager.debugDeleteNewMessageInfo(0, 1);
 
 		// Userid is 0, targetUserId is 1.
@@ -852,7 +852,7 @@ public class LcomDatabaseManagerTest {
 
 	@Test
 	public void testAddNewMessageInfo() {
-		log.log(Level.INFO, "testAddNewMessageInfo");
+		DbgUtil.showLog(Level.INFO, "testAddNewMessageInfo");
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 		dbhelper.removeNewMessagesFromMemCache(0);
 		mManager.debugDeleteUserData(0);
@@ -991,14 +991,14 @@ public class LcomDatabaseManagerTest {
 	 */
 	@Test
 	public void testBackupOldMessageData2() {
-		log.log(Level.INFO, "testBackupOldMessageData2");
+		DbgUtil.showLog(Level.INFO, "testBackupOldMessageData2");
 		long current = TimeUtil.getCurrentDate();
 		long previous = current - 100000;
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 		dbhelper.removeNewMessagesFromMemCache(0);
 		mManager.debugDeleteUserData(0);
 
-		log.log(Level.INFO, "previous: " + previous);
+		DbgUtil.showLog(Level.INFO, "previous: " + previous);
 		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", current);
 
 		// add memcache if it doesn't exist
@@ -1048,7 +1048,7 @@ public class LcomDatabaseManagerTest {
 	 */
 	@Test
 	public void testBackupOldMessageData3() {
-		log.log(Level.INFO, "testBackupOldMessageData3");
+		DbgUtil.showLog(Level.INFO, "testBackupOldMessageData3");
 		long current = TimeUtil.getCurrentDate();
 		long previous = current - 100000;
 		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
@@ -1056,7 +1056,7 @@ public class LcomDatabaseManagerTest {
 		mManager.debugDeleteUserData(0);
 		mManager.debugDeleteNewMessageInfo(0, 1);
 
-		log.log(Level.INFO, "previous: " + previous);
+		DbgUtil.showLog(Level.INFO, "previous: " + previous);
 		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", current);
 
 		// add memcache if it doesn't exist

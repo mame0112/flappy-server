@@ -57,17 +57,17 @@ public class CipherUtil {
 			mCipher.init(Cipher.ENCRYPT_MODE, key, iv);
 
 		} catch (UnsupportedEncodingException e) {
-			log.log(Level.WARNING,
+			DbgUtil.showLog(Level.WARNING,
 					"UnsupportedEncodingException: " + e.getMessage());
 		} catch (NoSuchAlgorithmException e) {
-			log.log(Level.WARNING,
+			DbgUtil.showLog(Level.WARNING,
 					"NoSuchAlgorithmException: " + e.getMessage());
 		} catch (NoSuchPaddingException e) {
-			log.log(Level.WARNING, "NoSuchPaddingException: " + e.getMessage());
+			DbgUtil.showLog(Level.WARNING, "NoSuchPaddingException: " + e.getMessage());
 		} catch (InvalidKeyException e) {
-			log.log(Level.WARNING, "InvalidKeyException: " + e.getMessage());
+			DbgUtil.showLog(Level.WARNING, "InvalidKeyException: " + e.getMessage());
 		} catch (InvalidAlgorithmParameterException e) {
-			log.log(Level.WARNING,
+			DbgUtil.showLog(Level.WARNING,
 					"InvalidAlgorithmParameterException: " + e.getMessage());
 		}
 	}
@@ -92,13 +92,13 @@ public class CipherUtil {
 					output = new String(Base64.encodeBase64(byteResult));
 
 				} catch (UnsupportedEncodingException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"UnsupportedEncodingException: " + e.getMessage());
 				} catch (IllegalBlockSizeException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"IllegalBlockSizeException: " + e.getMessage());
 				} catch (BadPaddingException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"BadPaddingException: " + e.getMessage());
 				}
 			}
@@ -127,13 +127,13 @@ public class CipherUtil {
 					output = new String(byteResult, "UTF-8");
 
 				} catch (UnsupportedEncodingException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"UnsupportedEncodingException: " + e.getMessage());
 				} catch (IllegalBlockSizeException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"IllegalBlockSizeException: " + e.getMessage());
 				} catch (BadPaddingException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"BadPaddingException: " + e.getMessage());
 				}
 			}
@@ -162,10 +162,10 @@ public class CipherUtil {
 					output = new Blob(byteResult);
 
 				} catch (IllegalBlockSizeException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"IllegalBlockSizeException: " + e.getMessage());
 				} catch (BadPaddingException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"BadPaddingException: " + e.getMessage());
 				}
 			}
@@ -251,10 +251,10 @@ public class CipherUtil {
 					output = new Blob(byteResult);
 
 				} catch (IllegalBlockSizeException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"IllegalBlockSizeException: " + e.getMessage());
 				} catch (BadPaddingException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"BadPaddingException: " + e.getMessage());
 				}
 			}
@@ -288,25 +288,6 @@ public class CipherUtil {
 
 	}
 
-	// public List<LcomNewMessageData> encryptForListLcomNewMessageData(
-	// List<LcomNewMessageData> input) {
-	//
-	// List<LcomNewMessageData> output = new ArrayList<LcomNewMessageData>();
-	//
-	// if (!LcomConst.IS_ENCRYPT) {
-	// if (input != null && input.size() != 0 && mCipher != null) {
-	// for (LcomNewMessageData data : input) {
-	// List<String> message = data.getMessage();
-	// String targetUserName = data.getTargetUserName();
-	// }
-	// }
-	// } else {
-	// output = input;
-	// }
-	//
-	// return output;
-	// }
-
 	public static String encrypt(String text, String secretKey) {
 		String strResult = null;
 
@@ -337,23 +318,23 @@ public class CipherUtil {
 				strResult = new String(Base64.encodeBase64(byteResult));
 
 			} catch (UnsupportedEncodingException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"UnsupportedEncodingException: " + e.getMessage());
 			} catch (NoSuchAlgorithmException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"NoSuchAlgorithmException: " + e.getMessage());
 			} catch (NoSuchPaddingException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"NoSuchPaddingException: " + e.getMessage());
 			} catch (InvalidKeyException e) {
-				log.log(Level.WARNING, "InvalidKeyException: " + e.getMessage());
+				DbgUtil.showLog(Level.WARNING, "InvalidKeyException: " + e.getMessage());
 			} catch (IllegalBlockSizeException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"IllegalBlockSizeException: " + e.getMessage());
 			} catch (BadPaddingException e) {
-				log.log(Level.WARNING, "BadPaddingException: " + e.getMessage());
+				DbgUtil.showLog(Level.WARNING, "BadPaddingException: " + e.getMessage());
 			} catch (InvalidAlgorithmParameterException e) {
-				log.log(Level.WARNING, "InvalidAlgorithmParameterException: "
+				DbgUtil.showLog(Level.WARNING, "InvalidAlgorithmParameterException: "
 						+ e.getMessage());
 			}
 		}
@@ -405,23 +386,23 @@ public class CipherUtil {
 				strResult = new String(byteResult, "UTF-8");
 
 			} catch (UnsupportedEncodingException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"UnsupportedEncodingException: " + e.getMessage());
 			} catch (NoSuchAlgorithmException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"NoSuchAlgorithmException: " + e.getMessage());
 			} catch (NoSuchPaddingException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"NoSuchPaddingException: " + e.getMessage());
 			} catch (InvalidKeyException e) {
-				log.log(Level.WARNING, "InvalidKeyException: " + e.getMessage());
+				DbgUtil.showLog(Level.WARNING, "InvalidKeyException: " + e.getMessage());
 			} catch (IllegalBlockSizeException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"IllegalBlockSizeException: " + e.getMessage());
 			} catch (BadPaddingException e) {
-				log.log(Level.WARNING, "BadPaddingException: " + e.getMessage());
+				DbgUtil.showLog(Level.WARNING, "BadPaddingException: " + e.getMessage());
 			} catch (InvalidAlgorithmParameterException e) {
-				log.log(Level.WARNING, "InvalidAlgorithmParameterException: "
+				DbgUtil.showLog(Level.WARNING, "InvalidAlgorithmParameterException: "
 						+ e.getMessage());
 			}
 		}

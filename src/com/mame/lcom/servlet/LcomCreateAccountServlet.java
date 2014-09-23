@@ -19,7 +19,7 @@ import com.mame.lcom.invitation.LcomMail;
 import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.DatastoreUtil;
 import com.mame.lcom.util.TimeUtil;
-
+import com.mame.lcom.util.DbgUtil;
 public class LcomCreateAccountServlet extends HttpServlet {
 
 	private final static Logger log = Logger
@@ -28,7 +28,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.INFO, "doPost" + TimeUtil.calcResponse());
+		DbgUtil.showLog(Level.INFO, "doPost" + TimeUtil.calcResponse());
 
 		String identifier = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -63,7 +63,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 			if (thumb != null) {
 				thumbnail = DatastoreUtil.transcodeString2Blob(thumb);
 				if (thumbnail != null) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"thumbnail size: " + thumbnail.getBytes().length);
 				}
 			}
@@ -75,7 +75,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 				// Check if the current user is registered by other use because
 				// someone asked him to join this service
 				long userIdByMail = manager.getUserIdByMailAddress(mailAddress);
-				log.log(Level.INFO, "userIdByMail: " + userIdByMail);
+				DbgUtil.showLog(Level.INFO, "userIdByMail: " + userIdByMail);
 				if (userIdByMail == LcomConst.NO_USER) {
 					// If the target mail address doesn't exist in DB (This is
 					// normal new registration case)
@@ -91,7 +91,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 					// If mail address exist in DB although user name is not
 					// registered (This is a case that the user was invited by
 					// his friend)
-					log.log(Level.INFO, "A2");
+					DbgUtil.showLog(Level.INFO, "A2");
 
 					// Update friend himself information
 					manager.updateUserData(userIdByMail, userName, password,
@@ -106,7 +106,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 					result = LcomConst.CREATE_ACCOUNT_RESULT_OK_WITH_ADDRESS_REGISTERED;
 				}
 			} else {
-				log.log(Level.INFO, "B");
+				DbgUtil.showLog(Level.INFO, "B");
 				result = LcomConst.CREATE_ACCOUNT_USER_ALREADY_EXIST;
 			}
 		} else {

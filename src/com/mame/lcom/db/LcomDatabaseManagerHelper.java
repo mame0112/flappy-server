@@ -9,6 +9,7 @@ import com.google.appengine.api.memcache.MemcacheServiceException;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.util.CipherUtil;
+import com.mame.lcom.util.DbgUtil;
 
 public class LcomDatabaseManagerHelper {
 
@@ -16,7 +17,7 @@ public class LcomDatabaseManagerHelper {
 			.getLogger(LcomDatabaseManagerHelper.class.getName());
 
 	public static String getDeviceIdForGCMPush(long userId) {
-		log.log(Level.INFO, "getDeviceIdForGCMPush");
+		DbgUtil.showLog(Level.INFO, "getDeviceIdForGCMPush");
 
 		MemcacheService ms = MemcacheServiceFactory
 				.getMemcacheService(LcomConst.MEMCACHE_KEY_DEVICEID);
@@ -25,9 +26,9 @@ public class LcomDatabaseManagerHelper {
 		try {
 			deviceId = (String) ms.get(userId);
 		} catch (IllegalArgumentException e1) {
-			log.log(Level.INFO, "IllegalArgumentException: " + e1.getMessage());
+			DbgUtil.showLog(Level.INFO, "IllegalArgumentException: " + e1.getMessage());
 		} catch (InvalidValueException e2) {
-			log.log(Level.INFO, "InvalidValueException: " + e2.getMessage());
+			DbgUtil.showLog(Level.INFO, "InvalidValueException: " + e2.getMessage());
 		}
 
 //		CipherUtil util = new CipherUtil();
@@ -37,7 +38,7 @@ public class LcomDatabaseManagerHelper {
 	}
 
 	public static void putDeviceIdForGCMPush(long userId, String deviceId) {
-		log.log(Level.INFO, "putDeviceIdForGCMPush");
+		DbgUtil.showLog(Level.INFO, "putDeviceIdForGCMPush");
 		MemcacheService ms = MemcacheServiceFactory
 				.getMemcacheService(LcomConst.MEMCACHE_KEY_DEVICEID);
 
@@ -47,9 +48,9 @@ public class LcomDatabaseManagerHelper {
 		try {
 			ms.put(userId, deviceId);
 		} catch (IllegalArgumentException e1) {
-			log.log(Level.INFO, "IllegalArgumentException: " + e1.getMessage());
+			DbgUtil.showLog(Level.INFO, "IllegalArgumentException: " + e1.getMessage());
 		} catch (MemcacheServiceException e2) {
-			log.log(Level.INFO, "MemcacheServiceException: " + e2.getMessage());
+			DbgUtil.showLog(Level.INFO, "MemcacheServiceException: " + e2.getMessage());
 		}
 	}
 	// public static void putUserDataToMemcache(Key userKey, Entity data) {
@@ -108,7 +109,7 @@ public class LcomDatabaseManagerHelper {
 	// return data;
 	// }
 	// } catch (Exception e) {
-	// log.log(Level.WARNING, "Exception: " + e.getMessage());
+	// DbgUtil.showLog(Level.WARNING, "Exception: " + e.getMessage());
 	// }
 	// }
 	// return null;
@@ -121,10 +122,10 @@ public class LcomDatabaseManagerHelper {
 	// try {
 	// memcacheService.delete(userId);
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// }
 	//
@@ -137,10 +138,10 @@ public class LcomDatabaseManagerHelper {
 	// memcacheService.put(LcomConst.NUM_OF_USER,
 	// String.valueOf(numOfUser));
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// }
 	// }
@@ -152,10 +153,10 @@ public class LcomDatabaseManagerHelper {
 	// try {
 	// memcacheService.delete(LcomConst.NUM_OF_USER);
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// }
 	// }
@@ -175,17 +176,17 @@ public class LcomDatabaseManagerHelper {
 	// userNum = Integer.valueOf(userNumCached);
 	// return userNum;
 	// } catch (NumberFormatException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "NumberFormatException: " + e.getMessage());
 	// return LcomConst.NO_USER;
 	// }
 	// }
 	//
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// } catch (InvalidValueException e) {
-	// log.log(Level.WARNING, "InvalidValueException: " + e.getMessage());
+	// DbgUtil.showLog(Level.WARNING, "InvalidValueException: " + e.getMessage());
 	// }
 	//
 	// return LcomConst.NO_USER;
@@ -200,7 +201,7 @@ public class LcomDatabaseManagerHelper {
 	// */
 	// public List<LcomNewMessageData> getNewMessageFromMemcache(int userId)
 	// throws LcomMemcacheException {
-	// log.log(Level.INFO, "getNewMessageFromMemcache");
+	// DbgUtil.showLog(Level.INFO, "getNewMessageFromMemcache");
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomNewMessageData.class.getSimpleName());
 	// try {
@@ -209,7 +210,7 @@ public class LcomDatabaseManagerHelper {
 	// @SuppressWarnings("unchecked")
 	// String cachedMessage = (String) memcacheService.get(userId);
 	// if (cachedMessage != null) {
-	// log.log(Level.INFO, "cachedMessage length: "
+	// DbgUtil.showLog(Level.INFO, "cachedMessage length: "
 	// + cachedMessage.length());
 	// LcomMemcacheUtil util = new LcomMemcacheUtil();
 	//
@@ -230,22 +231,22 @@ public class LcomDatabaseManagerHelper {
 	//
 	// return messages;
 	// } else {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "LcomMemcacheException illega userId");
 	// throw new LcomMemcacheException("Cache doesn't exist");
 	// }
 	//
 	// } else {
-	// log.log(Level.WARNING, "LcomMemcacheException illega userId");
+	// DbgUtil.showLog(Level.WARNING, "LcomMemcacheException illega userId");
 	// throw new LcomMemcacheException("illegal userId");
 	// }
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
 	// } catch (InvalidValueException e) {
-	// log.log(Level.WARNING, "InvalidValueException: " + e.getMessage());
+	// DbgUtil.showLog(Level.WARNING, "InvalidValueException: " + e.getMessage());
 	// throw new LcomMemcacheException("InvalidValueException: "
 	// + e.getMessage());
 	// }
@@ -264,7 +265,7 @@ public class LcomDatabaseManagerHelper {
 	// public List<LcomNewMessageData>
 	// getNewMessageFromMemcacheWithChangeReadState(
 	// int userId, int friendUserId) throws LcomMemcacheException {
-	// log.log(Level.INFO, "getNewMessageFromMemcacheWithChangeReadState: "
+	// DbgUtil.showLog(Level.INFO, "getNewMessageFromMemcacheWithChangeReadState: "
 	// + userId + " / " + friendUserId);
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomNewMessageData.class.getSimpleName());
@@ -274,9 +275,9 @@ public class LcomDatabaseManagerHelper {
 	// @SuppressWarnings("unchecked")
 	// String cachedMessage = (String) memcacheService.get(userId);
 	// if (cachedMessage != null) {
-	// log.log(Level.INFO, "cachedMessage length: "
+	// DbgUtil.showLog(Level.INFO, "cachedMessage length: "
 	// + cachedMessage.length());
-	// log.log(Level.INFO, "cachedMessage: " + cachedMessage);
+	// DbgUtil.showLog(Level.INFO, "cachedMessage: " + cachedMessage);
 	// }
 	//
 	// if (cachedMessage != null) {
@@ -294,20 +295,20 @@ public class LcomDatabaseManagerHelper {
 	// for (LcomNewMessageData message : messages) {
 	// if (message != null) {
 	//
-	// log.log(Level.INFO,
+	// DbgUtil.showLog(Level.INFO,
 	// "message content: " + message.getMessage());
 	//
 	// // only for meesage that is sent by targetUserId, we
 	// // shall return it.
 	// int toUserId = message.getTargetUserId();
-	// log.log(Level.INFO, "toUserId: " + toUserId);
+	// DbgUtil.showLog(Level.INFO, "toUserId: " + toUserId);
 	// if (toUserId == userId) {
 	//
 	// boolean isRead = message.isMessageRead();
 	//
 	// if (isRead == false) {
 	// message.setReadState(true);
-	// log.log(Level.INFO, "Changed");
+	// DbgUtil.showLog(Level.INFO, "Changed");
 	// result.add(message);
 	// }
 	// }
@@ -320,7 +321,7 @@ public class LcomDatabaseManagerHelper {
 	// String updatedString = util
 	// .parseMessagesData2String(cacheUpdated);
 	// if (updatedString != null) {
-	// log.log(Level.INFO, "updatedString: " + updatedString);
+	// DbgUtil.showLog(Level.INFO, "updatedString: " + updatedString);
 	// }
 	//
 	// // set read state-updated message to memcache again
@@ -330,21 +331,21 @@ public class LcomDatabaseManagerHelper {
 	// return result;
 	// } else {
 	// // No cache exist
-	// log.log(Level.WARNING, "No cache exist");
+	// DbgUtil.showLog(Level.WARNING, "No cache exist");
 	// throw new LcomMemcacheException("No cache exist");
 	// }
 	//
 	// } else {
-	// log.log(Level.WARNING, "LcomMemcacheException illega userId");
+	// DbgUtil.showLog(Level.WARNING, "LcomMemcacheException illega userId");
 	// throw new LcomMemcacheException("illegal userId");
 	// }
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
 	// } catch (InvalidValueException e) {
-	// log.log(Level.WARNING, "InvalidValueException: " + e.getMessage());
+	// DbgUtil.showLog(Level.WARNING, "InvalidValueException: " + e.getMessage());
 	// throw new LcomMemcacheException("InvalidValueException: "
 	// + e.getMessage());
 	// }
@@ -352,7 +353,7 @@ public class LcomDatabaseManagerHelper {
 	//
 	// public void putNewMessageToMemCache(LcomNewMessageData message)
 	// throws LcomMemcacheException {
-	// log.log(Level.INFO, "putNewMessageToMemCache");
+	// DbgUtil.showLog(Level.INFO, "putNewMessageToMemCache");
 	//
 	// try {
 	// if (message != null) {
@@ -379,18 +380,18 @@ public class LcomDatabaseManagerHelper {
 	// memcacheService.put(targetUserId, updatedMessage);
 	// }
 	// } else {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "LcomMemcacheException: messages is null");
 	// throw new LcomMemcacheException("messages is null");
 	// }
 	//
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// throw new LcomMemcacheException("MemcacheServiceException: "
 	// + e.getMessage());
@@ -400,7 +401,7 @@ public class LcomDatabaseManagerHelper {
 	//
 	// public void putNewMessagesToMemCache(int userId,
 	// List<LcomNewMessageData> messages) throws LcomMemcacheException {
-	// log.log(Level.INFO, "putNewMessagesToMemCache");
+	// DbgUtil.showLog(Level.INFO, "putNewMessagesToMemCache");
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomNewMessageData.class.getSimpleName());
 	//
@@ -409,7 +410,7 @@ public class LcomDatabaseManagerHelper {
 	//
 	// LcomMemcacheUtil util = new LcomMemcacheUtil();
 	// String parsed = util.parseMessagesData2String(messages);
-	// log.log(Level.INFO, "parsed: " + parsed);
+	// DbgUtil.showLog(Level.INFO, "parsed: " + parsed);
 	// if (parsed != null) {
 	//
 	// // In come cases, there is current memcache. Then, we try to
@@ -429,17 +430,17 @@ public class LcomDatabaseManagerHelper {
 	// }
 	//
 	// } else {
-	// log.log(Level.WARNING, "LcomMemcacheException message is null");
+	// DbgUtil.showLog(Level.WARNING, "LcomMemcacheException message is null");
 	// // throw new LcomMemcacheException("messages is null");
 	// }
 	//
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// throw new LcomMemcacheException("MemcacheServiceException: "
 	// + e.getMessage());
@@ -453,16 +454,16 @@ public class LcomDatabaseManagerHelper {
 	// try {
 	// memcacheService.delete(userId);
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// }
 	// }
 	//
 	// public String getPushDevceIdToMemCache(int userId) {
-	// log.log(Level.INFO, "getPushDevceIdToMemCache");
+	// DbgUtil.showLog(Level.INFO, "getPushDevceIdToMemCache");
 	//
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomMessageDeviceId.class.getSimpleName());
@@ -471,14 +472,14 @@ public class LcomDatabaseManagerHelper {
 	// @SuppressWarnings("unchecked")
 	// String registrationId = (String) memcacheService.get(userId);
 	// if (registrationId != null) {
-	// log.log(Level.INFO, "registrationId is not null");
+	// DbgUtil.showLog(Level.INFO, "registrationId is not null");
 	// return registrationId;
 	// }
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// } catch (InvalidValueException e) {
-	// log.log(Level.WARNING, "InvalidValueException: " + e.getMessage());
+	// DbgUtil.showLog(Level.WARNING, "InvalidValueException: " + e.getMessage());
 	// }
 	//
 	// return null;
@@ -486,7 +487,7 @@ public class LcomDatabaseManagerHelper {
 	//
 	// public void putPushDevceIdToMemCache(int userId, String registrationId)
 	// throws LcomMemcacheException {
-	// log.log(Level.INFO, "putPushDevceIdToMemCache");
+	// DbgUtil.showLog(Level.INFO, "putPushDevceIdToMemCache");
 	//
 	// // Get memcache for push device id
 	// MemcacheService memcacheService = MemcacheServiceFactory
@@ -499,11 +500,11 @@ public class LcomDatabaseManagerHelper {
 	// if (currentCache != null) {
 	// // If cache is already there
 	// // Once delete memcache
-	// log.log(Level.INFO, "delete memcache");
+	// DbgUtil.showLog(Level.INFO, "delete memcache");
 	// memcacheService.delete(userId);
 	// }
 	// // And insert memcache
-	// log.log(Level.INFO, "put memcache");
+	// DbgUtil.showLog(Level.INFO, "put memcache");
 	// memcacheService.put(userId, registrationId);
 	//
 	// } else {
@@ -511,12 +512,12 @@ public class LcomDatabaseManagerHelper {
 	// }
 	//
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// throw new LcomMemcacheException("MemcacheServiceException: "
 	// + e.getMessage());
@@ -525,7 +526,7 @@ public class LcomDatabaseManagerHelper {
 	//
 	// public void removeDevceIdFromMemCache(int userId)
 	// throws LcomMemcacheException {
-	// log.log(Level.INFO, "removeDevceIdFromMemCache");
+	// DbgUtil.showLog(Level.INFO, "removeDevceIdFromMemCache");
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomMessageDeviceId.class.getSimpleName());
 	// try {
@@ -533,7 +534,7 @@ public class LcomDatabaseManagerHelper {
 	// memcacheService.delete(userId);
 	// }
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
@@ -542,18 +543,18 @@ public class LcomDatabaseManagerHelper {
 	//
 	// public synchronized void deleteAllNewMessages(
 	// ArrayList<Integer> registeredIds) throws LcomMemcacheException {
-	// log.log(Level.INFO, "deleteAllNewMessages");
+	// DbgUtil.showLog(Level.INFO, "deleteAllNewMessages");
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomNewMessageData.class.getSimpleName());
 	//
 	// try {
 	// // Remove new message
 	// if (registeredIds != null && registeredIds.size() != 0) {
-	// log.log(Level.INFO, "delete all");
+	// DbgUtil.showLog(Level.INFO, "delete all");
 	// memcacheService.deleteAll(registeredIds);
 	// }
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
@@ -564,7 +565,7 @@ public class LcomDatabaseManagerHelper {
 	// public synchronized void putFriendListDataToMemCache(LcomFriendshipData
 	// data)
 	// throws LcomMemcacheException {
-	// log.log(Level.INFO, "putFriendListDataToMemCache");
+	// DbgUtil.showLog(Level.INFO, "putFriendListDataToMemCache");
 	//
 	// // Get memcache for push device id
 	// MemcacheService memcacheService = MemcacheServiceFactory
@@ -624,13 +625,13 @@ public class LcomDatabaseManagerHelper {
 	// }
 	//
 	// } else {
-	// log.log(Level.INFO, "currentData is null");
+	// DbgUtil.showLog(Level.INFO, "currentData is null");
 	// }
 	//
 	// // If target second user id is new for memcache
 	// if (!isExist) {
 	// output = output + LcomConst.ITEM_SEPARATOR + parsed;
-	// log.log(Level.INFO, "user doesn't exist");
+	// DbgUtil.showLog(Level.INFO, "user doesn't exist");
 	// }
 	//
 	// // Remove unnecessary part
@@ -638,7 +639,7 @@ public class LcomDatabaseManagerHelper {
 	// 1 + LcomConst.ITEM_SEPARATOR.length(),
 	// output.length());
 	//
-	// log.log(Level.INFO, "output: " + output);
+	// DbgUtil.showLog(Level.INFO, "output: " + output);
 	//
 	// // Once we delete old memcache
 	// memcacheService.delete(firstId);
@@ -647,12 +648,12 @@ public class LcomDatabaseManagerHelper {
 	// memcacheService.put(firstId, output);
 	//
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException(
 	// "IllegalArgumentException: " + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// throw new LcomMemcacheException(
 	// "MemcacheServiceException: " + e.getMessage());
@@ -667,7 +668,7 @@ public class LcomDatabaseManagerHelper {
 	//
 	// // public synchronized void putFriendListDatasToMemCache(
 	// // List<LcomFriendshipData> datas) {
-	// // log.log(Level.INFO, "putFriendListDataToMemCache");
+	// // DbgUtil.showLog(Level.INFO, "putFriendListDataToMemCache");
 	// //
 	// // // Get memcache for push device id
 	// // MemcacheService memcacheService = MemcacheServiceFactory
@@ -732,13 +733,13 @@ public class LcomDatabaseManagerHelper {
 	// // }
 	// //
 	// // } else {
-	// // log.log(Level.INFO, "currentData is null");
+	// // DbgUtil.showLog(Level.INFO, "currentData is null");
 	// // }
 	// //
 	// // // If target second user id is new for memcache
 	// // if (!isExist) {
 	// // output = output + LcomConst.ITEM_SEPARATOR + parsed;
-	// // log.log(Level.INFO, "user doesn't exist");
+	// // DbgUtil.showLog(Level.INFO, "user doesn't exist");
 	// // }
 	// //
 	// // // Remove unnecessary part
@@ -746,7 +747,7 @@ public class LcomDatabaseManagerHelper {
 	// // 1 + LcomConst.ITEM_SEPARATOR.length(),
 	// // output.length());
 	// //
-	// // log.log(Level.INFO, "output: " + output);
+	// // DbgUtil.showLog(Level.INFO, "output: " + output);
 	// //
 	// // // Once we delete old memcache
 	// // memcacheService.delete(firstId);
@@ -755,12 +756,12 @@ public class LcomDatabaseManagerHelper {
 	// // memcacheService.put(firstId, output);
 	// //
 	// // } catch (IllegalArgumentException e) {
-	// // log.log(Level.WARNING,
+	// // DbgUtil.showLog(Level.WARNING,
 	// // "IllegalArgumentException: " + e.getMessage());
 	// // throw new LcomMemcacheException(
 	// // "IllegalArgumentException: " + e.getMessage());
 	// // } catch (MemcacheServiceException e) {
-	// // log.log(Level.WARNING,
+	// // DbgUtil.showLog(Level.WARNING,
 	// // "MemcacheServiceException: " + e.getMessage());
 	// // throw new LcomMemcacheException(
 	// // "MemcacheServiceException: " + e.getMessage());
@@ -780,10 +781,10 @@ public class LcomDatabaseManagerHelper {
 	// try {
 	// memcacheService.delete(userId);
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// } catch (MemcacheServiceException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "MemcacheServiceException: " + e.getMessage());
 	// }
 	//
@@ -833,17 +834,17 @@ public class LcomDatabaseManagerHelper {
 	//
 	// }
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
 	// } catch (InvalidValueException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "InvalidValueException: " + e.getMessage());
 	// throw new LcomMemcacheException("InvalidValueException: "
 	// + e.getMessage());
 	// } catch (IndexOutOfBoundsException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IndexOutOfBoundsException: " + e.getMessage());
 	// throw new LcomMemcacheException("IndexOutOfBoundsException: "
 	// + e.getMessage());
@@ -857,7 +858,7 @@ public class LcomDatabaseManagerHelper {
 	// public synchronized List<LcomFriendshipData>
 	// getFriendListDataFromMemCache(
 	// int firstId) throws LcomMemcacheException {
-	// log.log(Level.INFO, "getFriendListDataFromMemCache");
+	// DbgUtil.showLog(Level.INFO, "getFriendListDataFromMemCache");
 	//
 	// MemcacheService memcacheService = MemcacheServiceFactory
 	// .getMemcacheService(LcomFriendshipData.class.getSimpleName());
@@ -871,7 +872,7 @@ public class LcomDatabaseManagerHelper {
 	// String parsedData = (String) memcacheService.get(firstId);
 	//
 	// if (parsedData != null) {
-	// log.log(Level.INFO, "parsedData: " + parsedData);
+	// DbgUtil.showLog(Level.INFO, "parsedData: " + parsedData);
 	//
 	// String[] itemArray = parsedData
 	// .split(LcomConst.ITEM_SEPARATOR);
@@ -891,7 +892,7 @@ public class LcomDatabaseManagerHelper {
 	// String messageTime = dataArray[6];
 	//
 	// if (message != null) {
-	// log.log(Level.INFO, "message: " + message);
+	// DbgUtil.showLog(Level.INFO, "message: " + message);
 	// }
 	//
 	// LcomFriendshipData data = new LcomFriendshipData(
@@ -907,17 +908,17 @@ public class LcomDatabaseManagerHelper {
 	// }
 	//
 	// } catch (IllegalArgumentException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IllegalArgumentException: " + e.getMessage());
 	// throw new LcomMemcacheException("IllegalArgumentException: "
 	// + e.getMessage());
 	// } catch (InvalidValueException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "InvalidValueException: " + e.getMessage());
 	// throw new LcomMemcacheException("InvalidValueException: "
 	// + e.getMessage());
 	// } catch (IndexOutOfBoundsException e) {
-	// log.log(Level.WARNING,
+	// DbgUtil.showLog(Level.WARNING,
 	// "IndexOutOfBoundsException: " + e.getMessage());
 	// throw new LcomMemcacheException("IndexOutOfBoundsException: "
 	// + e.getMessage());

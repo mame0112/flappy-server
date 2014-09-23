@@ -11,6 +11,8 @@ public class LcomConst {
 
 	public final static boolean IS_ENCRYPT = true;
 
+	public final static boolean IS_DEBUG = true;
+
 	public final static String BASE_URL = "http://loosecommunication.appspot.com/";
 
 	public final static String MEMCACHE_SEPARATOR = "#@#";

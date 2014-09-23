@@ -22,7 +22,7 @@ public class DatastoreUtil {
 				byte[] bytes = origin.getBytes("UTF-8");
 				return new Blob(bytes);
 			} catch (UnsupportedEncodingException e) {
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"UnsupportedEncodingException: " + e.getMessage());
 			}
 		}
@@ -37,7 +37,7 @@ public class DatastoreUtil {
 				try {
 					return new String(bytes, "UTF-8");
 				} catch (UnsupportedEncodingException e) {
-					log.log(Level.WARNING,
+					DbgUtil.showLog(Level.WARNING,
 							"UnsupportedEncodingException: " + e.getMessage());
 				}
 			}
@@ -50,7 +50,7 @@ public class DatastoreUtil {
 		String result = null;
 		boolean isFirstTime = true;
 		for (LcomNewMessageData data : newMessages) {
-			// log.log(Level.INFO, "parseNewMessage(data):"
+			// DbgUtil.showLog(Level.INFO, "parseNewMessage(data):"
 			// + parseNewMessage(data));
 			if (data != null) {
 				if (isFirstTime) {
@@ -60,7 +60,7 @@ public class DatastoreUtil {
 					result = result + LcomConst.ITEM_SEPARATOR
 							+ parseNewMessage(data);
 				}
-				log.log(Level.WARNING, "result: " + result);
+				DbgUtil.showLog(Level.WARNING, "result: " + result);
 			}
 		}
 		// Remove last separator
@@ -71,7 +71,7 @@ public class DatastoreUtil {
 
 	public static String parseFriendListData(int userId,
 			List<LcomFriendshipData> friendListData) {
-		log.log(Level.WARNING, "parseFriendListData");
+		DbgUtil.showLog(Level.WARNING, "parseFriendListData");
 		String result = null;
 		boolean isFirstTime = true;
 
@@ -80,7 +80,7 @@ public class DatastoreUtil {
 			// for (int i = friendListData.size() - 1; i >= 0; i--) {
 			// LcomFriendshipData data = friendListData.get(i);
 			for (LcomFriendshipData data : friendListData) {
-				// log.log(Level.INFO, "parseNewMessage(data):"
+				// DbgUtil.showLog(Level.INFO, "parseNewMessage(data):"
 				// + parseNewMessage(data));
 				if (data != null) {
 					if (isFirstTime) {
@@ -149,7 +149,7 @@ public class DatastoreUtil {
 	}
 
 	public static String parseNewMessage(long userId, LcomFriendshipData data) {
-		log.log(Level.WARNING, "parseNewMessage");
+		DbgUtil.showLog(Level.WARNING, "parseNewMessage");
 		String parsed = null;
 		// int firstUserId = data.getFirstUserId();
 		// String firstUserName = data.getFirstUserName();
@@ -175,12 +175,12 @@ public class DatastoreUtil {
 
 		String parsedMessage = null;
 		if (messages != null && messages.size() != 0) {
-			log.log(Level.WARNING, "A1");
+			DbgUtil.showLog(Level.WARNING, "A1");
 			boolean isFirst = true;
 			for (int i = messages.size() - 1; i >= 0; i--) {
-				log.log(Level.WARNING, "A2");
+				DbgUtil.showLog(Level.WARNING, "A2");
 				String msg = messages.get(i);
-				log.log(Level.WARNING, "msg: " + msg);
+				DbgUtil.showLog(Level.WARNING, "msg: " + msg);
 				// for (String msg : messages) {
 				if (isFirst) {
 					parsedMessage = msg;
@@ -193,13 +193,13 @@ public class DatastoreUtil {
 		}
 		String parsedDate = null;
 		if (expireDate != null && expireDate.size() != 0) {
-			log.log(Level.WARNING, "B1");
+			DbgUtil.showLog(Level.WARNING, "B1");
 			boolean isFirst = true;
 			// for (Long date : expireDate) {
 			for (int j = expireDate.size() - 1; j >= 0; j--) {
-				log.log(Level.WARNING, "B2");
+				DbgUtil.showLog(Level.WARNING, "B2");
 				long date = expireDate.get(j);
-				log.log(Level.WARNING, "date: " + date);
+				DbgUtil.showLog(Level.WARNING, "date: " + date);
 				if (isFirst) {
 					parsedDate = String.valueOf(date);
 					isFirst = false;
@@ -210,8 +210,8 @@ public class DatastoreUtil {
 			}
 		}
 
-		log.log(Level.WARNING, "parsedMessage: " + parsedMessage);
-		log.log(Level.WARNING, "parsedDate: " + parsedDate);
+		DbgUtil.showLog(Level.WARNING, "parsedMessage: " + parsedMessage);
+		DbgUtil.showLog(Level.WARNING, "parsedDate: " + parsedDate);
 
 		parsed = secondUserId + LcomConst.SEPARATOR + secondUserName
 				+ LcomConst.SEPARATOR + parsedMessage + LcomConst.SEPARATOR

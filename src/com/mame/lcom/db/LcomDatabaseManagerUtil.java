@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomFriendshipData;
+import com.mame.lcom.util.DbgUtil;
 import com.mame.lcom.util.TimeUtil;
 
 public class LcomDatabaseManagerUtil {
@@ -39,7 +40,7 @@ public class LcomDatabaseManagerUtil {
 	}
 
 	public boolean isEntityForKeyUserIdExist(long keyUserId, DatastoreService ds) {
-		log.log(Level.WARNING, "isEntityForKeyUserIdExist");
+		DbgUtil.showLog(Level.WARNING, "isEntityForKeyUserIdExist");
 
 		Key userKey = getUserDataKey(keyUserId);
 
@@ -58,7 +59,7 @@ public class LcomDatabaseManagerUtil {
 
 	public Entity getEntityForKeyUser(long keyUserId, DatastoreService ds) {
 
-		log.log(Level.WARNING, "getEntityForKeyUser");
+		DbgUtil.showLog(Level.WARNING, "getEntityForKeyUser");
 
 		Key userKey = getUserDataKey(keyUserId);
 		Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
@@ -70,7 +71,7 @@ public class LcomDatabaseManagerUtil {
 
 	public boolean isFriendUserIdExistInEntity(Entity entity, long friendUserId) {
 
-		log.log(Level.WARNING, "isFriendUserIdExistInEntity");
+		DbgUtil.showLog(Level.WARNING, "isFriendUserIdExistInEntity");
 
 		@SuppressWarnings("unchecked")
 		List<Long> friendUserIdArray = (List<Long>) entity
@@ -131,7 +132,7 @@ public class LcomDatabaseManagerUtil {
 			String senderName, long keyUserId, String keyUserName,
 			String lastMessage, long currentTime, DatastoreService ds) {
 
-		log.log(Level.WARNING, "addMessageForFriendUser");
+		DbgUtil.showLog(Level.WARNING, "addMessageForFriendUser");
 
 		if (e != null) {
 
@@ -213,7 +214,7 @@ public class LcomDatabaseManagerUtil {
 							return true;
 						}
 					} else {
-						log.log(Level.WARNING,
+						DbgUtil.showLog(Level.WARNING,
 								"friend id exist but no friend Id here. something wrong.");
 						return false;
 					}
@@ -223,7 +224,7 @@ public class LcomDatabaseManagerUtil {
 				}
 			} catch (IndexOutOfBoundsException e1) {
 				// TODO
-				log.log(Level.WARNING,
+				DbgUtil.showLog(Level.WARNING,
 						"IndexOutOfBoundsException: " + e1.getMessage());
 			}
 		}
@@ -244,7 +245,7 @@ public class LcomDatabaseManagerUtil {
 	private void putNewMessageInfoToEntity(Entity e, long senderUserId,
 			String senderUserName, String message, String postTime,
 			String expireTime) {
-		log.log(Level.WARNING, "putNewMessageInfoToEntity");
+		DbgUtil.showLog(Level.WARNING, "putNewMessageInfoToEntity");
 		if (e != null) {
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
 					Arrays.asList(expireTime));
@@ -265,7 +266,7 @@ public class LcomDatabaseManagerUtil {
 			String keyUserName, String lastMessage, long currentTime,
 			DatastoreService ds) {
 
-		log.log(Level.WARNING, "addNewUserDataAndMessageToFriendship");
+		DbgUtil.showLog(Level.WARNING, "addNewUserDataAndMessageToFriendship");
 
 		List<Long> friendUserIdArray = (List<Long>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
@@ -325,7 +326,7 @@ public class LcomDatabaseManagerUtil {
 			String senderName, long keyUserId, String keyUserName,
 			String lastMessage, long time, DatastoreService ds) {
 
-		log.log(Level.WARNING, "addNewEntiyInFriendshipTable");
+		DbgUtil.showLog(Level.WARNING, "addNewEntiyInFriendshipTable");
 
 		Key userKey = getUserDataKey(keyUserId);
 
@@ -343,7 +344,7 @@ public class LcomDatabaseManagerUtil {
 
 	public Entity getFriendshipEntityForUserIdWituhoutFilter(long userId,
 			DatastoreService ds) {
-		log.log(Level.WARNING, "getFriendshipEntityForUserIdWituhoutFilter: "
+		DbgUtil.showLog(Level.WARNING, "getFriendshipEntityForUserIdWituhoutFilter: "
 				+ userId);
 
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
@@ -354,7 +355,7 @@ public class LcomDatabaseManagerUtil {
 	}
 
 	public Entity getFriendshipEntityForUserId(long userId, DatastoreService ds) {
-		log.log(Level.WARNING, "getFriendshipEntityForUserId");
+		DbgUtil.showLog(Level.WARNING, "getFriendshipEntityForUserId");
 		Filter messageFilter = new FilterPredicate(
 				LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
 				FilterOperator.NOT_EQUAL, null);
@@ -370,7 +371,7 @@ public class LcomDatabaseManagerUtil {
 	@SuppressWarnings("unchecked")
 	public List<LcomFriendshipData> getAllFriendshipData(Entity e,
 			DatastoreService ds, long userId) {
-		log.log(Level.INFO, "getAllFriendshipData");
+		DbgUtil.showLog(Level.INFO, "getAllFriendshipData");
 
 		List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
 
@@ -392,14 +393,14 @@ public class LcomDatabaseManagerUtil {
 				for (int i = 0; i < friendIdArray.size(); i++) {
 					long friendId = friendIdArray.get(i);
 
-					log.log(Level.INFO, "friendId: " + friendId);
+					DbgUtil.showLog(Level.INFO, "friendId: " + friendId);
 
 					String friendName = friendNameArray.get(i);
 					String messageForUser = messageArray.get(i);
 					String msgTimeForUser = messageTimeArray.get(i);
 
-					log.log(Level.WARNING, "messageForUser: " + messageForUser);
-					log.log(Level.WARNING, "msgTimeForUser: " + msgTimeForUser);
+					DbgUtil.showLog(Level.WARNING, "messageForUser: " + messageForUser);
+					DbgUtil.showLog(Level.WARNING, "msgTimeForUser: " + msgTimeForUser);
 
 					List<String> validMessage = new ArrayList<String>();
 					List<Long> validExpireTime = new ArrayList<Long>();
@@ -419,7 +420,7 @@ public class LcomDatabaseManagerUtil {
 									}
 								}
 							} catch (NumberFormatException e1) {
-								log.log(Level.WARNING,
+								DbgUtil.showLog(Level.WARNING,
 										"NumberFormatException: "
 												+ e1.getMessage());
 							}
@@ -441,7 +442,7 @@ public class LcomDatabaseManagerUtil {
 	@SuppressWarnings("unchecked")
 	public List<LcomFriendshipData> getAllValidFriendshipData(Entity e,
 			DatastoreService ds, long userId) {
-		log.log(Level.INFO, "getAllValidFriendshipData");
+		DbgUtil.showLog(Level.INFO, "getAllValidFriendshipData");
 
 		List<LcomFriendshipData> result = new ArrayList<LcomFriendshipData>();
 
@@ -462,8 +463,8 @@ public class LcomDatabaseManagerUtil {
 					String messageForUser = messageArray.get(i);
 					String msgTimeForUser = messageTimeArray.get(i);
 
-					log.log(Level.WARNING, "messageForUser: " + messageForUser);
-					log.log(Level.WARNING, "msgTimeForUser: " + msgTimeForUser);
+					DbgUtil.showLog(Level.WARNING, "messageForUser: " + messageForUser);
+					DbgUtil.showLog(Level.WARNING, "msgTimeForUser: " + msgTimeForUser);
 
 					if (messageForUser != null) {
 						String[] msgParsed = messageForUser
@@ -497,7 +498,7 @@ public class LcomDatabaseManagerUtil {
 									result.add(data);
 								}
 							} catch (NumberFormatException e1) {
-								log.log(Level.WARNING,
+								DbgUtil.showLog(Level.WARNING,
 										"NumberFormatException: "
 												+ e1.getMessage());
 							}
@@ -513,7 +514,7 @@ public class LcomDatabaseManagerUtil {
 
 	public Entity getEntityForTargetUser(long userId, long targetUserId,
 			DatastoreService ds) {
-		log.log(Level.WARNING, "getEntityForTargetUser");
+		DbgUtil.showLog(Level.WARNING, "getEntityForTargetUser");
 
 		if (userId != LcomConst.NO_USER && targetUserId != LcomConst.NO_USER) {
 			Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
@@ -542,7 +543,7 @@ public class LcomDatabaseManagerUtil {
 	 * @return
 	 */
 	public Entity getConversationEntity(long targetUserId, DatastoreService ds) {
-		log.log(Level.INFO, "getConversationEntity");
+		DbgUtil.showLog(Level.INFO, "getConversationEntity");
 
 		if (targetUserId != LcomConst.NO_USER) {
 			Key targetUserKey = LcomDatabaseManagerUtil
@@ -574,7 +575,7 @@ public class LcomDatabaseManagerUtil {
 	 */
 	public boolean isConversationDataForTargetUserExist(long targetUserId,
 			DatastoreService ds) {
-		log.log(Level.INFO, "isConversationDataForTargetUserExist");
+		DbgUtil.showLog(Level.INFO, "isConversationDataForTargetUserExist");
 
 		if (targetUserId != LcomConst.NO_USER) {
 			Key targetUserKey = LcomDatabaseManagerUtil
@@ -598,14 +599,14 @@ public class LcomDatabaseManagerUtil {
 	}
 
 	public boolean isUserIdExistInFriendshipKind(long userId, Entity e) {
-		log.log(Level.INFO, "isUserIdExistInFriendshipKind");
+		DbgUtil.showLog(Level.INFO, "isUserIdExistInFriendshipKind");
 
 		if (e != null && userId != LcomConst.NO_USER) {
 			@SuppressWarnings("unchecked")
 			ArrayList<Long> friendList = (ArrayList<Long>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
 			if (friendList != null && friendList.size() != 0) {
-				log.log(Level.INFO, "friendList is not null");
+				DbgUtil.showLog(Level.INFO, "friendList is not null");
 				if (friendList.contains(userId)) {
 					return true;
 				}
@@ -618,7 +619,7 @@ public class LcomDatabaseManagerUtil {
 	public void addNewUserDataToFriendshipKind(long userId, String userName,
 			long postTime, long expireTime, String message, Entity e,
 			DatastoreService ds) {
-		log.log(Level.INFO, "addNewUserDataToFriendshipKind");
+		DbgUtil.showLog(Level.INFO, "addNewUserDataToFriendshipKind");
 
 		if (userId != LcomConst.NO_USER && e != null) {
 			putNewMessageInfoToEntity(e, userId, userName, message,
@@ -643,7 +644,7 @@ public class LcomDatabaseManagerUtil {
 	public void addMessageToFriendshipKind(long userId, String userName,
 			long postTime, long expireTime, String message, Entity e,
 			DatastoreService ds) {
-		log.log(Level.INFO, "addMessageToFriendshipKind");
+		DbgUtil.showLog(Level.INFO, "addMessageToFriendshipKind");
 
 		List<Long> friendList = (List<Long>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
@@ -676,9 +677,9 @@ public class LcomDatabaseManagerUtil {
 
 				for (int i = 0; i < msg.length; i++) {
 					if (Long.valueOf(expireDate[i]) > currentTime) {
-						log.log(Level.INFO, "msg: " + msg[i]);
-						log.log(Level.INFO, "currentTime: " + currentTime);
-						log.log(Level.INFO, "expireDate[i]: " + expireDate[i]);
+						DbgUtil.showLog(Level.INFO, "msg: " + msg[i]);
+						DbgUtil.showLog(Level.INFO, "currentTime: " + currentTime);
+						DbgUtil.showLog(Level.INFO, "expireDate[i]: " + expireDate[i]);
 						validMsg = validMsg + LcomConst.SEPARATOR + msg[i];
 						validPostDate = validPostDate + LcomConst.SEPARATOR
 								+ postDate[i];
@@ -721,7 +722,7 @@ public class LcomDatabaseManagerUtil {
 				}
 
 				if (validMsg2 != null && validMsg2.length() > 0) {
-					log.log(Level.INFO, "validMsg2: " + validMsg2);
+					DbgUtil.showLog(Level.INFO, "validMsg2: " + validMsg2);
 					// Update original List
 					messageList.set(index, validMsg2);
 					postDateList.set(index, validPostDate2);
@@ -734,7 +735,7 @@ public class LcomDatabaseManagerUtil {
 				}
 			} else {
 				// If already registered message is null
-				log.log(Level.INFO, "registered message is null");
+				DbgUtil.showLog(Level.INFO, "registered message is null");
 				messageList.set(index, message);
 				postDateList.set(index, String.valueOf(postTime));
 				expireDateList.set(index, String.valueOf(expireTime));
@@ -756,7 +757,7 @@ public class LcomDatabaseManagerUtil {
 	public void createNewEntity(long userId, String userName,
 			long targetUserId, long postTime, long expireTime, String message,
 			DatastoreService ds) {
-		log.log(Level.INFO, "createNewEntity");
+		DbgUtil.showLog(Level.INFO, "createNewEntity");
 
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(targetUserId);
 		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, targetUserId,

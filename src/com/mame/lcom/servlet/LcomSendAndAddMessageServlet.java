@@ -1,6 +1,7 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+import com.mame.lcom.util.DbgUtil;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,7 +28,7 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -58,7 +59,7 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 				&& targetUserName != null && message != null && date != null
 				&& apiLevel != null) {
 
-			log.log(Level.WARNING, "message:" + message);
+			DbgUtil.showLog(Level.WARNING, "message:" + message);
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 
@@ -85,7 +86,7 @@ public class LcomSendAndAddMessageServlet extends HttpServlet {
 			}
 
 		} else {
-			log.log(Level.WARNING, "Some of parameters are null");
+			DbgUtil.showLog(Level.WARNING, "Some of parameters are null");
 			result = LcomConst.SEND_MESSAGE_UNKNOWN_ERROR;
 		}
 

@@ -1,6 +1,7 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+import com.mame.lcom.util.DbgUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,8 +30,9 @@ public class LcomMessagePushServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws IOException {
 
-		log.log(Level.WARNING, "doGet");
-		log.log(Level.WARNING, "req.getQueryString(): " + req.getQueryString());
+		DbgUtil.showLog(Level.WARNING, "doGet");
+		DbgUtil.showLog(Level.WARNING,
+				"req.getQueryString(): " + req.getQueryString());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -44,30 +46,30 @@ public class LcomMessagePushServlet extends HttpServlet {
 		String apiLevel = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
-		log.log(Level.WARNING, "action: " + action);
-		log.log(Level.WARNING, "registrationId: " + registrationId);
+		DbgUtil.showLog(Level.WARNING, "action: " + action);
+		DbgUtil.showLog(Level.WARNING, "registrationId: " + registrationId);
 
 		if ("register".equals(action)) {
 			// 端末登録、Androidから呼ばれる。
 			deviceMap.put(userId, registrationId);
-			log.log(Level.WARNING, "register");
+			DbgUtil.showLog(Level.WARNING, "register");
 
 		} else if ("unregister".equals(action)) {
 			// 端末登録解除、Androidから呼ばれる。
 			deviceMap.remove(userId);
-			log.log(Level.WARNING, "unregister");
+			DbgUtil.showLog(Level.WARNING, "unregister");
 
 		} else if ("send".equals(action)) {
 			// メッセージ送信。任意の送信アプリから呼ばれる。
 
-			log.log(Level.WARNING, "send");
+			DbgUtil.showLog(Level.WARNING, "send");
 
 			// registrationId = deviceMap.get(userId);
 			Sender sender = new Sender(API_KEY);
 			Message message = new Message.Builder().addData("msg", msg).build();
 
-			log.log(Level.WARNING, "message: " + message);
-			log.log(Level.WARNING, "registrationId: " + registrationId);
+			DbgUtil.showLog(Level.WARNING, "message: " + message);
+			DbgUtil.showLog(Level.WARNING, "registrationId: " + registrationId);
 
 			Result result = sender.send(message, registrationId, RETRY_COUNT);
 			res.setContentType("text/plain");
@@ -82,7 +84,7 @@ public class LcomMessagePushServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws IOException {
-		log.log(Level.WARNING, "doPost");
+		DbgUtil.showLog(Level.WARNING, "doPost");
 		doGet(req, res);
 	}
 

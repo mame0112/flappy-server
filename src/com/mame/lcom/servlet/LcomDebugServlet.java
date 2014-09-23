@@ -1,6 +1,7 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+import com.mame.lcom.util.DbgUtil;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,7 +27,7 @@ public class LcomDebugServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.WARNING, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(Level.WARNING, "doPost:" + TimeUtil.calcResponse());
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 		String origin = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
@@ -41,24 +42,24 @@ public class LcomDebugServlet extends HttpServlet {
 				req.getParameter(LcomConst.SERVLET_USER_NAME), secretKey);
 		String targetUserId = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_TARGET_USER_ID), secretKey);
-		String targetUserName = CipherUtil.decrypt(
-				req.getParameter(LcomConst.SERVLET_TARGET_USER_NAME),
-				secretKey);
+		String targetUserName = CipherUtil
+				.decrypt(req.getParameter(LcomConst.SERVLET_TARGET_USER_NAME),
+						secretKey);
 		String message = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_MESSAGE_BODY), secretKey);
 		String date = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_MESSAGE_DATE), secretKey);
 
-		log.log(Level.WARNING, "origin:" + origin);
-		log.log(Level.WARNING, "userId:" + userId);
-		log.log(Level.WARNING, "userName:" + userName);
-		log.log(Level.WARNING, "targetUserId:" + targetUserId);
-		log.log(Level.WARNING, "targetUserName:" + targetUserName);
-		log.log(Level.WARNING, "message:" + message);
-		log.log(Level.WARNING, "date:" + date);
+		DbgUtil.showLog(Level.WARNING, "origin:" + origin);
+		DbgUtil.showLog(Level.WARNING, "userId:" + userId);
+		DbgUtil.showLog(Level.WARNING, "userName:" + userName);
+		DbgUtil.showLog(Level.WARNING, "targetUserId:" + targetUserId);
+		DbgUtil.showLog(Level.WARNING, "targetUserName:" + targetUserName);
+		DbgUtil.showLog(Level.WARNING, "message:" + message);
+		DbgUtil.showLog(Level.WARNING, "date:" + date);
 
-		log.log(Level.WARNING, "requestCode:" + requestCode);
-		log.log(Level.WARNING, "numOfUser:" + numOfUser);
+		DbgUtil.showLog(Level.WARNING, "requestCode:" + requestCode);
+		DbgUtil.showLog(Level.WARNING, "numOfUser:" + numOfUser);
 
 		List<String> list = new ArrayList<String>();
 
@@ -72,7 +73,8 @@ public class LcomDebugServlet extends HttpServlet {
 			// try {
 			// parsedDate = TimeUtil.getDateInDateFormat(date);
 			// } catch (ParseException e) {
-			// log.log(Level.WARNING, "ParseException: " + e.getMessage());
+			// DbgUtil.showLog(Level.WARNING, "ParseException: " +
+			// e.getMessage());
 			// // result = LcomConst.SEND_MESSAGE_DATE_CANNOT_BE_PARSED;
 			// }
 

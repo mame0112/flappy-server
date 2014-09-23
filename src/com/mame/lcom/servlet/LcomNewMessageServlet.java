@@ -1,6 +1,7 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+import com.mame.lcom.util.DbgUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,7 @@ public class LcomNewMessageServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		log.log(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -44,7 +45,7 @@ public class LcomNewMessageServlet extends HttpServlet {
 		list.add(origin);
 
 		if (userId != null && apiLevel != null) {
-			log.log(Level.INFO, "userId:" + userId);
+			DbgUtil.showLog(Level.INFO, "userId:" + userId);
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 
 			long currentTime = TimeUtil.getCurrentDate();
@@ -58,14 +59,14 @@ public class LcomNewMessageServlet extends HttpServlet {
 				String result = DatastoreUtil.parseFriendListData(
 						Integer.valueOf(userId), friendListData);
 
-				log.log(Level.INFO, "result::" + result);
+				DbgUtil.showLog(Level.INFO, "result::" + result);
 				list.add(result);
 			} else {
-				log.log(Level.INFO, "friendListData is null or 0");
+				DbgUtil.showLog(Level.INFO, "friendListData is null or 0");
 			}
 		}
 
-		log.log(Level.INFO, "end:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(Level.INFO, "end:" + TimeUtil.calcResponse());
 		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
 				secretKey));
 		resp.setContentType("application/json");

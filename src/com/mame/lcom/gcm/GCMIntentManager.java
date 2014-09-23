@@ -1,6 +1,7 @@
 package com.mame.lcom.gcm;
 
 import java.io.IOException;
+import com.mame.lcom.util.DbgUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +23,7 @@ public class GCMIntentManager {
 			String userName, String targetUserName, String msg, String regId,
 			long expireTime) {
 
-		log.log(Level.WARNING, "pushGCMNotification");
+		DbgUtil.showLog(Level.WARNING, "pushGCMNotification");
 
 		int RETRY_COUNT = 5;
 
@@ -36,8 +37,8 @@ public class GCMIntentManager {
 
 		// Message message = new Message.Builder().addData("msg", msg).build();
 
-		log.log(Level.WARNING, "message: " + message);
-		log.log(Level.WARNING, "registrationId: " + regId);
+		DbgUtil.showLog(Level.WARNING, "message: " + message);
+		DbgUtil.showLog(Level.WARNING, "registrationId: " + regId);
 
 		Result result = null;
 		if (message != null) {
@@ -45,7 +46,7 @@ public class GCMIntentManager {
 				// TODO Need to check return value and meaning
 				result = sender.send(message, regId, RETRY_COUNT);
 			} catch (IOException e) {
-				log.log(Level.WARNING, "IOException: " + e.getMessage());
+				DbgUtil.showLog(Level.WARNING, "IOException: " + e.getMessage());
 			}
 
 		}
