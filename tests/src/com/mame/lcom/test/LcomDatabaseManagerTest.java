@@ -1,11 +1,14 @@
 package com.mame.lcom.test;
 
+import com.mame.lcom.util.DbgUtil;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -15,6 +18,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.mame.lcom.constant.LcomConst;
@@ -24,6 +35,7 @@ import com.mame.lcom.data.LcomNewMessageData;
 import com.mame.lcom.data.LcomUserData;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.db.LcomDatabaseManagerHelper;
+import com.mame.lcom.db.LcomDatabaseManagerUtil;
 import com.mame.lcom.db.LcomMemcacheException;
 import com.mame.lcom.util.TimeUtil;
 
@@ -37,10 +49,15 @@ public class LcomDatabaseManagerTest {
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
 			new LocalDatastoreServiceTestConfig());
 
+	private DatastoreService ds = null;
+
+	private LcomDatabaseManagerUtil util = null;
+
 	@Before
 	public void setUp() {
 		helper.setUp();
-		mManager = LcomDatabaseManager.getInstance();
+		ds = DatastoreServiceFactory.getDatastoreService();
+		util = new LcomDatabaseManagerUtil();
 	}
 
 	@After
@@ -50,1100 +67,717 @@ public class LcomDatabaseManagerTest {
 	}
 
 	@Test
-	public void testGetUserIdByNameAndPassword1() {
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-		int userId = mManager.getUserIdByNameAndPassword("aaaa", "bbbb");
-		assertEquals(userId, 0);
-		mManager.deleteUserData(0);
+	public void testIsEntityForKeyUserIdExist1() {
+		// Initial case
+		boolean result = util.isEntityForKeyUserIdExist(1, ds);
+		assertEquals(result, false);
 	}
 
 	@Test
-	public void testGetUserIdByNameAndPassword2() {
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-		int userId = mManager.getUserIdByNameAndPassword(null, "bbbb");
-		assertEquals(userId, -1);
-		mManager.deleteUserData(0);
+	public void testIsEntityForKeyUserIdExist2() {
+		int userId = 1;
+
+		Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
+		Key key = KeyFactory
+				.createKey(ancKey, LcomConst.KIND_USER_DATA, userId);
+		Entity entity = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, userId, key);
+		ds.put(entity);
+
+		// Correct user id case
+		boolean result = util.isEntityForKeyUserIdExist(userId, ds);
+		assertEquals(result, true);
+
+		// Wrong user id case
+		boolean result2 = util.isEntityForKeyUserIdExist(2, ds);
+		assertEquals(result2, false);
+
+		ds.delete(key);
 	}
 
 	@Test
-	public void testGetUserIdByNameAndPassword3() {
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-		int userId = mManager.getUserIdByNameAndPassword("aaaa", null);
-		assertEquals(userId, -1);
-		mManager.deleteUserData(0);
-	}
-
-	@Test
-	public void testGetUserIdByNameAndPassword4() {
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-		int userId = mManager.getUserIdByNameAndPassword("aaaa", "illegal");
-		assertEquals(userId, -1);
-		mManager.deleteUserData(0);
-	}
-
-	@Test
-	public void testGetUserIdByName1() {
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-		int userId = mManager.getUserIdByName("aaaa");
-		assertEquals(userId, 0);
-		mManager.deleteUserData(0);
-	}
-
-	@Test
-	public void testGetUserIdByName2() {
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-		int userId = mManager.getUserIdByName(null);
-		assertEquals(userId, -1);
-		mManager.deleteUserData(0);
-	}
-
-	@Test
-	public void testGetUserIdByName3() {
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-
-		int userId = mManager.getUserIdByName("illegal");
-		assertEquals(userId, -1);
-		mManager.deleteUserData(0);
-	}
-
-	@Test
-	public void testAddNewUserData1() {
-		LcomUserData data2 = new LcomUserData(LcomConst.NO_USER, "cccc",
-				"dddd", "b@b", null);
-		mManager.debugModifyNumOfUser(1);
-		int userId = mManager.addNewUserData(data2);
-
-		assertEquals(userId, 1);
-
-		LcomUserData result = mManager.getUserData(userId);
-		assertEquals(result.getUserName(), "cccc");
-		assertEquals(result.getPassword(), "dddd");
-		assertEquals(result.getMailAddress(), "b@b");
-		assertEquals(result.getThumbnail(), null);
-		mManager.deleteUserData(0);
-		mManager.debugModifyNumOfUser(1);
-	}
-
-	@Test
-	public void testAddNewUserData2() {
-		LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", "b@b", null);
-		mManager.debugModifyNumOfUser(2);
-		int userId = mManager.addNewUserData(data2);
-
-		assertEquals(userId, 1);
-
-		mManager.deleteUserData(0);
-		mManager.debugModifyNumOfUser(1);
-	}
-
-	@Test
-	public void testAddNewUserData3() {
-		int userId = mManager.addNewUserData(null);
-		assertEquals(userId, -1);
-	}
-
-	@Test
-	public void testAddNewUserData4() {
-		LcomUserData data2 = new LcomUserData(1, null, "dddd", "b@b", null);
-		mManager.debugModifyNumOfUser(2);
-		int userId = mManager.addNewUserData(data2);
-
-		LcomUserData result = mManager.getUserData(userId);
-		assertEquals(result.getUserName(), LcomConst.NULL);
-		assertEquals(result.getPassword(), "dddd");
-		assertEquals(result.getMailAddress(), "b@b");
-		assertEquals(result.getThumbnail(), null);
-	}
-
-	@Test
-	public void testAddNewUserData5() {
-		LcomUserData data2 = new LcomUserData(1, "cccc", null, "b@b", null);
-		mManager.debugModifyNumOfUser(2);
-		int userId = mManager.addNewUserData(data2);
-
-		LcomUserData result = mManager.getUserData(userId);
-		assertEquals(result.getUserName(), "cccc");
-		assertEquals(result.getPassword(), LcomConst.NULL);
-		assertEquals(result.getMailAddress(), "b@b");
-		assertEquals(result.getThumbnail(), null);
-	}
-
-	// TODO need to add check fot thumbnail
-	@Test
-	public void testAddNewUserData6() {
-		LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", null, null);
-		mManager.debugModifyNumOfUser(2);
-		int userId = mManager.addNewUserData(data2);
-
-		LcomUserData result = mManager.getUserData(userId);
-		assertEquals(result.getUserName(), "cccc");
-		assertEquals(result.getPassword(), "dddd");
-		assertEquals(result.getMailAddress(), LcomConst.NULL);
-		assertEquals(result.getThumbnail(), null);
-	}
-
-	/**
-	 * Without memcache
-	 */
-	@Test
-	public void testUpdateUserData1() {
-		// LcomUserData data2 = new LcomUserData();
-		int userId = 2;
-		LcomDatabaseManagerHelper dbHelper = new LcomDatabaseManagerHelper();
-
-		LcomUserData data2 = new LcomUserData(userId, "cccc2", "dddd2", "b@b2",
-				null);
-		mManager.debugModifyNumOfUser(userId);
-		mManager.addNewUserData(data2);
-
-		LcomUserData result = mManager.getUserData(userId);
-
-		assertEquals(result.getUserName(), "cccc2");
-
-		mManager.updateUserData(userId, "cccc_updated", null, null, null);
-
-		dbHelper.removeUserDataFromMemcache(userId);
-
-		LcomUserData result2 = mManager.getUserData(userId);
-
-		assertEquals(result2.getUserName(), "cccc_updated");
-		assertEquals(result2.getPassword(), "dddd2");
-		assertEquals(result2.getMailAddress(), "b@b2");
-		assertEquals(result2.getThumbnail(), null);
-
-		dbHelper.removeUserDataFromMemcache(userId);
-	}
-
-	/**
-	 * With memcache
-	 */
-	@Test
-	public void testUpdateUserData2() {
-		// LcomUserData data2 = new LcomUserData();
-		int userId = 2;
-		LcomDatabaseManagerHelper dbHelper = new LcomDatabaseManagerHelper();
-
-		LcomUserData data2 = new LcomUserData(userId, "cccc2", "dddd2", "b@b2",
-				null);
-		mManager.debugModifyNumOfUser(userId);
-		mManager.addNewUserData(data2);
-
-		LcomUserData result = mManager.getUserData(userId);
-
-		assertEquals(result.getUserName(), "cccc2");
-
-		mManager.updateUserData(userId, "cccc_updated", null, null, null);
-
-		LcomUserData result2 = mManager.getUserData(userId);
-
-		assertEquals(result2.getUserName(), "cccc_updated");
-		assertEquals(result2.getPassword(), "dddd2");
-		assertEquals(result2.getMailAddress(), "b@b2");
-		assertEquals(result2.getThumbnail(), null);
-	}
-
-	@Test
-	public void testUpdateUserNameInFriendhsiopTable1() {
-		mManager.addNewFriendshipInfo(1, "aaaa", 3, null, "aaaa",
-				TimeUtil.getCurrentDate(), 1);
-
-		mManager.updateUserNameInFriendhsiopTable(3, "updated_cccc");
-
-		ArrayList<LcomFriendshipData> datas = (ArrayList<LcomFriendshipData>) mManager
-				.getFriendshipDataForUser(3);
-
-		assertNotNull(datas);
-		assertEquals(1, datas.size());
-
-		LcomFriendshipData data = datas.get(0);
-		String updatedName = data.getSecondUserName();
-
-		assertEquals("updated_cccc", updatedName);
-		// TODO need to remove memcache
-		// LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
-
-	}
-
-	/**
-	 * Without memcache
-	 */
-	@Test
-	public void testUpdateUserDate1() {
-
-		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
-		helper.removeUserDataFromMemcache(1);
-
-		LcomUserData oldData = new LcomUserData(1, "cccc", "dddd", "b@b", null);
-		mManager.addNewUserData(oldData);
-
-		LcomUserData newData = new LcomUserData(1, "cccc2", "dddd2", "b@b2",
-				null);
-
-		mManager.updateUserDate(newData);
-
-		helper.removeUserDataFromMemcache(1);
-
-		LcomUserData data = mManager.getUserData(1);
-
-		assertNotNull(data);
-
-		assertEquals(data.getUserId(), 1);
-		assertEquals(data.getUserName(), "cccc2");
-		assertEquals(data.getMailAddress(), "b@b2");
-		assertEquals(data.getPassword(), "dddd2");
-
-		helper.removeUserDataFromMemcache(1);
-
-	}
-
-	/**
-	 * With memcache
-	 */
-	@Test
-	public void testUpdateUserDate2() {
-
-		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
-		helper.removeUserDataFromMemcache(1);
-
-		LcomUserData oldData = new LcomUserData(1, "cccc", "dddd", "b@b", null);
-		mManager.addNewUserData(oldData);
-
-		LcomUserData newData = new LcomUserData(1, "cccc2", "dddd2", "b@b2",
-				null);
-
-		mManager.updateUserDate(newData);
-
-		LcomUserData data = mManager.getUserData(1);
-
-		assertNotNull(data);
-
-		assertEquals(data.getUserId(), 1);
-		assertEquals(data.getUserName(), "cccc2");
-		assertEquals(data.getMailAddress(), "b@b2");
-		assertEquals(data.getPassword(), "dddd2");
-
-		helper.removeUserDataFromMemcache(1);
-
-	}
-
-	/**
-	 * With memcach
-	 */
-	@Test
-	public void testGetNumOfUserId1() {
-		mManager.debugModifyNumOfUser(1);
-		LcomDatabaseManagerHelper helper = new LcomDatabaseManagerHelper();
-		helper.putTotalNumberOfUser(2);
-
-		int num = mManager.getNumOfUserId();
-
-		assertEquals(num, 2);
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		assertEquals(dbhelper.getTotalNumberOfUser(), 2);
-	}
-
-	/**
-	 * Without memcach
-	 */
-	@Test
-	public void testGetNumOfUserId2() {
-		mManager.debugModifyNumOfUser(3);
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		dbhelper.removeTotalNumberOfUser();
-
-		int num = mManager.getNumOfUserId();
-
-		assertEquals(num, 3);
-		assertEquals(dbhelper.getTotalNumberOfUser(), 3);
-	}
-
-	/**
-	 * Without memcache
-	 */
-	@Test
-	public void testGetNewMessages1() {
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-
-		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test message 1",
-				TimeUtil.getCurrentDate() + 100);
-		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test message 2",
-				TimeUtil.getCurrentDate() + 100);
-		dbhelper.removeNewMessagesFromMemCache(1);
-
-		// try {
-		// dbhelper.putNewMessagesToMemCache(0, newMessages);
-		// } catch (LcomMemcacheException e) {
-		// assertTrue(false);
-		// }
-
-		List<LcomNewMessageData> results = mManager.getNewMessages(1);
-
-		assertNotNull(results);
-		assertEquals(results.size(), 2);
-
-		LcomNewMessageData data = results.get(0);
-
-		assertEquals(data.getMessage(), "test message 1");
-		try {
-			assertNotNull(dbhelper.getNewMessageFromMemcache(1));
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-	}
-
-	/**
-	 * With memcache
-	 */
-	@Test
-	public void testGetNewMessages2() {
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		ArrayList<LcomNewMessageData> newMessages = new ArrayList<LcomNewMessageData>();
-
-		LcomNewMessageData data1 = new LcomNewMessageData(0, 1, "aaaa", "bbbb",
-				"test message 1", TimeUtil.getCurrentDate() - 100,
-				TimeUtil.getCurrentDate() + 100, true);
-		;
-		LcomNewMessageData data2 = new LcomNewMessageData(0, 1, "aaaa", "bbbb",
-				"test message 2", TimeUtil.getCurrentDate() - 100,
-				TimeUtil.getCurrentDate() + 100, false);
-
-		newMessages.add(data1);
-		newMessages.add(data2);
-
-		try {
-			dbhelper.putNewMessagesToMemCache(1, newMessages);
-		} catch (LcomMemcacheException e1) {
-			assertTrue(false);
-		}
-
-		List<LcomNewMessageData> results = mManager.getNewMessages(1);
-
-		assertNotNull(results);
-		assertEquals(results.size(), 1);
-
-		LcomNewMessageData data = results.get(0);
-
-		assertEquals(data.getMessage(), "test message 2");
-		try {
-			assertNotNull(dbhelper.getNewMessageFromMemcache(1));
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-	}
-
-	/**
-	 * With memcache
-	 */
-	@Test
-	public void testGetNewMessagesWithTargetUser1() {
-		DbgUtil.showLog(Level.INFO, "testGetNewMessagesWithTargetUser1");
-		mManager.debugDeleteNewMessageInfo(0, 1);
-
-		// Userid is 0, targetUserId is 1.
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		dbhelper.removeNewMessagesFromMemCache(0);
-
-		ArrayList<LcomNewMessageData> newMessages = new ArrayList<LcomNewMessageData>();
-
-		LcomNewMessageData data1 = new LcomNewMessageData(0, 1, "aaaa", "bbbb",
-				"test message 1", TimeUtil.getCurrentDate() - 100,
-				TimeUtil.getCurrentDate() + 100, true);
-		;
-		LcomNewMessageData data2 = new LcomNewMessageData(0, 1, "aaaa", "bbbb",
-				"test message 2", TimeUtil.getCurrentDate() - 100,
-				TimeUtil.getCurrentDate() + 100, false);
-
-		newMessages.add(data1);
-		newMessages.add(data2);
-
-		try {
-			dbhelper.putNewMessagesToMemCache(1, newMessages);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-
-		// List<LcomNewMessageData> result = mManager
-		// .getNewMessagesWithTargetUser(0, 1);
-		// assertNotNull(result);
-		// assertEquals(2, result.size());
-
-	}
-
-	@Test
-	public void testGetUserIdByMailAddress() {
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb",
-				"test@mail.com", null);
-		mManager.addNewUserData(data);
-
-		int userId = mManager.getUserIdByMailAddress("test@mail.com");
-
-		assertEquals(userId, 0);
-		LcomUserData cacheData = dbhelper.getUserDataFromMemcache(0);
-		assertNotNull(cacheData);
-		assertEquals(0, cacheData.getUserId());
-		assertEquals("aaaa", cacheData.getUserName());
-		assertEquals("bbbb", cacheData.getPassword());
-		assertEquals("test@mail.com", cacheData.getMailAddress());
-
-	}
-
-	/**
-	 * with memcache
-	 */
-	@Test
-	public void testGetUserData1() {
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb",
-				"test@mail.com", null);
-
-		LcomUserData data2 = new LcomUserData(0, "aaaa2", "bbbb2",
-				"test@mail.com2", null);
-		mManager.addNewUserData(data2);
-
-		// Override cache to check cache function
-		dbhelper.putUserDataToMemCache(data);
-
-		LcomUserData result = mManager.getUserData(0);
+	public void testGetEntityForKeyUser1() {
+		int userId = 1;
+
+		Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
+		Key key = KeyFactory
+				.createKey(ancKey, LcomConst.KIND_USER_DATA, userId);
+		Entity entity = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, userId, key);
+		ds.put(entity);
+
+		Entity result = util.getEntityForKeyUser(userId, ds);
 
 		assertNotNull(result);
-		assertEquals(result.getUserName(), "aaaa");
+
 	}
 
-	/**
-	 * without memcache
-	 */
 	@Test
-	public void testGetUserData() {
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+	public void testGetFriendshipEntityForUserId1() {
+		int userId = 1;
 
-		LcomUserData data2 = new LcomUserData(0, "aaaa2", "bbbb2",
-				"test@mail.com2", null);
-		mManager.addNewUserData(data2);
+		Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
+		Key key = KeyFactory
+				.createKey(ancKey, LcomConst.KIND_USER_DATA, userId);
+		Entity entity = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, userId, key);
 
-		// Override cache to check cache function
-		dbhelper.removeUserDataFromMemcache(0);
+		ds.put(entity);
 
-		LcomUserData result = mManager.getUserData(0);
+		// Because ENTITY_FRIENDSHIP_EXPIRE_TIME is null, to be returned entity
+		// should be null
+		Entity result = util.getFriendshipEntityForUserId(userId, ds);
+		assertNull(result);
+	}
+
+	@Test
+	public void testGetFriendshipEntityForUserId2() {
+		int userId = 1;
+
+		Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
+		Key key = KeyFactory
+				.createKey(ancKey, LcomConst.KIND_USER_DATA, userId);
+		Entity entity = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, userId, key);
+
+		long time = TimeUtil.getCurrentDate();
+		entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(time));
+		entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(time - 10000));
+		entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList("Test message"));
+
+		ds.put(entity);
+
+		// Because ENTITY_FRIENDSHIP_EXPIRE_TIME is null, to be returned entity
+		// should be null
+		Entity result = util.getFriendshipEntityForUserId(userId, ds);
+		assertNotNull(result);
+
+		// ArrayList<String>
+		//
+		// assertEquals(entity.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME),
+		// 1);
+	}
+
+	@Test
+	public void testAddMessageForFriendUser1() {
+		// Put test data onto Datastore
+
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+
+		long senderUserId = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String lastMessage = "test message";
+		long currentTime = TimeUtil.getCurrentDate();
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+
+		// FIrst, no friend Id case
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
+		// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+		// Arrays.asList(keyUserId));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(lastMessage));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(currentTime)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime)));
+		ds.put(e);
+
+		boolean result = util.addMessageForFriendUser(e, senderUserId,
+				senderName, keyUserId, keyUserName, lastMessage, currentTime,
+				ds);
+
+		assertEquals(result, false);
+
+		ds.delete(userKey);
+
+	}
+
+	@Test
+	public void testAddMessageForFriendUser2() {
+		// Put test data onto Datastore
+
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+
+		long senderUserId = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String lastMessage = "test message";
+		long currentTime = TimeUtil.getCurrentDate();
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+
+		// Second, friend Id itself exists, but no user Id on it.
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID, Arrays.asList(3));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(lastMessage));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(currentTime)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime)));
+		ds.put(e);
+
+		boolean result = util.addMessageForFriendUser(e, senderUserId,
+				senderName, keyUserId, keyUserName, lastMessage, currentTime,
+				ds);
+
+		assertEquals(result, false);
+
+		ds.delete(userKey);
+
+	}
+
+	@Test
+	public void testAddMessageForFriendUser3() {
+		// Put test data onto Datastore
+
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+
+		long senderUserId = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String lastMessage = "test message";
+		long currentTime = TimeUtil.getCurrentDate();
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+
+		// third, friend Id is OK but no new message case.
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(senderUserId));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE, null);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME, null);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime)));
+		ds.put(e);
+
+		boolean result = util.addMessageForFriendUser(e, senderUserId,
+				senderName, keyUserId, keyUserName, lastMessage, currentTime,
+				ds);
+
+		assertEquals(result, true);
+
+		ds.delete(userKey);
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testAddMessageForFriendUser4() {
+		// Put test data onto Datastore
+
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+
+		long senderUserId = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String lastMessage = "test message";
+		long currentTime = TimeUtil.getCurrentDate() - 100000;
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+
+		// forth, friend Id is OK and message is already there case.
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(senderUserId));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(lastMessage));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(currentTime)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime)));
+		ds.put(e);
+
+		String newMessage = "new Message";
+		long currentTime2 = TimeUtil.getCurrentDate();
+
+		boolean result = util.addMessageForFriendUser(e, senderUserId,
+				senderName, keyUserId, keyUserName, newMessage, currentTime2,
+				ds);
+
+		assertEquals(result, true);
+
+		List<Long> friendUserIdArray = (List<Long>) e
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+		List<String> messageArray = (List<String>) e
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		List<String> expireTimeArray = (List<String>) e
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+		List<String> postedTimeArray = (List<String>) e
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
+
+		assertNotNull(friendUserIdArray);
+		assertEquals(1, friendUserIdArray.size());
+
+		String message = messageArray.get(0);
+		assertEquals(message, lastMessage + LcomConst.SEPARATOR + newMessage);
+
+		String posted = postedTimeArray.get(0);
+		assertEquals(posted, currentTime + LcomConst.SEPARATOR + currentTime2);
+
+		ds.delete(userKey);
+	}
+
+	@Test
+	public void testGetAllValidFriendshipData1() {
+		DbgUtil.showLog(Level.INFO, "testGetAllValidFriendshipData1");
+
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+
+		long senderUserId = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String lastMessage = "test message";
+		long currentTime = TimeUtil.getCurrentDate() + 100000;
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(senderUserId));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(lastMessage));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(currentTime)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime)));
+		ds.put(e);
+
+		// First, we have only one message info in Entity
+		List<LcomFriendshipData> result = util.getAllValidFriendshipData(e, ds,
+				keyUserId);
 
 		assertNotNull(result);
-		assertEquals(result.getUserName(), "aaaa2");
-	}
+		assertEquals(result.size(), 1);
 
-	@Test
-	public void testAddNewFriendshipInfo() {
-		mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
-				TimeUtil.getCurrentDate(), 3);
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		LcomFriendshipData data = result.get(0);
 
-		try {
-			LcomFriendshipData result = dbhelper
-					.getFriendListDataFromMemCacheWithFriendId(0, 1);
-			assertNotNull(result);
-			assertEquals(result.getFirstUserId(), 0);
-			assertEquals(result.getSecondUserId(), 1);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
+		List<String> messages = data.getLatestMessage();
+		List<Long> expires = data.getLastMessageExpireTime();
+		long expire = expires.get(0);
+		assertEquals(expire, expireTime);
 
-		List<LcomFriendshipData> datas = mManager.getFriendshipDataForUser(0);
-		assertNotNull(datas);
-		assertEquals(1, datas.size());
+		assertEquals(messages.get(0), lastMessage);
+
+		ds.delete(userKey);
 
 	}
 
-	/**
-	 * Hit by first user. Then hit by second user.
-	 */
 	@Test
-	public void testUpdateLatestMessageInfoOnFriendshipTable1() {
+	public void testGetAllValidFriendshipData2() {
+		DbgUtil.showLog(Level.INFO, "testGetAllValidFriendshipData2");
 
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
-				TimeUtil.getCurrentDate(), 1);
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
 
-		// TODO Do we need to put new data to memcache?
-		mManager.updateLatestMessageInfoOnFriendshipTable(0, 1,
-				"Last message here", TimeUtil.getCurrentDate());
+		long senderUserId = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String lastMessage = "test message";
+		String lastMessage2 = "test message2";
+		long currentTime = TimeUtil.getCurrentDate() + 100000;
+		long currentTime2 = currentTime + 500000;
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+		long expireTime2 = expireTime + 50000;
 
-		try {
-			LcomFriendshipData cachedData = dbhelper
-					.getFriendListDataFromMemCacheWithFriendId(0, 1);
-			assertNotNull(cachedData);
-			assertEquals(cachedData.getFirstUserId(), 0);
-			assertEquals(cachedData.getSecondUserId(), 1);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(senderUserId));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(lastMessage + LcomConst.SEPARATOR + lastMessage2));
+		e.setProperty(
+				LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(currentTime + LcomConst.SEPARATOR
+						+ currentTime2)));
+		e.setProperty(
+				LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime + LcomConst.SEPARATOR
+						+ expireTime2)));
+		ds.put(e);
 
-		// First check for memcache
-		List<LcomFriendshipData> datas = mManager.getFriendshipDataForUser(0);
-		assertNotNull(datas);
-		assertEquals(datas.size(), 1);
-
-		// Then, check for datastore
-		dbhelper.removeFriendshipDataFromMemcache(0);
-
-		List<LcomFriendshipData> dataStoreDatas = mManager
-				.getFriendshipDataForUser(0);
-		assertNotNull(dataStoreDatas);
-		assertEquals(dataStoreDatas.size(), 1);
-
-	}
-
-	/**
-	 * Hit by second user. Then hit by first user.
-	 */
-	@Test
-	public void testUpdateLatestMessageInfoOnFriendshipTable2() {
-
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		mManager.addNewFriendshipInfo(1, "bbbb", 0, "aaaa", "last message",
-				TimeUtil.getCurrentDate(), 1);
-
-		// TODO Do we need to put new data to memcache?
-		mManager.updateLatestMessageInfoOnFriendshipTable(1, 0,
-				"Last message here", TimeUtil.getCurrentDate());
-
-		try {
-			LcomFriendshipData cachedData = dbhelper
-					.getFriendListDataFromMemCacheWithFriendId(1, 0);
-			assertNotNull(cachedData);
-			assertEquals(cachedData.getFirstUserId(), 1);
-			assertEquals(cachedData.getSecondUserId(), 0);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-
-		// First check for memcache
-		List<LcomFriendshipData> datas = mManager.getFriendshipDataForUser(1);
-		assertNotNull(datas);
-		assertEquals(datas.size(), 1);
-
-		// Then, check for datastore
-		dbhelper.removeFriendshipDataFromMemcache(1);
-
-		List<LcomFriendshipData> dataStoreDatas = mManager
-				.getFriendshipDataForUser(1);
-		assertNotNull(dataStoreDatas);
-		assertEquals(dataStoreDatas.size(), 1);
-
-	}
-
-	/**
-	 * Hit by first user. but not hit second user.
-	 */
-	@Test
-	public void testUpdateLatestMessageInfoOnFriendshipTable3() {
-
-		mManager.debugDeleteFriendshipData();
-
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
-				TimeUtil.getCurrentDate(), 1);
-
-		mManager.updateLatestMessageInfoOnFriendshipTable(0, 2,
-				"Last updated message", TimeUtil.getCurrentDate());
-
-		try {
-			LcomFriendshipData cachedData = dbhelper
-					.getFriendListDataFromMemCacheWithFriendId(0, 2);
-			assertNull(cachedData);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-
-		List<LcomFriendshipData> datas = mManager.getFriendshipDataForUser(2);
-		assertEquals(datas.size(), 0);
-	}
-
-	@Test
-	public void testIsUsersAreFriend1() {
-		mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
-				TimeUtil.getCurrentDate(), 1);
-		boolean result = mManager.isUsersAreFriend(0, 1);
-		assertTrue(result);
-	}
-
-	@Test
-	public void testIsUsersAreFriend2() {
-		mManager.addNewFriendshipInfo(0, "aaaa", 2, "bbbb", "last message",
-				TimeUtil.getCurrentDate(), 1);
-		boolean result = mManager.isUsersAreFriend(0, 1);
-		assertTrue(result == false);
-	}
-
-	@Test
-	public void testIsUsersAreFriend3() {
-		mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
-				TimeUtil.getCurrentDate(), 1);
-		boolean result = mManager.isUsersAreFriend(0, 1);
-		assertTrue(result);
-
-		boolean result2 = mManager.isUsersAreFriend(1, 0);
-		assertTrue(result2);
-	}
-
-	/**
-	 * With memcache, single default data
-	 */
-	@Test
-	public void testGetFriendListData1() {
-		int userId = 0;
-		long currentTime = TimeUtil.getCurrentDate() - 1000;
-		long expireTime = currentTime - 1000;
-
-		// int firstUserId, String firstUserName,
-		// int secondUserId, String secondUserName, String lastMessage,
-		// long expireTime, int numOfNewMessage
-		LcomFriendshipData data = new LcomFriendshipData(0, "aaaa", 1, "bbbb",
-				"last message", expireTime, 0);
-
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		try {
-			dbhelper.putFriendListDataToMemCache(data);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-
-		List<LcomFriendshipData> datas = mManager.getFriendListData(userId,
-				currentTime);
-		assertNotNull(datas);
-		assertEquals(datas.size(), 1);
-
-		LcomFriendshipData result = datas.get(0);
-
-		assertEquals(result.getNumOfNewMessage(), 0);
-	}
-
-	/**
-	 * With memcache, multiple default data
-	 */
-	@Test
-	public void testGetFriendListData2() {
-		int userId = 0;
-		long currentTime = TimeUtil.getCurrentDate() - 1000;
-		long expireTime1 = currentTime - 1000;
-		long expireTime2 = currentTime - 2000;
-		long expireTime3 = currentTime - 3000;
-		long expireTime4 = currentTime - 4000;
-
-		LcomFriendshipData data = new LcomFriendshipData(0, "aaaa", 1, "bbbb",
-				"last message1", expireTime1, 0);
-		LcomFriendshipData data2 = new LcomFriendshipData(0, "aaaa2", 2,
-				"bbbb2", "last message2", expireTime2, 1);
-		LcomFriendshipData data3 = new LcomFriendshipData(1, "aaaa3", 3,
-				"bbbb3", "last message3", expireTime3, 2);
-
-		// TODO Do we need to take care about this case?
-		// LcomFriendshipData data4 = new LcomFriendshipData(4, "aaaa4", 0,
-		// "bbbb4", "last message4", expireTime4, 3);
-
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		try {
-			dbhelper.putFriendListDataToMemCache(data);
-			dbhelper.putFriendListDataToMemCache(data2);
-			dbhelper.putFriendListDataToMemCache(data3);
-			// dbhelper.putFriendListDataToMemCache(data4);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-
-		List<LcomFriendshipData> datas = mManager.getFriendListData(userId,
-				currentTime);
-		assertNotNull(datas);
-		assertEquals(datas.size(), 2);
-
-		LcomFriendshipData result1 = datas.get(0);
-		LcomFriendshipData result2 = datas.get(1);
-
-		assertEquals(result1.getNumOfNewMessage(), 0);
-		assertEquals(result2.getNumOfNewMessage(), 1);
-	}
-
-	/**
-	 * Without memcache, single default data
-	 */
-	@Test
-	public void testGetFriendListData3() {
-		int userId = 0;
-		long currentTime = TimeUtil.getCurrentDate() - 1000;
-		long expireTime = currentTime - 1000;
-
-		// int firstUserId, String firstUserName,
-		// int secondUserId, String secondUserName, String lastMessage,
-		// long expireTime, int numOfNewMessage
-		mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
-				expireTime, 4);
-
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		dbhelper.removeFriendshipDataFromMemcache(userId);
-
-		List<LcomFriendshipData> datas = mManager.getFriendListData(userId,
-				currentTime);
-		assertNotNull(datas);
-		assertEquals(datas.size(), 1);
-
-		LcomFriendshipData result = datas.get(0);
-		assertEquals(result.getNumOfNewMessage(), 4);
-
-		dbhelper.removeFriendshipDataFromMemcache(userId);
-	}
-
-	/**
-	 * With memcache
-	 */
-	@Test
-	public void testGetFriendshipDataForUser1() {
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		long currentTime = TimeUtil.getCurrentDate() - 1000;
-		long expireTime = currentTime - 1000;
-
-		// mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
-		// expireTime, 4);
-		LcomFriendshipData data = new LcomFriendshipData(0, "aaaa", 1, "bbbb",
-				"last message.", expireTime, 4);
-		try {
-			dbhelper.putFriendListDataToMemCache(data);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-
-		List<LcomFriendshipData> datas = mManager.getFriendshipDataForUser(0);
-
-		assertNotNull(datas);
-		assertEquals(datas.size(), 1);
-		assertEquals(datas.get(0).getNumOfNewMessage(), 4);
-		assertEquals(datas.get(0).getLatestMessage(), "last message.");
-	}
-
-	/**
-	 * Without memcache
-	 */
-	@Test
-	public void testGetFriendshipDataForUser2() {
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		long currentTime = TimeUtil.getCurrentDate() - 1000;
-		long expireTime = currentTime - 1000;
-
-		mManager.addNewFriendshipInfo(0, "aaaa", 1, "bbbb", "last message",
-				expireTime, 0);
-		mManager.addNewFriendshipInfo(0, "aaaa", 1, "cccc", "last message2",
-				expireTime, 1);
-		dbhelper.removeFriendshipDataFromMemcache(0);
-
-		List<LcomFriendshipData> datas = mManager.getFriendshipDataForUser(0);
-
-		assertNotNull(datas);
-		assertEquals(datas.size(), 2);
-		assertEquals(datas.get(0).getNumOfNewMessage(), 0);
-		assertEquals(datas.get(1).getNumOfNewMessage(), 1);
-		assertEquals(datas.get(0).getLatestMessage(), "last message");
-		assertEquals(datas.get(1).getLatestMessage(), "last message2");
-	}
-
-	@Test
-	public void testAddNewMessageInfo() {
-		DbgUtil.showLog(Level.INFO, "testAddNewMessageInfo");
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		dbhelper.removeNewMessagesFromMemCache(0);
-		mManager.debugDeleteUserData(0);
-		mManager.debugDeleteNewMessageInfo(0, 1);
-
-		long currentTime = TimeUtil.getCurrentDate() - 1000;
-		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "Message here",
-				currentTime);
-
-		List<LcomNewMessageData> datas = mManager.getNewMessages(1);
-
-		assertNotNull(datas);
-		assertEquals(datas.size(), 1);
-		assertEquals(datas.get(0).getMessage(), "Message here");
-
-		try {
-			List<LcomNewMessageData> memDatas = dbhelper
-					.getNewMessageFromMemcache(1);
-			assertNotNull(memDatas);
-			assertEquals(memDatas.size(), 1);
-			assertEquals(memDatas.get(0).getMessage(), "Message here");
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-
-	}
-
-	/**
-	 * With no user data
-	 */
-	@Test
-	public void testGetFriendThubmnails1() {
-
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		dbhelper.removeUserDataFromMemcache(0);
-		dbhelper.removeUserDataFromMemcache(1);
-
-		List<String> input = new ArrayList<String>();
-		input.add("0");
-		input.add("1");
-
-		HashMap<Integer, String> result = mManager.getFriendThubmnails(input);
+		// Second, we have more than two messages for one user in Entity
+		List<LcomFriendshipData> result = util.getAllValidFriendshipData(e, ds,
+				keyUserId);
 
 		assertNotNull(result);
-		assertEquals(result.size(), 0);
+		assertEquals(result.size(), 1);
 
+		LcomFriendshipData data = result.get(0);
+
+		List<String> messages = data.getLatestMessage();
+		List<Long> expires = data.getLastMessageExpireTime();
+
+		assertEquals(messages.size(), 2);
+		assertEquals(messages.get(0), lastMessage);
+		assertEquals(messages.get(1), lastMessage2);
+
+		assertEquals(expires.size(), 2);
+		assertEquals(expires.get(0), Long.valueOf(expireTime));
+		assertEquals(expires.get(1), Long.valueOf(expireTime2));
+
+		ds.delete(userKey);
 	}
 
-	/**
-	 * With no thumbnail data (although user data is stored)
-	 */
 	@Test
-	public void testGetFriendThubmnails2() {
+	public void testGetAllValidFriendshipData3() {
+		DbgUtil.showLog(Level.INFO, "testGetAllValidFriendshipData3");
 
-		LcomUserData data1 = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", "b@b", null);
-		mManager.addNewUserData(data1);
-		mManager.addNewUserData(data2);
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
 
-		List<String> input = new ArrayList<String>();
-		input.add("0");
-		input.add("1");
+		long senderUserId = 1;
+		long senderUserId2 = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String keyUserName2 = "cccc";
+		String lastMessage = "test message";
+		String lastMessage2 = "test message2";
+		String lastMessage3 = "test message3";
+		String lastMessage4 = "test message4";
+		long currentTime = TimeUtil.getCurrentDate() + 100000;
+		long currentTime2 = currentTime + 50000;
+		long currentTime3 = TimeUtil.getCurrentDate() + 200000;
+		long currentTime4 = currentTime + 10000;
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+		long expireTime2 = expireTime + 50000;
+		long expireTime3 = TimeUtil.getExpireDate(currentTime) - 10000;
+		long expireTime4 = expireTime + 10000;
 
-		HashMap<Integer, String> result = mManager.getFriendThubmnails(input);
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(senderUserId, senderUserId2));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName, keyUserName2));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE, Arrays
+				.asList(lastMessage + LcomConst.SEPARATOR + lastMessage2,
+						lastMessage3 + LcomConst.SEPARATOR + lastMessage4));
+		e.setProperty(
+				LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(currentTime) + LcomConst.SEPARATOR
+						+ String.valueOf(currentTime2),
+						String.valueOf(currentTime3) + LcomConst.SEPARATOR
+								+ String.valueOf(currentTime4)));
+		e.setProperty(
+				LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime) + LcomConst.SEPARATOR
+						+ String.valueOf(expireTime2),
+						String.valueOf(expireTime3) + LcomConst.SEPARATOR
+								+ String.valueOf(expireTime4)));
+		ds.put(e);
+
+		// Third, we have more than two messages for two users in Entity
+		List<LcomFriendshipData> result = util.getAllValidFriendshipData(e, ds,
+				keyUserId);
 
 		assertNotNull(result);
-		assertEquals(result.size(), 0);
+		assertEquals(result.size(), 2);
+
+		LcomFriendshipData data = result.get(0);
+
+		List<String> messages = data.getLatestMessage();
+		List<Long> expires = data.getLastMessageExpireTime();
+
+		assertEquals(messages.size(), 2);
+		assertEquals(messages.get(0), lastMessage);
+		assertEquals(messages.get(1), lastMessage2);
+
+		assertEquals(expires.size(), 2);
+		assertEquals(expires.get(0), Long.valueOf(expireTime));
+		assertEquals(expires.get(1), Long.valueOf(expireTime2));
+
+		LcomFriendshipData data2 = result.get(1);
+
+		List<String> messages2 = data2.getLatestMessage();
+		List<Long> expires2 = data2.getLastMessageExpireTime();
+
+		assertEquals(messages2.size(), 2);
+		assertEquals(messages2.get(0), lastMessage3);
+		assertEquals(messages2.get(1), lastMessage4);
+
+		assertEquals(expires2.size(), 2);
+		assertEquals(expires2.get(0), Long.valueOf(expireTime3));
+		assertEquals(expires2.get(1), Long.valueOf(expireTime4));
+
+		ds.delete(userKey);
+	}
+
+	@SuppressWarnings({ "unused", "unchecked" })
+	@Test
+	public void testAddMessageToFriendshipKind1() {
+
+		DbgUtil.showLog(Level.INFO, "testAddMessageToFriendshipKind1");
+
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+
+		long senderUserId = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String lastMessage = "test message";
+		long currentTime = TimeUtil.getCurrentDate() + 1000000;
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(senderUserId));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(lastMessage));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(currentTime)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime)));
+		ds.put(e);
+
+		String lastMessage2 = "test message2";
+		long currentTime2 = TimeUtil.getCurrentDate() + 500000;
+		long expireTime2 = TimeUtil.getExpireDate(currentTime);
+
+		// First, not expired message in Datastore
+		util.addMessageToFriendshipKind(senderUserId, senderName, currentTime2,
+				expireTime2, lastMessage2, e, ds);
+
+		Key testKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+		Entity e2;
+		Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, testKey);
+		PreparedQuery pQuery = ds.prepare(query);
+		e2 = pQuery.asSingleEntity();
+		List<Long> friendUserIdArray = (List<Long>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+		List<String> messageArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		List<String> expireTimeArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+		List<String> postedTimeArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
+
+		assertEquals(messageArray.size(), 1);
+
+		assertEquals(messageArray.size(), 1);
+		String[] msg = messageArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(msg.length, 2);
+		assertEquals(msg[0], lastMessage);
+		assertEquals(msg[1], lastMessage2);
+
+		assertEquals(expireTimeArray.size(), 1);
+		String[] expires = expireTimeArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(expires.length, 2);
+		assertEquals(expires[0], String.valueOf(expireTime));
+		assertEquals(expires[1], String.valueOf(expireTime2));
+
+		assertEquals(postedTimeArray.size(), 1);
+		String[] posteds = postedTimeArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(posteds.length, 2);
+		assertEquals(posteds[0], String.valueOf(currentTime));
+		assertEquals(posteds[1], String.valueOf(currentTime2));
+
+		ds.delete(userKey);
 
 	}
 
-	/**
-	 * With thumbnail data
-	 */
-	// TODO
-	// @Test
-	// public void testGetFriendThubmnails3() {
-	//
-	// try {
-	// URL url = new URL("welcome_title_logo.png");
-	// InputStream in = url.openStream();
-	// ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-	// Streams.copy(in, bytes, true /* close stream after copy */);
-	// Blob blob = new Blob(bytes.toByteArray());
-	//
-	// LcomUserData data1 = new LcomUserData(0, "aaaa", "bbbb", "a@a",
-	// null);
-	// LcomUserData data2 = new LcomUserData(1, "cccc", "dddd", "b@b",
-	// null);
-	// mManager.addNewUserData(data1);
-	// mManager.addNewUserData(data2);
-	//
-	// List<String> input = new ArrayList<String>();
-	// input.add("0");
-	// input.add("1");
-	//
-	// HashMap<Integer, String> result = mManager
-	// .getFriendThubmnails(input);
-	//
-	// assertNotNull(result);
-	// assertEquals(result.size(), 0);
-	//
-	// } catch (Exception e) {
-	// assertTrue(false);
-	// }
-	//
-	// }
-
-	/**
-	 * With no memcache and no datastore data
-	 */
+	@SuppressWarnings({ "unused", "unchecked" })
 	@Test
-	public void testBackupOldMessageData1() {
+	public void testAddMessageToFriendshipKind2() {
+
+		DbgUtil.showLog(Level.INFO, "testAddMessageToFriendshipKind2");
+
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+
+		long senderUserId = 1;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String lastMessage = "test message";
+		long currentTime = 100000;
+		long expireTime = TimeUtil.getExpireDate(currentTime);
+		DbgUtil.showLog(Level.INFO, "expireTime::" + expireTime);
+
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_ID, senderUserId);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_USER_NAME, senderName);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(senderUserId));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(lastMessage));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(currentTime)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expireTime)));
+		ds.put(e);
+
+		String lastMessage2 = "test message2";
+		long currentTime2 = TimeUtil.getCurrentDate() + 500000;
+		long expireTime2 = TimeUtil.getExpireDate(currentTime);
+
+		// Second, already expired message in Datastore
+		util.addMessageToFriendshipKind(senderUserId, senderName, currentTime2,
+				expireTime2, lastMessage2, e, ds);
+
+		Key testKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+		Entity e2;
+		Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, testKey);
+		PreparedQuery pQuery = ds.prepare(query);
+		e2 = pQuery.asSingleEntity();
+		List<Long> friendUserIdArray = (List<Long>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+		List<String> messageArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		List<String> expireTimeArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+		List<String> postedTimeArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
+
+		assertEquals(messageArray.size(), 1);
+		String[] msg = messageArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(msg.length, 1);
+		assertEquals(msg[0], lastMessage2);
+
+		assertEquals(expireTimeArray.size(), 1);
+		String[] expires = expireTimeArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(expires.length, 1);
+		assertEquals(expires[0], String.valueOf(expireTime2));
+
+		assertEquals(postedTimeArray.size(), 1);
+		String[] posteds = postedTimeArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(posteds.length, 1);
+		assertEquals(posteds[0], String.valueOf(currentTime2));
+
+		ds.delete(userKey);
+
+	}
+
+	@SuppressWarnings({ "unused", "unchecked" })
+	@Test
+	public void testAddMessageToFriendshipKind3() {
+
+		DbgUtil.showLog(Level.INFO, "testAddMessageToFriendshipKind3");
+
+		long keyUserId = 2;
+		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+
+		long senderUserId = 1;
+		long senderUserId2 = 3;
+		String senderName = "aaaa";
+		String keyUserName = "bbbb";
+		String keyUserName2 = "cccc";
+		String lastMessage = "test message" + LcomConst.SEPARATOR
+				+ "test message2";
+		String lastMessage2 = "test message3";
 		long current = TimeUtil.getCurrentDate();
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
+		long c1 = current - 100000000;
+		long c2 = current - 100;
+		long c3 = current - 200000000;
+		long c4 = TimeUtil.getCurrentDate() - 200;
+		String currentTime1 = c1 + LcomConst.SEPARATOR + c2;
+		// String currentTime2 = c3;
+		long exp1 = TimeUtil.getExpireDate(c1);
+		long exp2 = TimeUtil.getExpireDate(c2);
+		long exp3 = TimeUtil.getExpireDate(c3);
+		long exp4 = TimeUtil.getExpireDate(c4);
+		String expireTime1 = exp1 + LcomConst.SEPARATOR + exp2;
+		// String expireTime2 = exp3 + LcomConst.SEPARATOR + exp4;
 
-		mManager.backupOldMessageData(current);
+		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
+				userKey);
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(senderUserId, senderUserId2));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(keyUserName, keyUserName2));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+				Arrays.asList(lastMessage, lastMessage2));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(currentTime1, String.valueOf(c3)));
+		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(expireTime1, String.valueOf(exp3)));
+		ds.put(e);
 
-		// Check for memcache
-		try {
-			List<LcomNewMessageData> datas = dbhelper
-					.getNewMessageFromMemcache(0);
-			assertNull(datas);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
+		// Second, There are more than two friends and each has already expired
+		// message in Datastore
+		util.addMessageToFriendshipKind(senderUserId, senderName, c3, exp4,
+				lastMessage2, e, ds);
 
-		// check for datastore
-		dbhelper.removeNewMessagesFromMemCache(0);
-		List<LcomNewMessageData> datas2 = mManager.getNewMessages(1);
-		assertNull(datas2);
+		Key testKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
+		Entity e2;
+		Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, testKey);
+		PreparedQuery pQuery = ds.prepare(query);
+		e2 = pQuery.asSingleEntity();
+		List<Long> friendUserIdArray = (List<Long>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+		List<String> messageArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		List<String> expireTimeArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
+		List<String> postedTimeArray = (List<String>) e2
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
 
-	}
+		assertEquals(messageArray.size(), 2);
+		String[] msg = messageArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(msg.length, 2);
+		assertEquals(msg[0], "test message2");
+		assertEquals(msg[1], "test message3");
 
-	/**
-	 * With memcache and datastore data
-	 */
-	@Test
-	public void testBackupOldMessageData2() {
-		DbgUtil.showLog(Level.INFO, "testBackupOldMessageData2");
-		long current = TimeUtil.getCurrentDate();
-		long previous = current - 100000;
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		dbhelper.removeNewMessagesFromMemCache(0);
-		mManager.debugDeleteUserData(0);
+		String[] msg2 = messageArray.get(1).split(LcomConst.SEPARATOR);
+		assertEquals(msg2.length, 1);
+		assertEquals(msg2[0], lastMessage2);
 
-		DbgUtil.showLog(Level.INFO, "previous: " + previous);
-		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", current);
+		assertEquals(postedTimeArray.size(), 2);
+		String[] posts = postedTimeArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(posts.length, 2);
+		assertEquals(posts[0], String.valueOf(c2));
+		assertEquals(posts[1], String.valueOf(c3));
 
-		// add memcache if it doesn't exist
-		List<LcomNewMessageData> cached = null;
-		try {
-			cached = dbhelper.getNewMessageFromMemcache(0);
-		} catch (LcomMemcacheException e1) {
-			assertTrue(false);
-		}
-		if (cached == null) {
-			LcomNewMessageData data = new LcomNewMessageData(0, 1, "aaaa",
-					"bbbb", "test", current - 100000, current, false);
-			List<LcomNewMessageData> dataList = new ArrayList<LcomNewMessageData>();
-			dataList.add(data);
-			try {
-				dbhelper.putNewMessagesToMemCache(0, dataList);
-			} catch (LcomMemcacheException e) {
-				assertTrue(false);
-			}
-		}
+		String[] posts2 = postedTimeArray.get(1).split(LcomConst.SEPARATOR);
+		assertEquals(posts2.length, 1);
+		assertEquals(posts2[0], String.valueOf(c3));
 
-		mManager.backupOldMessageData(current + 10000000);
+		assertEquals(expireTimeArray.size(), 2);
+		String[] expires = expireTimeArray.get(0).split(LcomConst.SEPARATOR);
+		assertEquals(expires.length, 2);
+		assertEquals(expires[0], String.valueOf(exp2));
+		assertEquals(expires[1], String.valueOf(exp4));
 
-		// Check for memcache
-		try {
-			List<LcomNewMessageData> datas = dbhelper
-					.getNewMessageFromMemcache(0);
-			assertNull(datas);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
+		String[] expires2 = expireTimeArray.get(1).split(LcomConst.SEPARATOR);
+		assertEquals(expires2.length, 1);
+		assertEquals(expires2[0], String.valueOf(exp3));
 
-		// check for datastore
-		dbhelper.removeNewMessagesFromMemCache(1);
-		List<LcomNewMessageData> datas2 = mManager.getNewMessages(1);
-		assertNull(datas2);
+		ds.delete(userKey);
 
-		// Check backup table
-		List<LcomExpiredMessageData> backUped = mManager
-				.debugGetExpiredMessages();
-		assertNotNull(backUped);
-		assertEquals(1, backUped.size());
-	}
-
-	/**
-	 * With memcache and datastore data and not expire case
-	 */
-	@Test
-	public void testBackupOldMessageData3() {
-		DbgUtil.showLog(Level.INFO, "testBackupOldMessageData3");
-		long current = TimeUtil.getCurrentDate();
-		long previous = current - 100000;
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-		dbhelper.removeNewMessagesFromMemCache(0);
-		mManager.debugDeleteUserData(0);
-		mManager.debugDeleteNewMessageInfo(0, 1);
-
-		DbgUtil.showLog(Level.INFO, "previous: " + previous);
-		mManager.addNewMessageInfo(0, 1, "aaaa", "bbbb", "test", current);
-
-		// add memcache if it doesn't exist
-		List<LcomNewMessageData> cached = null;
-		try {
-			cached = dbhelper.getNewMessageFromMemcache(0);
-		} catch (LcomMemcacheException e1) {
-			assertTrue(false);
-		}
-		if (cached == null) {
-			LcomNewMessageData data = new LcomNewMessageData(0, 1, "aaaa",
-					"bbbb", "test", current - 100000, current, false);
-			List<LcomNewMessageData> dataList = new ArrayList<LcomNewMessageData>();
-			dataList.add(data);
-			try {
-				dbhelper.putNewMessagesToMemCache(0, dataList);
-			} catch (LcomMemcacheException e) {
-				assertTrue(false);
-			}
-		}
-
-		mManager.backupOldMessageData(current);
-
-		// Check for memcache
-		try {
-			List<LcomNewMessageData> datas = dbhelper
-					.getNewMessageFromMemcache(0);
-			assertNull(datas);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-
-		// check for datastore
-		dbhelper.removeNewMessagesFromMemCache(0);
-		List<LcomNewMessageData> datas2 = mManager.getNewMessages(1);
-		assertNotNull(datas2);
-
-		// Check backup table
-		List<LcomExpiredMessageData> backUped = mManager
-				.debugGetExpiredMessages();
-		assertNotNull(backUped);
-		assertEquals(0, backUped.size());
-	}
-
-	@Test
-	public void testSetDeviceIdForMessagePush() {
-		String deviceId = "TestDeviceId";
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-
-		mManager.setDeviceIdForMessagePush(0, deviceId);
-
-		// Check memcache
-		String cached = mManager.getDeviceIdForGCMPush(0);
-		assertNotNull(cached);
-		assertEquals(cached, deviceId);
-
-		// Check datastore
-		try {
-			dbhelper.removeDevceIdFromMemCache(0);
-		} catch (LcomMemcacheException e) {
-			assertTrue(false);
-		}
-		String stored = mManager.getDeviceIdForGCMPush(0);
-		assertNotNull(stored);
-		assertEquals(stored, deviceId);
-	}
-
-	@Test
-	public void testDeleteUserData() {
-		mManager.deleteUserData(0);
-		LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
-
-		// With no user data case
-		mManager.deleteUserData(0);
-
-		dbhelper.removeUserDataFromMemcache(0);
-		LcomUserData result1 = mManager.getUserData(0);
-		assertNull(result1);
-
-		// With user data case
-		LcomUserData data = new LcomUserData(0, "aaaa", "bbbb", "a@a", null);
-		mManager.addNewUserData(data);
-
-		mManager.deleteUserData(0);
-
-		dbhelper.removeUserDataFromMemcache(0);
-		LcomUserData result2 = mManager.getUserData(0);
-		assertNull(result2);
 	}
 }
