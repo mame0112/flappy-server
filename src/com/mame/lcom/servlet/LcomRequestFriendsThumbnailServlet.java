@@ -1,7 +1,9 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,10 +27,12 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 	private final static Logger log = Logger
 			.getLogger(LcomRequestFriendsThumbnailServlet.class.getName());
 
+	private final static String TAG = "LcomRequestFriendsThumbnailServlet";
+
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		DbgUtil.showLog(Level.INFO, "doPost");
+		DbgUtil.showLog(TAG, "doPost");
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -67,14 +71,14 @@ public class LcomRequestFriendsThumbnailServlet extends HttpServlet {
 
 	private List<String> parseFriendIds(String friendsId) {
 		if (friendsId != null) {
-			DbgUtil.showLog(Level.WARNING, "parseFriendIds");
+			DbgUtil.showLog(TAG, "parseFriendIds");
 			String[] idArray = friendsId.split(LcomConst.SEPARATOR);
 			if (idArray != null && idArray.length != 0) {
-				DbgUtil.showLog(Level.WARNING, "A");
+				DbgUtil.showLog(TAG, "A");
 				List<String> result = Arrays.asList(idArray);
 
 				for (String str : result) {
-					DbgUtil.showLog(Level.WARNING, "str: " + str);
+					DbgUtil.showLog(TAG, "str: " + str);
 				}
 
 				return result;

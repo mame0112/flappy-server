@@ -1,7 +1,9 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -22,6 +24,8 @@ public class LcomMessagePushServlet extends HttpServlet {
 	private final static Logger log = Logger
 			.getLogger(LcomMessagePushServlet.class.getName());
 
+	private final static String TAG = "LcomMessagePushServlet";
+
 	private static final String API_KEY = "AIzaSyBkrzyfBwaHQgjVphRiUNHusjEOjPQdOr4";
 	private static final int RETRY_COUNT = 5;
 
@@ -30,9 +34,8 @@ public class LcomMessagePushServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws IOException {
 
-		DbgUtil.showLog(Level.WARNING, "doGet");
-		DbgUtil.showLog(Level.WARNING,
-				"req.getQueryString(): " + req.getQueryString());
+		DbgUtil.showLog(TAG, "doGet");
+		DbgUtil.showLog(TAG, "req.getQueryString(): " + req.getQueryString());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -46,30 +49,30 @@ public class LcomMessagePushServlet extends HttpServlet {
 		String apiLevel = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_API_LEVEL), secretKey);
 
-		DbgUtil.showLog(Level.WARNING, "action: " + action);
-		DbgUtil.showLog(Level.WARNING, "registrationId: " + registrationId);
+		DbgUtil.showLog(TAG, "action: " + action);
+		DbgUtil.showLog(TAG, "registrationId: " + registrationId);
 
 		if ("register".equals(action)) {
 			// 端末登録、Androidから呼ばれる。
 			deviceMap.put(userId, registrationId);
-			DbgUtil.showLog(Level.WARNING, "register");
+			DbgUtil.showLog(TAG, "register");
 
 		} else if ("unregister".equals(action)) {
 			// 端末登録解除、Androidから呼ばれる。
 			deviceMap.remove(userId);
-			DbgUtil.showLog(Level.WARNING, "unregister");
+			DbgUtil.showLog(TAG, "unregister");
 
 		} else if ("send".equals(action)) {
 			// メッセージ送信。任意の送信アプリから呼ばれる。
 
-			DbgUtil.showLog(Level.WARNING, "send");
+			DbgUtil.showLog(TAG, "send");
 
 			// registrationId = deviceMap.get(userId);
 			Sender sender = new Sender(API_KEY);
 			Message message = new Message.Builder().addData("msg", msg).build();
 
-			DbgUtil.showLog(Level.WARNING, "message: " + message);
-			DbgUtil.showLog(Level.WARNING, "registrationId: " + registrationId);
+			DbgUtil.showLog(TAG, "message: " + message);
+			DbgUtil.showLog(TAG, "registrationId: " + registrationId);
 
 			Result result = sender.send(message, registrationId, RETRY_COUNT);
 			res.setContentType("text/plain");
@@ -84,7 +87,7 @@ public class LcomMessagePushServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws IOException {
-		DbgUtil.showLog(Level.WARNING, "doPost");
+		DbgUtil.showLog(TAG, "doPost");
 		doGet(req, res);
 	}
 

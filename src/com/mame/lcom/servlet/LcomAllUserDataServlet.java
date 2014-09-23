@@ -3,7 +3,6 @@ package com.mame.lcom.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -16,18 +15,20 @@ import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.util.CipherUtil;
 import com.mame.lcom.util.DatastoreUtil;
-import com.mame.lcom.util.TimeUtil;
 import com.mame.lcom.util.DbgUtil;
+import com.mame.lcom.util.TimeUtil;
 
 public class LcomAllUserDataServlet extends HttpServlet {
 
 	private final static Logger log = Logger
 			.getLogger(LcomAllUserDataServlet.class.getName());
 
+	private final static String TAG = "LcomAllUserDataServlet";
+
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(TAG, "doPost:" + TimeUtil.calcResponse());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -42,7 +43,7 @@ public class LcomAllUserDataServlet extends HttpServlet {
 		list.add(origin);
 
 		if (userId != null && apiLevel != null) {
-			DbgUtil.showLog(Level.INFO, "userId:" + userId);
+			DbgUtil.showLog(TAG, "userId:" + userId);
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 
 			List<LcomFriendshipData> friendListData = null;
@@ -53,10 +54,10 @@ public class LcomAllUserDataServlet extends HttpServlet {
 				String result = DatastoreUtil.parseFriendListData(
 						Integer.valueOf(userId), friendListData);
 
-				DbgUtil.showLog(Level.INFO, "result::" + result);
+				DbgUtil.showLog(TAG, "result::" + result);
 				list.add(result);
 			} else {
-				DbgUtil.showLog(Level.INFO, "friendListData is null or 0");
+				DbgUtil.showLog(TAG, "friendListData is null or 0");
 			}
 		}
 

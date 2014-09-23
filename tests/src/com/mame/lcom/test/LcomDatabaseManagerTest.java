@@ -44,6 +44,8 @@ public class LcomDatabaseManagerTest {
 	private final static Logger log = Logger
 			.getLogger(LcomDatabaseManagerTest.class.getName());
 
+	private final String TAG = "LcomDatabaseManagerTest";
+
 	private LcomDatabaseManager mManager = null;
 
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
@@ -341,7 +343,7 @@ public class LcomDatabaseManagerTest {
 
 	@Test
 	public void testGetAllValidFriendshipData1() {
-		DbgUtil.showLog(Level.INFO, "testGetAllValidFriendshipData1");
+		DbgUtil.showLog(TAG, "testGetAllValidFriendshipData1");
 
 		long keyUserId = 2;
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
@@ -391,7 +393,7 @@ public class LcomDatabaseManagerTest {
 
 	@Test
 	public void testGetAllValidFriendshipData2() {
-		DbgUtil.showLog(Level.INFO, "testGetAllValidFriendshipData2");
+		DbgUtil.showLog(TAG, "testGetAllValidFriendshipData2");
 
 		long keyUserId = 2;
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
@@ -449,7 +451,7 @@ public class LcomDatabaseManagerTest {
 
 	@Test
 	public void testGetAllValidFriendshipData3() {
-		DbgUtil.showLog(Level.INFO, "testGetAllValidFriendshipData3");
+		DbgUtil.showLog(TAG, "testGetAllValidFriendshipData3");
 
 		long keyUserId = 2;
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
@@ -535,7 +537,7 @@ public class LcomDatabaseManagerTest {
 	@Test
 	public void testAddMessageToFriendshipKind1() {
 
-		DbgUtil.showLog(Level.INFO, "testAddMessageToFriendshipKind1");
+		DbgUtil.showLog(TAG, "testAddMessageToFriendshipKind1");
 
 		long keyUserId = 2;
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
@@ -613,7 +615,7 @@ public class LcomDatabaseManagerTest {
 	@Test
 	public void testAddMessageToFriendshipKind2() {
 
-		DbgUtil.showLog(Level.INFO, "testAddMessageToFriendshipKind2");
+		DbgUtil.showLog(TAG, "testAddMessageToFriendshipKind2");
 
 		long keyUserId = 2;
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);
@@ -624,7 +626,7 @@ public class LcomDatabaseManagerTest {
 		String lastMessage = "test message";
 		long currentTime = 100000;
 		long expireTime = TimeUtil.getExpireDate(currentTime);
-		DbgUtil.showLog(Level.INFO, "expireTime::" + expireTime);
+		DbgUtil.showLog(TAG, "expireTime::" + expireTime);
 
 		Entity e = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, keyUserId,
 				userKey);
@@ -687,7 +689,7 @@ public class LcomDatabaseManagerTest {
 	@Test
 	public void testAddMessageToFriendshipKind3() {
 
-		DbgUtil.showLog(Level.INFO, "testAddMessageToFriendshipKind3");
+		DbgUtil.showLog(TAG, "testAddMessageToFriendshipKind3");
 
 		long keyUserId = 2;
 		Key userKey = LcomDatabaseManagerUtil.getUserDataKey(keyUserId);

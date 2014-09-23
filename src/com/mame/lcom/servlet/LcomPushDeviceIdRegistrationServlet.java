@@ -1,10 +1,8 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
-import com.mame.lcom.util.DbgUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -15,16 +13,19 @@ import com.google.gson.Gson;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.db.LcomDatabaseManager;
 import com.mame.lcom.util.CipherUtil;
+import com.mame.lcom.util.DbgUtil;
 
 public class LcomPushDeviceIdRegistrationServlet extends HttpServlet {
 
 	private final static Logger log = Logger
 			.getLogger(LcomPushDeviceIdRegistrationServlet.class.getName());
 
+	private final static String TAG = "LcomPushDeviceIdRegistrationServlet";
+
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		DbgUtil.showLog(Level.INFO, "doPost");
+		DbgUtil.showLog(TAG, "doPost");
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 

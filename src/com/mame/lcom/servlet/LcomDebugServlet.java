@@ -1,7 +1,9 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,10 +26,12 @@ public class LcomDebugServlet extends HttpServlet {
 	private final static Logger log = Logger.getLogger(LcomDebugServlet.class
 			.getName());
 
+	private final static String TAG = "LcomDebugServlet";
+
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		DbgUtil.showLog(Level.WARNING, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(TAG, "doPost:" + TimeUtil.calcResponse());
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 		String origin = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
@@ -50,16 +54,16 @@ public class LcomDebugServlet extends HttpServlet {
 		String date = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_MESSAGE_DATE), secretKey);
 
-		DbgUtil.showLog(Level.WARNING, "origin:" + origin);
-		DbgUtil.showLog(Level.WARNING, "userId:" + userId);
-		DbgUtil.showLog(Level.WARNING, "userName:" + userName);
-		DbgUtil.showLog(Level.WARNING, "targetUserId:" + targetUserId);
-		DbgUtil.showLog(Level.WARNING, "targetUserName:" + targetUserName);
-		DbgUtil.showLog(Level.WARNING, "message:" + message);
-		DbgUtil.showLog(Level.WARNING, "date:" + date);
+		DbgUtil.showLog(TAG, "origin:" + origin);
+		DbgUtil.showLog(TAG, "userId:" + userId);
+		DbgUtil.showLog(TAG, "userName:" + userName);
+		DbgUtil.showLog(TAG, "targetUserId:" + targetUserId);
+		DbgUtil.showLog(TAG, "targetUserName:" + targetUserName);
+		DbgUtil.showLog(TAG, "message:" + message);
+		DbgUtil.showLog(TAG, "date:" + date);
 
-		DbgUtil.showLog(Level.WARNING, "requestCode:" + requestCode);
-		DbgUtil.showLog(Level.WARNING, "numOfUser:" + numOfUser);
+		DbgUtil.showLog(TAG, "requestCode:" + requestCode);
+		DbgUtil.showLog(TAG, "numOfUser:" + numOfUser);
 
 		List<String> list = new ArrayList<String>();
 
@@ -73,7 +77,7 @@ public class LcomDebugServlet extends HttpServlet {
 			// try {
 			// parsedDate = TimeUtil.getDateInDateFormat(date);
 			// } catch (ParseException e) {
-			// DbgUtil.showLog(Level.WARNING, "ParseException: " +
+			// DbgUtil.showLog(TAG, "ParseException: " +
 			// e.getMessage());
 			// // result = LcomConst.SEND_MESSAGE_DATE_CANNOT_BE_PARSED;
 			// }

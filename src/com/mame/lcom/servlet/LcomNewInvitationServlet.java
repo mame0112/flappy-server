@@ -1,7 +1,9 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,10 +32,12 @@ public class LcomNewInvitationServlet extends HttpServlet {
 	private final Logger log = Logger.getLogger(LcomNewInvitationServlet.class
 			.getName());
 
+	private final static String TAG = "LcomNewInvitationServlet";
+
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(TAG, "doPost:" + TimeUtil.calcResponse());
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
 		String origin = CipherUtil.decrypt(
@@ -61,17 +65,17 @@ public class LcomNewInvitationServlet extends HttpServlet {
 
 		if (origin != null && userId != null && userName != null
 				&& mailAddress != null && apiLevel != null) {
-			DbgUtil.showLog(Level.INFO, "userId:" + userId);
-			DbgUtil.showLog(Level.INFO, "userName:" + userName);
-			DbgUtil.showLog(Level.INFO, "mailAddress:" + mailAddress);
+			DbgUtil.showLog(TAG, "userId:" + userId);
+			DbgUtil.showLog(TAG, "userName:" + userName);
+			DbgUtil.showLog(TAG, "mailAddress:" + mailAddress);
 			// if (message != null) {
-			// DbgUtil.showLog(Level.INFO, "message:" + message);
+			// DbgUtil.showLog(TAG, "message:" + message);
 			// }
 
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 			long targetUserId = manager.getUserIdByMailAddress(mailAddress);
 
-			DbgUtil.showLog(Level.INFO, "id from mail address:" + targetUserId);
+			DbgUtil.showLog(TAG, "id from mail address:" + targetUserId);
 
 			// If target mail address is not registered yet
 			if (targetUserId == LcomConst.NO_USER) {

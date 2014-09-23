@@ -16,13 +16,15 @@ public class DatastoreUtil {
 	private final static Logger log = Logger.getLogger(DatastoreUtil.class
 			.getName());
 
+	private final static String TAG = "DatastoreUtil";
+
 	public static Blob transcodeString2Blob(String origin) {
 		if (origin != null) {
 			try {
 				byte[] bytes = origin.getBytes("UTF-8");
 				return new Blob(bytes);
 			} catch (UnsupportedEncodingException e) {
-				DbgUtil.showLog(Level.WARNING,
+				DbgUtil.showLog(TAG,
 						"UnsupportedEncodingException: " + e.getMessage());
 			}
 		}
@@ -37,7 +39,7 @@ public class DatastoreUtil {
 				try {
 					return new String(bytes, "UTF-8");
 				} catch (UnsupportedEncodingException e) {
-					DbgUtil.showLog(Level.WARNING,
+					DbgUtil.showLog(TAG,
 							"UnsupportedEncodingException: " + e.getMessage());
 				}
 			}
@@ -50,7 +52,7 @@ public class DatastoreUtil {
 		String result = null;
 		boolean isFirstTime = true;
 		for (LcomNewMessageData data : newMessages) {
-			// DbgUtil.showLog(Level.INFO, "parseNewMessage(data):"
+			// DbgUtil.showLog(TAG, "parseNewMessage(data):"
 			// + parseNewMessage(data));
 			if (data != null) {
 				if (isFirstTime) {
@@ -60,7 +62,7 @@ public class DatastoreUtil {
 					result = result + LcomConst.ITEM_SEPARATOR
 							+ parseNewMessage(data);
 				}
-				DbgUtil.showLog(Level.WARNING, "result: " + result);
+				DbgUtil.showLog(TAG, "result: " + result);
 			}
 		}
 		// Remove last separator
@@ -71,7 +73,7 @@ public class DatastoreUtil {
 
 	public static String parseFriendListData(int userId,
 			List<LcomFriendshipData> friendListData) {
-		DbgUtil.showLog(Level.WARNING, "parseFriendListData");
+		DbgUtil.showLog(TAG, "parseFriendListData");
 		String result = null;
 		boolean isFirstTime = true;
 
@@ -80,7 +82,7 @@ public class DatastoreUtil {
 			// for (int i = friendListData.size() - 1; i >= 0; i--) {
 			// LcomFriendshipData data = friendListData.get(i);
 			for (LcomFriendshipData data : friendListData) {
-				// DbgUtil.showLog(Level.INFO, "parseNewMessage(data):"
+				// DbgUtil.showLog(TAG, "parseNewMessage(data):"
 				// + parseNewMessage(data));
 				if (data != null) {
 					if (isFirstTime) {
@@ -149,7 +151,7 @@ public class DatastoreUtil {
 	}
 
 	public static String parseNewMessage(long userId, LcomFriendshipData data) {
-		DbgUtil.showLog(Level.WARNING, "parseNewMessage");
+		DbgUtil.showLog(TAG, "parseNewMessage");
 		String parsed = null;
 		// int firstUserId = data.getFirstUserId();
 		// String firstUserName = data.getFirstUserName();
@@ -175,12 +177,12 @@ public class DatastoreUtil {
 
 		String parsedMessage = null;
 		if (messages != null && messages.size() != 0) {
-			DbgUtil.showLog(Level.WARNING, "A1");
+			DbgUtil.showLog(TAG, "A1");
 			boolean isFirst = true;
 			for (int i = messages.size() - 1; i >= 0; i--) {
-				DbgUtil.showLog(Level.WARNING, "A2");
+				DbgUtil.showLog(TAG, "A2");
 				String msg = messages.get(i);
-				DbgUtil.showLog(Level.WARNING, "msg: " + msg);
+				DbgUtil.showLog(TAG, "msg: " + msg);
 				// for (String msg : messages) {
 				if (isFirst) {
 					parsedMessage = msg;
@@ -193,13 +195,13 @@ public class DatastoreUtil {
 		}
 		String parsedDate = null;
 		if (expireDate != null && expireDate.size() != 0) {
-			DbgUtil.showLog(Level.WARNING, "B1");
+			DbgUtil.showLog(TAG, "B1");
 			boolean isFirst = true;
 			// for (Long date : expireDate) {
 			for (int j = expireDate.size() - 1; j >= 0; j--) {
-				DbgUtil.showLog(Level.WARNING, "B2");
+				DbgUtil.showLog(TAG, "B2");
 				long date = expireDate.get(j);
-				DbgUtil.showLog(Level.WARNING, "date: " + date);
+				DbgUtil.showLog(TAG, "date: " + date);
 				if (isFirst) {
 					parsedDate = String.valueOf(date);
 					isFirst = false;
@@ -210,8 +212,8 @@ public class DatastoreUtil {
 			}
 		}
 
-		DbgUtil.showLog(Level.WARNING, "parsedMessage: " + parsedMessage);
-		DbgUtil.showLog(Level.WARNING, "parsedDate: " + parsedDate);
+		DbgUtil.showLog(TAG, "parsedMessage: " + parsedMessage);
+		DbgUtil.showLog(TAG, "parsedDate: " + parsedDate);
 
 		parsed = secondUserId + LcomConst.SEPARATOR + secondUserName
 				+ LcomConst.SEPARATOR + parsedMessage + LcomConst.SEPARATOR

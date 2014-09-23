@@ -519,7 +519,7 @@ import com.mame.lcom.util.TimeUtil;
 // */
 // @Test
 // public void testPutFriendListDataToMemCache1() {
-// DbgUtil.showLog(Level.INFO, "testPutFriendListDataToMemCache1");
+// DbgUtil.showLog(TAG, "testPutFriendListDataToMemCache1");
 // LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 // long current = TimeUtil.getCurrentDate();
 // long expire = current - 10000;
@@ -562,7 +562,7 @@ import com.mame.lcom.util.TimeUtil;
 // */
 // @Test
 // public void testPutFriendListDataToMemCache2() {
-// DbgUtil.showLog(Level.INFO, "testPutFriendListDataToMemCache2");
+// DbgUtil.showLog(TAG, "testPutFriendListDataToMemCache2");
 // LcomDatabaseManagerHelper dbhelper = new LcomDatabaseManagerHelper();
 // long current = TimeUtil.getCurrentDate();
 // long expire = current - 10000;

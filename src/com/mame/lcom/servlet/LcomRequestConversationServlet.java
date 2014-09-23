@@ -1,7 +1,9 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -24,10 +26,12 @@ public class LcomRequestConversationServlet extends HttpServlet {
 	private final static Logger log = Logger
 			.getLogger(LcomRequestConversationServlet.class.getName());
 
+	private final static String TAG = "LcomRequestConversationServlet";
+
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(TAG, "doPost:" + TimeUtil.calcResponse());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 

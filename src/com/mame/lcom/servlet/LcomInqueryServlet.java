@@ -1,7 +1,9 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +22,8 @@ public class LcomInqueryServlet extends HttpServlet {
 	private final static Logger log = Logger.getLogger(LcomInqueryServlet.class
 			.getName());
 
+	private final static String TAG = "LcomInqueryServlet";
+
 	private enum Return_Code {
 		RESULT_OK, RESULT_BEFORE_SEND, RESULT_USERNAME_NULL, RESULT_MAIL_ADDRESS_NULL, RESULT_MESSAGE_NULL,
 	}
@@ -27,7 +31,7 @@ public class LcomInqueryServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(TAG, "doPost:" + TimeUtil.calcResponse());
 
 		// String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 		// String origin = CipherUtil.decrypt(
@@ -56,22 +60,22 @@ public class LcomInqueryServlet extends HttpServlet {
 
 		// List<String> list = new ArrayList<String>();
 		if (origin != null && apiLevel != null) {
-			DbgUtil.showLog(Level.INFO, "origin and apiLevel is not null: "
-					+ origin + " / " + apiLevel);
+			DbgUtil.showLog(TAG, "origin and apiLevel is not null: " + origin
+					+ " / " + apiLevel);
 			if (userName != null) {
 				if (mailAddress != null) {
-					DbgUtil.showLog(Level.INFO, "userName: " + userName);
-					DbgUtil.showLog(Level.INFO, "mailAddress: " + mailAddress);
-					DbgUtil.showLog(Level.INFO, "category: " + category);
+					DbgUtil.showLog(TAG, "userName: " + userName);
+					DbgUtil.showLog(TAG, "mailAddress: " + mailAddress);
+					DbgUtil.showLog(TAG, "category: " + category);
 					result = Return_Code.RESULT_OK;
 					// Send message
 					LcomMail mail = new LcomMail();
 					boolean mailResult = mail.sendInqueryMail(mailAddress,
 							category, userName, message);
 					if (mailResult) {
-						DbgUtil.showLog(Level.INFO, "successfully message sent");
+						DbgUtil.showLog(TAG, "successfully message sent");
 					} else {
-						DbgUtil.showLog(Level.INFO, "failed to send message");
+						DbgUtil.showLog(TAG, "failed to send message");
 					}
 				} else {
 					result = Return_Code.RESULT_MAIL_ADDRESS_NULL;
@@ -81,7 +85,7 @@ public class LcomInqueryServlet extends HttpServlet {
 			}
 		} else {
 			result = Return_Code.RESULT_BEFORE_SEND;
-			DbgUtil.showLog(Level.INFO, "origin and apiLevel is null");
+			DbgUtil.showLog(TAG, "origin and apiLevel is null");
 		}
 
 		// list.add(String.valueOf(result));
@@ -104,7 +108,7 @@ public class LcomInqueryServlet extends HttpServlet {
 		// try {
 		// dispatcher.forward(req, resp);
 		// } catch (ServletException e) {
-		// DbgUtil.showLog(Level.INFO, "ServletException: " + e.getMessage());
+		// DbgUtil.showLog(TAG, "ServletException: " + e.getMessage());
 		// }
 
 		resp.sendRedirect(url);

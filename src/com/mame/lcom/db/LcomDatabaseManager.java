@@ -41,6 +41,8 @@ public class LcomDatabaseManager {
 
 	private static LcomDatabaseManager sDatabaseManager = new LcomDatabaseManager();
 
+	private final static String TAG = "LcomDatabaseManager";
+
 	private LcomDatabaseManager() {
 		// Singletone
 	}
@@ -50,7 +52,7 @@ public class LcomDatabaseManager {
 	}
 
 	public static boolean isUserNameAlreadyExist(String userName) {
-		DbgUtil.showLog(Level.WARNING, "isUserNameAlreadyExist");
+		DbgUtil.showLog(TAG, "isUserNameAlreadyExist");
 
 		CipherUtil util = new CipherUtil();
 		userName = util.encryptForInputString(userName);
@@ -68,16 +70,16 @@ public class LcomDatabaseManager {
 
 		// If no username existy
 		if (entity == null) {
-			DbgUtil.showLog(Level.WARNING, "Exist");
+			DbgUtil.showLog(TAG, "Exist");
 			return false;
 		} else {
-			DbgUtil.showLog(Level.WARNING, "Not exist");
+			DbgUtil.showLog(TAG, "Not exist");
 			return true;
 		}
 	}
 
 	public long getUserIdByNameAndPassword(String userName, String password) {
-		DbgUtil.showLog(Level.WARNING, "getUserIdByNameAndPassword");
+		DbgUtil.showLog(TAG, "getUserIdByNameAndPassword");
 		long userId = LcomConst.NO_USER;
 
 		if (userName != null && password != null) {
@@ -103,7 +105,7 @@ public class LcomDatabaseManager {
 	}
 
 	public long getUserIdByName(String userName) {
-		DbgUtil.showLog(Level.WARNING, "getUserIdByName");
+		DbgUtil.showLog(TAG, "getUserIdByName");
 		long userId = LcomConst.NO_USER;
 		if (userName != null) {
 
@@ -122,7 +124,7 @@ public class LcomDatabaseManager {
 			Entity entity = pQuery.asSingleEntity();
 			if (entity != null) {
 				userId = entity.getKey().getId();
-				DbgUtil.showLog(Level.WARNING, "userId: " + userId);
+				DbgUtil.showLog(TAG, "userId: " + userId);
 			} else {
 				userId = LcomConst.NO_USER;
 			}
@@ -138,7 +140,7 @@ public class LcomDatabaseManager {
 	 * @param data
 	 */
 	public synchronized long addNewUserData(LcomUserData data) {
-		DbgUtil.showLog(Level.INFO, "addNewUserData");
+		DbgUtil.showLog(TAG, "addNewUserData");
 		// int userId = LcomConst.NO_USER;
 
 		CipherUtil util = new CipherUtil();
@@ -163,7 +165,7 @@ public class LcomDatabaseManager {
 			} catch (EntityNotFoundException e) {
 				// if no All user data exist, create it as total user num is 0.
 				// (Because we will add +1 below part)
-				DbgUtil.showLog(Level.WARNING,
+				DbgUtil.showLog(TAG,
 						"EntityNotFoundException: " + e.getMessage());
 				// entity = new Entity(LcomConst.KIND_ALL_USER_DATA,
 				// LcomConst.ENTITY_TOTAL_USER_NUM);
@@ -174,7 +176,7 @@ public class LcomDatabaseManager {
 			// LcomConst.ENTITY_TOTAL_USER_NUM);
 
 			if (entity != null) {
-				DbgUtil.showLog(Level.WARNING, "AllUserData entity is not null");
+				DbgUtil.showLog(TAG, "AllUserData entity is not null");
 
 				// If user id is already assigned
 				if (userId != LcomConst.NO_USER) {
@@ -203,7 +205,7 @@ public class LcomDatabaseManager {
 					int numOfUser = (int) id + 1;
 					userId = numOfUser;
 
-					DbgUtil.showLog(Level.WARNING, "numOfUser: " + numOfUser);
+					DbgUtil.showLog(TAG, "numOfUser: " + numOfUser);
 
 					entity.setProperty(LcomConst.ENTITY_TOTAL_USER_NUM,
 							numOfUser);
@@ -228,7 +230,7 @@ public class LcomDatabaseManager {
 				}
 
 			} else {
-				DbgUtil.showLog(Level.WARNING, "AllUserData entity is null");
+				DbgUtil.showLog(TAG, "AllUserData entity is null");
 				// If no LcomAllUserDada exist
 				userId = 1;
 				Entity allUserEntity = new Entity(ancKey);
@@ -250,7 +252,7 @@ public class LcomDatabaseManager {
 			}
 
 		} catch (ConcurrentModificationException e) {
-			DbgUtil.showLog(Level.INFO,
+			DbgUtil.showLog(TAG,
 					"ConcurrentModificationException: " + e.getMessage());
 			if (tx.isActive()) {
 				tx.rollback();
@@ -280,7 +282,7 @@ public class LcomDatabaseManager {
 		} else {
 			// If no AllUserData exist (This shall be occur at the very first
 			// time
-			DbgUtil.showLog(Level.WARNING, "No all user data key");
+			DbgUtil.showLog(TAG, "No all user data key");
 			Entity totalEntity = new Entity(ancKey);
 			totalEntity.setProperty(LcomConst.ENTITY_TOTAL_USER_NUM, 1);
 			ds.put(totalEntity);
@@ -328,7 +330,7 @@ public class LcomDatabaseManager {
 	 */
 	public synchronized void updateUserData(long userId, String userName,
 			String password, String mailAddress, Blob thumbnail) {
-		DbgUtil.showLog(Level.INFO, "updateUserData");
+		DbgUtil.showLog(TAG, "updateUserData");
 
 		CipherUtil util = new CipherUtil();
 		userName = util.encryptForInputString(userName);
@@ -361,7 +363,7 @@ public class LcomDatabaseManager {
 			ds.put(entity);
 
 		} catch (EntityNotFoundException e) {
-			DbgUtil.showLog(Level.WARNING, "EntityNotFoundException: " + e.getMessage());
+			DbgUtil.showLog(TAG, "EntityNotFoundException: " + e.getMessage());
 			LcomUserData data = new LcomUserData(userId, userName, password,
 					mailAddress, thumbnail);
 			addNewUserData(data);
@@ -377,9 +379,9 @@ public class LcomDatabaseManager {
 	 */
 	public synchronized void updateUserNameInFriendhsiopTable(long userId,
 			String userName) {
-		DbgUtil.showLog(Level.INFO, "updateUserNameInFriendhsiopTable");
+		DbgUtil.showLog(TAG, "updateUserNameInFriendhsiopTable");
 		if (userId != LcomConst.NO_USER && userName != null) {
-			DbgUtil.showLog(Level.INFO, "userId: " + userId + " uerName: " + userName);
+			DbgUtil.showLog(TAG, "userId: " + userId + " uerName: " + userName);
 
 			CipherUtil util = new CipherUtil();
 			userName = util.encryptForInputString(userName);
@@ -406,15 +408,15 @@ public class LcomDatabaseManager {
 				ds.put(e);
 			}
 		} else {
-			DbgUtil.showLog(Level.INFO, "userId: " + userId);
+			DbgUtil.showLog(TAG, "userId: " + userId);
 			if (userName != null) {
-				DbgUtil.showLog(Level.INFO, "useName: " + userName);
+				DbgUtil.showLog(TAG, "useName: " + userName);
 			}
 		}
 	}
 
 	public synchronized int getNumOfUserId() {
-		DbgUtil.showLog(Level.INFO, "getNumOfUserId");
+		DbgUtil.showLog(TAG, "getNumOfUserId");
 		int userNum = 0;
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -425,7 +427,7 @@ public class LcomDatabaseManager {
 			entity = ds.get(key);
 			userNum = (int) entity.getProperty("mTotalUserNum");
 		} catch (EntityNotFoundException e) {
-			DbgUtil.showLog(Level.WARNING, "EntityNotFoundException: " + e.getMessage());
+			DbgUtil.showLog(TAG, "EntityNotFoundException: " + e.getMessage());
 		}
 
 		return userNum;
@@ -434,8 +436,8 @@ public class LcomDatabaseManager {
 	@SuppressWarnings("unchecked")
 	public synchronized List<LcomNewMessageData> getNewMessagesWithTargetUser(
 			long userId, long friendUserId, long currentTime) {
-		DbgUtil.showLog(Level.WARNING, "getNewMessagesWithTargetUser: " + userId
-				+ " / " + friendUserId);
+		DbgUtil.showLog(TAG, "getNewMessagesWithTargetUser: " + userId + " / "
+				+ friendUserId);
 
 		List<LcomNewMessageData> result = new ArrayList<LcomNewMessageData>();
 
@@ -445,7 +447,7 @@ public class LcomDatabaseManager {
 		Entity entity = util.getEntityForTargetUser(userId, friendUserId, ds);
 
 		if (entity != null) {
-			DbgUtil.showLog(Level.WARNING, "A");
+			DbgUtil.showLog(TAG, "A");
 			ArrayList<Long> friendId = (ArrayList<Long>) entity
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
 			ArrayList<String> messageArray = (ArrayList<String>) entity
@@ -527,7 +529,7 @@ public class LcomDatabaseManager {
 	}
 
 	public synchronized long getUserIdByMailAddress(String address) {
-		DbgUtil.showLog(Level.WARNING, "getUserIdByMailAddress");
+		DbgUtil.showLog(TAG, "getUserIdByMailAddress");
 		long userId = LcomConst.NO_USER;
 
 		CipherUtil util = new CipherUtil();
@@ -554,7 +556,7 @@ public class LcomDatabaseManager {
 	}
 
 	public synchronized LcomUserData getUserData(long userId) {
-		DbgUtil.showLog(Level.WARNING, "getUserData");
+		DbgUtil.showLog(TAG, "getUserData");
 		LcomUserData result = null;
 
 		if (userId != LcomConst.NO_USER) {
@@ -571,7 +573,7 @@ public class LcomDatabaseManager {
 								.getProperty(LcomConst.ENTITY_MAIL_ADDRESS),
 						(Blob) entity.getProperty(LcomConst.ENTITY_THUMBNAIL));
 			} catch (EntityNotFoundException e) {
-				DbgUtil.showLog(Level.WARNING,
+				DbgUtil.showLog(TAG,
 						"EntityNotFoundException: " + e.getMessage());
 			}
 		}
@@ -585,7 +587,7 @@ public class LcomDatabaseManager {
 	public synchronized long addNewUserAndFriendshipInfo(LcomUserData data,
 			long senderUserId, String senderName, String lastMessage,
 			long currentTime) {
-		DbgUtil.showLog(Level.WARNING, "addNewUserAndFriendshipInfo");
+		DbgUtil.showLog(TAG, "addNewUserAndFriendshipInfo");
 
 		CipherUtil util = new CipherUtil();
 		senderName = util.encryptForInputString(senderName);
@@ -621,7 +623,7 @@ public class LcomDatabaseManager {
 	public synchronized void addNewFriendshipInfo(long senderUserId,
 			String senderName, long keyUserId, String keyUserName,
 			String lastMessage, long currentTime) {
-		DbgUtil.showLog(Level.WARNING, "addNewFriendshipData");
+		DbgUtil.showLog(TAG, "addNewFriendshipData");
 
 		CipherUtil cipherUtil = new CipherUtil();
 		senderName = cipherUtil.encryptForInputString(senderName);
@@ -634,7 +636,7 @@ public class LcomDatabaseManager {
 
 		// If entity itself exists
 		if (util.isEntityForKeyUserIdExist(keyUserId, ds)) {
-			DbgUtil.showLog(Level.WARNING, "A");
+			DbgUtil.showLog(TAG, "A");
 			// If targetUserId already exist (meaning this user has already
 			// sent message)
 
@@ -642,16 +644,16 @@ public class LcomDatabaseManager {
 			Entity entity = util.getEntityForKeyUser(keyUserId, ds);
 
 			if (entity != null) {
-				DbgUtil.showLog(Level.WARNING, "B");
+				DbgUtil.showLog(TAG, "B");
 				// If sender User data exist in entity
 				if (util.isFriendUserIdExistInEntity(entity, senderUserId)) {
-					DbgUtil.showLog(Level.WARNING, "C");
+					DbgUtil.showLog(TAG, "C");
 					// Add and update only message
 					util.addMessageForFriendUser(entity, senderUserId,
 							senderName, keyUserId, keyUserName, lastMessage,
 							currentTime, ds);
 				} else {
-					DbgUtil.showLog(Level.WARNING, "D");
+					DbgUtil.showLog(TAG, "D");
 					// If entity itself exist but it is new to send message
 					// to this user
 					// Add new user data and message
@@ -660,11 +662,11 @@ public class LcomDatabaseManager {
 							lastMessage, currentTime, ds);
 				}
 			} else {
-				DbgUtil.showLog(Level.WARNING, "E");
+				DbgUtil.showLog(TAG, "E");
 				// Something wrong. (this should not be happen)
 			}
 		} else {
-			DbgUtil.showLog(Level.WARNING, "F");
+			DbgUtil.showLog(TAG, "F");
 			// If entity itself doesn't exist
 			// Create new entity
 			util.addNewEntiyInFriendshipTable(senderUserId, senderName,
@@ -701,7 +703,7 @@ public class LcomDatabaseManager {
 
 	public synchronized List<LcomFriendshipData> getAllFriendshipData(
 			long userId) {
-		DbgUtil.showLog(Level.INFO, "getAllFriendshipData");
+		DbgUtil.showLog(TAG, "getAllFriendshipData");
 
 		List<LcomFriendshipData> result = null;
 
@@ -726,7 +728,7 @@ public class LcomDatabaseManager {
 	@SuppressWarnings("unchecked")
 	public synchronized List<LcomFriendshipData> getNewMessageData(long userId,
 			long currentTime) {
-		DbgUtil.showLog(Level.INFO, "getNewMessageData");
+		DbgUtil.showLog(TAG, "getNewMessageData");
 
 		List<LcomFriendshipData> result = null;
 
@@ -751,7 +753,7 @@ public class LcomDatabaseManager {
 	public synchronized void addNewMessageInfo(long userId, long targetUserId,
 			String userName, String targetUserName, String message,
 			long currentDate) {
-		DbgUtil.showLog(Level.INFO, "addNewMessageInfo");
+		DbgUtil.showLog(TAG, "addNewMessageInfo");
 
 		CipherUtil cipherUtil = new CipherUtil();
 		userName = cipherUtil.encryptForInputString(userName);
@@ -784,12 +786,12 @@ public class LcomDatabaseManager {
 							currentDate, expireTime, message, e, ds);
 				}
 			} else {
-				DbgUtil.showLog(Level.INFO, "Something wrong");
+				DbgUtil.showLog(TAG, "Something wrong");
 			}
 		} else {
 			// Entity doesn't exist, nothing to do.
 			long expireTime = TimeUtil.getExpireDate(currentDate);
-			DbgUtil.showLog(Level.INFO, "Entity doesn't exist");
+			DbgUtil.showLog(TAG, "Entity doesn't exist");
 			util.createNewEntity(userId, userName, targetUserId, currentDate,
 					expireTime, message, ds);
 		}
@@ -797,7 +799,7 @@ public class LcomDatabaseManager {
 
 	public synchronized void debugDeleteNewMessageInfo(int userId,
 			int targetUserId) {
-		DbgUtil.showLog(Level.INFO, "debugDeleteNewMessageInfo");
+		DbgUtil.showLog(TAG, "debugDeleteNewMessageInfo");
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
 
@@ -814,12 +816,12 @@ public class LcomDatabaseManager {
 
 		try {
 			if (firstMessages != null && firstMessages.size() != 0) {
-				DbgUtil.showLog(Level.INFO,
+				DbgUtil.showLog(TAG,
 						"firstFriendship size: " + firstMessages.size());
 				pm.deletePersistent(firstMessages);
 			}
 			if (secondMessages != null && secondMessages.size() != 0) {
-				DbgUtil.showLog(Level.INFO,
+				DbgUtil.showLog(TAG,
 						"secondMessages size: " + secondMessages.size());
 				pm.deletePersistent(secondMessages);
 			}
@@ -843,7 +845,7 @@ public class LcomDatabaseManager {
 			entity.setProperty("mTotalUserNum", numOfUser);
 			ds.put(entity);
 		} catch (EntityNotFoundException e) {
-			DbgUtil.showLog(Level.WARNING, "EntityNotFoundException: " + e.getMessage());
+			DbgUtil.showLog(TAG, "EntityNotFoundException: " + e.getMessage());
 		}
 	}
 
@@ -857,7 +859,7 @@ public class LcomDatabaseManager {
 	public synchronized HashMap<Integer, String> getFriendThubmnails(
 			List<String> friendsId) {
 
-		DbgUtil.showLog(Level.INFO, "getFriendThubmnails");
+		DbgUtil.showLog(TAG, "getFriendThubmnails");
 
 		HashMap<Integer, String> result = new HashMap<Integer, String>();
 
@@ -890,7 +892,7 @@ public class LcomDatabaseManager {
 						}
 					}
 				} catch (EntityNotFoundException e) {
-					DbgUtil.showLog(Level.INFO,
+					DbgUtil.showLog(TAG,
 							"EntityNotFoundException: " + e.getMessage());
 				}
 			}
@@ -901,7 +903,7 @@ public class LcomDatabaseManager {
 
 	@SuppressWarnings("unchecked")
 	public synchronized void backupOldMessageData(long currentTime) {
-		DbgUtil.showLog(Level.INFO, "backupOldMessageData");
+		DbgUtil.showLog(TAG, "backupOldMessageData");
 
 		Filter messageFilter = new FilterPredicate(
 				LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
@@ -917,11 +919,11 @@ public class LcomDatabaseManager {
 		PreparedQuery pQuery = ds.prepare(query);
 		FetchOptions option = FetchOptions.Builder.withOffset(0);
 		List<Entity> allEntities = pQuery.asList(option);
-		DbgUtil.showLog(Level.INFO, "A");
+		DbgUtil.showLog(TAG, "A");
 
 		if (allEntities != null && allEntities.size() != 0) {
 
-			DbgUtil.showLog(Level.INFO, "A2 size: " + allEntities.size());
+			DbgUtil.showLog(TAG, "A2 size: " + allEntities.size());
 
 			for (Entity e : allEntities) {
 
@@ -984,7 +986,7 @@ public class LcomDatabaseManager {
 								tmpMessageString = tmpMessageString
 										.substring((1 + LcomConst.SEPARATOR
 												.length()));
-								DbgUtil.showLog(Level.INFO, "tmpMessageString: "
+								DbgUtil.showLog(TAG, "tmpMessageString: "
 										+ tmpMessageString);
 								validMessageArray.add(tmpMessageString);
 							}
@@ -1014,11 +1016,11 @@ public class LcomDatabaseManager {
 									|| messageArray.size() > validMessageArray
 											.size()) {
 								if (validMessageArray != null) {
-									DbgUtil.showLog(Level.INFO,
+									DbgUtil.showLog(TAG,
 											"validMessageArray size:"
 													+ validMessageArray.size());
 								} else {
-									DbgUtil.showLog(Level.INFO,
+									DbgUtil.showLog(TAG,
 											"validMessageArray is null");
 								}
 
@@ -1035,7 +1037,7 @@ public class LcomDatabaseManager {
 								// TODO
 								// ds.put(e);
 							} else {
-								DbgUtil.showLog(Level.INFO,
+								DbgUtil.showLog(TAG,
 										"validMessageArray is not null or size not changed");
 							}
 						}
@@ -1048,7 +1050,7 @@ public class LcomDatabaseManager {
 
 	private static synchronized List<LcomExpiredMessageData> backupToExpiredTable(
 			List<LcomNewMessageData> oldMessages) {
-		DbgUtil.showLog(Level.INFO, "backupToExpiredTable");
+		DbgUtil.showLog(TAG, "backupToExpiredTable");
 
 		// if (oldMessages != null) {
 		//
@@ -1072,7 +1074,7 @@ public class LcomDatabaseManager {
 	}
 
 	public List<LcomExpiredMessageData> debugGetExpiredMessages() {
-		DbgUtil.showLog(Level.INFO, "debugGetExpiredMessages");
+		DbgUtil.showLog(TAG, "debugGetExpiredMessages");
 
 		PersistenceManager pm = LcomPersistenceManagerFactory.get()
 				.getPersistenceManager();
@@ -1086,7 +1088,7 @@ public class LcomDatabaseManager {
 
 	public synchronized void setDeviceIdForMessagePush(int userId,
 			String deviceId) {
-		DbgUtil.showLog(Level.INFO, "setDeviceIdForMessagePush");
+		DbgUtil.showLog(TAG, "setDeviceIdForMessagePush");
 
 		CipherUtil cipherUtil = new CipherUtil();
 		deviceId = cipherUtil.encryptForInputString(deviceId);
@@ -1113,7 +1115,7 @@ public class LcomDatabaseManager {
 						deviceId);
 
 			} catch (EntityNotFoundException e1) {
-				DbgUtil.showLog(Level.WARNING,
+				DbgUtil.showLog(TAG,
 						"EntityNotFoundException: " + e1.getMessage());
 				// If no data is on datastore
 				entity = new Entity(LcomConst.KIND_USER_DATA, userId,
@@ -1129,7 +1131,7 @@ public class LcomDatabaseManager {
 	}
 
 	public String getDeviceIdForGCMPush(long userId) {
-		DbgUtil.showLog(Level.INFO, "getDeviceIdForGCMPush");
+		DbgUtil.showLog(TAG, "getDeviceIdForGCMPush");
 
 		if (userId == LcomConst.NO_USER) {
 			return null;
@@ -1155,7 +1157,7 @@ public class LcomDatabaseManager {
 						deviceId);
 
 			} catch (EntityNotFoundException e) {
-				DbgUtil.showLog(Level.INFO,
+				DbgUtil.showLog(TAG,
 						"EntityNotFoundException: " + e.getMessage());
 			}
 

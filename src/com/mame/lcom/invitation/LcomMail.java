@@ -20,13 +20,15 @@ public class LcomMail {
 	private final static Logger log = Logger
 			.getLogger(LcomMail.class.getName());
 
+	private final static String TAG = "LcomMail";
+
 	public LcomMail() {
 
 	}
 
 	public boolean sendServiceWelcomeMail(String address, String userName,
 			String language) throws UnsupportedEncodingException {
-		DbgUtil.showLog(Level.INFO, "sendServiceWelcomeMail");
+		DbgUtil.showLog(TAG, "sendServiceWelcomeMail");
 		if (userName != null) {
 			Properties props = new Properties();
 			Session session = Session.getDefaultInstance(props, null);
@@ -73,11 +75,10 @@ public class LcomMail {
 				msg.setText(msgBody);
 				msg.setContent(msgBody, "text/html");
 				Transport.send(msg);
-				DbgUtil.showLog(Level.INFO, "Successfully sent message.");
+				DbgUtil.showLog(TAG, "Successfully sent message.");
 				return true;
 			} catch (MessagingException e) {
-				DbgUtil.showLog(Level.INFO,
-						"MessagingException:: " + e.getMessage());
+				DbgUtil.showLog(TAG, "MessagingException:: " + e.getMessage());
 				return false;
 			}
 		}
@@ -87,7 +88,7 @@ public class LcomMail {
 	public boolean sendInvitationMail(String address, String fromUserName,
 			String message, String language)
 			throws UnsupportedEncodingException {
-		DbgUtil.showLog(Level.INFO, "sendInvitationMail");
+		DbgUtil.showLog(TAG, "sendInvitationMail");
 		if (address != null) {
 			Properties props = new Properties();
 			Session session = Session.getDefaultInstance(props, null);
@@ -175,11 +176,10 @@ public class LcomMail {
 				msg.setText(msgBody);
 				msg.setContent(msgBody, "text/html");
 				Transport.send(msg);
-				DbgUtil.showLog(Level.INFO, "Successfully sent message.");
+				DbgUtil.showLog(TAG, "Successfully sent message.");
 				return true;
 			} catch (MessagingException e) {
-				DbgUtil.showLog(Level.INFO,
-						"MessagingException:: " + e.getMessage());
+				DbgUtil.showLog(TAG, "MessagingException:: " + e.getMessage());
 				return false;
 			}
 		}
@@ -189,7 +189,7 @@ public class LcomMail {
 	public boolean sendInqueryMail(String address, String category,
 			String userName, String message)
 			throws UnsupportedEncodingException {
-		DbgUtil.showLog(Level.INFO, "sendInqueryMail");
+		DbgUtil.showLog(TAG, "sendInqueryMail");
 		if (address != null) {
 			Properties props = new Properties();
 			Session session = Session.getDefaultInstance(props, null);
@@ -207,11 +207,10 @@ public class LcomMail {
 				msg.setText(msgBody);
 				msg.setContent(msgBody, "text/html");
 				Transport.send(msg);
-				DbgUtil.showLog(Level.INFO, "Successfully sent message.");
+				DbgUtil.showLog(TAG, "Successfully sent message.");
 				return true;
 			} catch (MessagingException e) {
-				DbgUtil.showLog(Level.INFO,
-						"MessagingException:: " + e.getMessage());
+				DbgUtil.showLog(TAG, "MessagingException:: " + e.getMessage());
 				return false;
 			}
 		}

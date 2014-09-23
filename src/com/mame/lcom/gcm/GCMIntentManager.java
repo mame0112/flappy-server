@@ -1,7 +1,9 @@
 package com.mame.lcom.gcm;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +17,8 @@ import com.mame.lcom.constant.LcomConst;
 public class GCMIntentManager {
 	private final static Logger log = Logger.getLogger(GCMIntentManager.class
 			.getName());
+	
+	private final static String TAG = "GCMIntentManager";
 
 	public GCMIntentManager() {
 	}
@@ -23,7 +27,7 @@ public class GCMIntentManager {
 			String userName, String targetUserName, String msg, String regId,
 			long expireTime) {
 
-		DbgUtil.showLog(Level.WARNING, "pushGCMNotification");
+		DbgUtil.showLog(TAG, "pushGCMNotification");
 
 		int RETRY_COUNT = 5;
 
@@ -37,8 +41,8 @@ public class GCMIntentManager {
 
 		// Message message = new Message.Builder().addData("msg", msg).build();
 
-		DbgUtil.showLog(Level.WARNING, "message: " + message);
-		DbgUtil.showLog(Level.WARNING, "registrationId: " + regId);
+		DbgUtil.showLog(TAG, "message: " + message);
+		DbgUtil.showLog(TAG, "registrationId: " + regId);
 
 		Result result = null;
 		if (message != null) {
@@ -46,7 +50,7 @@ public class GCMIntentManager {
 				// TODO Need to check return value and meaning
 				result = sender.send(message, regId, RETRY_COUNT);
 			} catch (IOException e) {
-				DbgUtil.showLog(Level.WARNING, "IOException: " + e.getMessage());
+				DbgUtil.showLog(TAG, "IOException: " + e.getMessage());
 			}
 
 		}

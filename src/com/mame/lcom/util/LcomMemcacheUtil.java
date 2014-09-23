@@ -49,7 +49,7 @@ public class LcomMemcacheUtil {
 	// + message.getPostedDate() + LcomConst.SEPARATOR
 	// + message.getExpireDate() + LcomConst.SEPARATOR
 	// + message.isMessageRead();
-	// DbgUtil.showLog(Level.WARNING, "result: " + result);
+	// DbgUtil.showLog(TAG, "result: " + result);
 	// return result;
 	// }
 	//
@@ -58,17 +58,17 @@ public class LcomMemcacheUtil {
 	//
 	// public List<LcomNewMessageData> parseCachedMessageToList(
 	// String cachedMessage) {
-	// DbgUtil.showLog(Level.INFO, "parseCachedMessageToList");
+	// DbgUtil.showLog(TAG, "parseCachedMessageToList");
 	//
 	// if (cachedMessage != null) {
-	// DbgUtil.showLog(Level.INFO, "cachedMessage: " + cachedMessage);
+	// DbgUtil.showLog(TAG, "cachedMessage: " + cachedMessage);
 	// List<LcomNewMessageData> messages = new ArrayList<LcomNewMessageData>();
 	//
 	// // First, we divide String to each message items.
 	// String[] item = cachedMessage.split(LcomConst.ITEM_SEPARATOR);
 	// if (item != null && item.length != 0) {
 	//
-	// DbgUtil.showLog(Level.INFO, "item.length: " + item.length);
+	// DbgUtil.showLog(TAG, "item.length: " + item.length);
 	//
 	// // Then, we devide each item to each data.
 	// for (int i = 0; i < item.length; i++) {
@@ -96,7 +96,7 @@ public class LcomMemcacheUtil {
 	// messages.add(data);
 	// } catch (IndexOutOfBoundsException e) {
 	// // Nothing to do
-	// DbgUtil.showLog(Level.WARNING, "IndexOutOfBoundsException: "
+	// DbgUtil.showLog(TAG, "IndexOutOfBoundsException: "
 	// + e.getMessage());
 	// }
 	// }
@@ -132,7 +132,7 @@ public class LcomMemcacheUtil {
 	// if (deviceId != null) {
 	// String result = deviceId.getUserId() + LcomConst.SEPARATOR
 	// + deviceId.getDeviceId();
-	// DbgUtil.showLog(Level.WARNING, "result: " + result);
+	// DbgUtil.showLog(TAG, "result: " + result);
 	// return result;
 	// }
 	// return null;

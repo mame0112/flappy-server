@@ -1,7 +1,9 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +33,8 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 	private final static Logger log = Logger.getLogger(LcomLoginServlet.class
 			.getName());
 
+	private final static String TAG = "LcomSendConfirmMessageServlet";
+
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
@@ -38,7 +42,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 		// In case of new user, target user name and target user id is null
 		// If tbe targetuser mail address is registerd, target user name is null
 		// (target user id is not null)
-		DbgUtil.showLog(Level.INFO, "doPost:" + TimeUtil.calcResponse());
+		DbgUtil.showLog(TAG, "doPost:" + TimeUtil.calcResponse());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -78,10 +82,9 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 			// If target user has been already been registered
 			if (targetUserId != null && !targetUserId.equals("")
 					&& !targetUserId.equals(LcomConst.NULL)) {
-				DbgUtil.showLog(Level.WARNING, "targetUserId: " + targetUserId);
+				DbgUtil.showLog(TAG, "targetUserId: " + targetUserId);
 				if (targetUserName != null) {
-					DbgUtil.showLog(Level.WARNING, "targetUserName: "
-							+ targetUserName);
+					DbgUtil.showLog(TAG, "targetUserName: " + targetUserName);
 				}
 
 				// LcomMail mail = new LcomMail();
@@ -132,7 +135,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 
 			} else {
 				// If the target user has NOT been registered. (= new user)
-				DbgUtil.showLog(Level.WARNING, "mailAddress: " + mailAddress
+				DbgUtil.showLog(TAG, "mailAddress: " + mailAddress
 						+ "/ userName: " + userName + "/ message: " + message);
 				LcomMail mail = new LcomMail();
 				boolean mailResult = mail.sendInvitationMail(mailAddress,

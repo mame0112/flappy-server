@@ -7,12 +7,13 @@ import com.mame.lcom.constant.LcomConst;
 
 public class DbgUtil {
 
-	private final static Logger log = Logger.getLogger(DbgUtil.class.getName());
+	private final static Logger loga = Logger
+			.getLogger(DbgUtil.class.getName());
 
-	public static void showLog(Level level, String message) {
+	public static void showLog(String tag, String message) {
 		if (LcomConst.IS_DEBUG) {
 			if (message != null) {
-				log.log(level, message);
+				loga.log(Level.WARNING, tag + ": " + message);
 			}
 		}
 	}

@@ -1,7 +1,9 @@
 package com.mame.lcom.servlet;
 
 import java.io.IOException;
+
 import com.mame.lcom.util.DbgUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,10 +25,12 @@ public class LcomUserNameCheckServlet extends HttpServlet {
 	private final static Logger log = Logger
 			.getLogger(LcomUserNameCheckServlet.class.getName());
 
+	private final static String TAG = "LcomUserNameCheckServlet";
+
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		DbgUtil.showLog(Level.INFO, "doPost" + TimeUtil.calcResponse());
+		DbgUtil.showLog(TAG, "doPost" + TimeUtil.calcResponse());
 
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
@@ -51,7 +55,7 @@ public class LcomUserNameCheckServlet extends HttpServlet {
 			if (userId == LcomConst.NO_USER) {
 				result = LcomConst.CREATE_ACCOUNT_RESULT_OK;
 			} else {
-				DbgUtil.showLog(Level.INFO, "B");
+				DbgUtil.showLog(TAG, "B");
 				result = LcomConst.CREATE_ACCOUNT_USER_ALREADY_EXIST;
 			}
 		} else {
