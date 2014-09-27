@@ -483,7 +483,12 @@ public class LcomDatabaseManagerUtil {
 							try {
 								for (int j = 0; j < msgParsed.length; j++) {
 									long t = Long.valueOf(timeParsed[j]);
+									DbgUtil.showLog(TAG, "t: " + t);
+									DbgUtil.showLog(TAG, "currentTime: "
+											+ currentTime);
 									if (t > currentTime) {
+										DbgUtil.showLog(TAG, "msgParsed[j]: "
+												+ msgParsed[j]);
 										validMessage.add(msgParsed[j]);
 										validExpireTime.add(t);
 									}
@@ -493,6 +498,8 @@ public class LcomDatabaseManagerUtil {
 								// return
 								if (validMessage != null
 										&& validMessage.size() != 0) {
+									DbgUtil.showLog(TAG, "validMessage: "
+											+ validMessage);
 									LcomFriendshipData data = new LcomFriendshipData(
 											userId, friendId, friendName,
 											validMessage, validExpireTime);

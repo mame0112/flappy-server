@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -516,6 +515,7 @@ public class LcomDatabaseManager {
 				ds.put(entity);
 
 				if (validMessage != null && validMessage.size() != 0) {
+					DbgUtil.showLog(TAG, "validMessage: " + validMessage);
 					LcomNewMessageData data = new LcomNewMessageData(userId,
 							friendUserId, targetUserName, validMessage,
 							validPostedTime, validMessageTime);
@@ -525,7 +525,7 @@ public class LcomDatabaseManager {
 		}
 
 		CipherUtil cipherUtil = new CipherUtil();
-		cipherUtil.decryptForNewMessageData(result);
+		result = cipherUtil.decryptForNewMessageData(result);
 
 		return result;
 

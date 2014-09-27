@@ -61,6 +61,10 @@ public class LcomRequestConversationServlet extends HttpServlet {
 			}
 		}
 
+		for (String tmp : list) {
+			DbgUtil.showLog(TAG, "tmp: " + tmp);
+		}
+
 		String json = new Gson().toJson(CipherUtil.encryptArrayList(list,
 				secretKey));
 		resp.setContentType("application/json");

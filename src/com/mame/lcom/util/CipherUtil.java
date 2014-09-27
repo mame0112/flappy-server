@@ -122,6 +122,7 @@ public class CipherUtil {
 	}
 
 	public String decryptForInputString(String input) {
+		DbgUtil.showLog(TAG, "decryptForInputString");
 		String output = null;
 
 		// If it is not debug mode
@@ -209,63 +210,87 @@ public class CipherUtil {
 
 	public List<LcomNewMessageData> decryptForNewMessageData(
 			List<LcomNewMessageData> input) {
-		List<LcomNewMessageData> output = null;
+		List<LcomNewMessageData> output = new ArrayList<LcomNewMessageData>();
 
 		if (LcomConst.IS_ENCRYPT) {
 			if (input != null && input.size() != 0 && mCipher != null) {
 				for (LcomNewMessageData data : input) {
-					decryptInputStringList(data.getMessage());
-					decryptForInputString(data.getTargetUserName());
+					DbgUtil.showLog(TAG, "data: " + data);
+					// long userId, long targetUserId,
+					// String targetUserName, List<String> message, List<Long>
+					// postedDate,
+					// List<Long> expireTime
+					LcomNewMessageData decryptedData = new LcomNewMessageData(
+							data.getUserId(), data.getTargetUserId(),
+							decryptForInputString(data.getTargetUserName()),
+							decryptInputStringList(data.getMessage()),
+							data.getPostedDate(), data.getExpireDate());
+					output.add(decryptedData);
 				}
 			}
+		} else {
+			output = input;
 		}
 
 		return output;
 	}
 
 	private List<String> decryptInputStringList(List<String> inputs) {
-		List<String> output = null;
+		DbgUtil.showLog(TAG, "decryptInputStringList");
+		List<String> output = new ArrayList<String>();
 		if (inputs != null && inputs.size() != 0) {
 			for (String str : inputs) {
-				decryptForInputString(str);
+				output.add(decryptForInputString(str));
 			}
 		}
 		return output;
 	}
 
 	public LcomUserData decryptLcomUserData(LcomUserData data) {
-		LcomUserData output = null;
 
 		if (data != null) {
-			decryptForInputString(data.getMailAddress());
-			decryptForInputString(data.getPassword());
 			Blob before = data.getThumbnail();
-			data.setThumbnail(decryptForInputBlob(before));
-			decryptForInputString(data.getUserName());
+
+			LcomUserData output = new LcomUserData(data.getUserId(),
+					decryptForInputString(data.getUserName()),
+					decryptForInputString(data.getPassword()),
+					decryptForInputString(data.getMailAddress()),
+					decryptForInputBlob(before));
+			return output;
 		}
 
-		return output;
+		return null;
 	}
 
 	public List<LcomFriendshipData> decryptForLcomFriendshipData(
 			List<LcomFriendshipData> input) {
-		List<LcomFriendshipData> output = null;
+		DbgUtil.showLog(TAG, "decryptForLcomFriendshipData");
+		List<LcomFriendshipData> output = new ArrayList<LcomFriendshipData>();
 
 		if (LcomConst.IS_ENCRYPT) {
 			if (input != null && input.size() != 0 && mCipher != null) {
-
-				output = new ArrayList<LcomFriendshipData>();
+				DbgUtil.showLog(TAG, "size: " + input.size());
 
 				for (LcomFriendshipData data : input) {
-					List<String> messages = decryptInputStringList(data
-							.getLatestMessage());
-					String name = decryptForInputString(data
-							.getSecondUserName());
+					// List<String> messages = decryptInputStringList(data
+					// .getLatestMessage());
+					// String name = decryptForInputString(data
+					// .getSecondUserName());
+					//
+					// data.setLatestMessage(messages);
+					// data.setSecondUserName(name);
 
-					data.setLatestMessage(messages);
-					data.setSecondUserName(name);
+					// long userId, long friendUserId,
+					// String friendUserName, List<String> newMessage,
+					// List<Long> expireTime
 
-					output.add(data);
+					LcomFriendshipData decryptedData = new LcomFriendshipData(
+							data.getFirstUserId(), data.getSecondUserId(),
+							decryptForInputString(data.getSecondUserName()),
+							decryptInputStringList(data.getLatestMessage()),
+							data.getLastMessageExpireTime());
+
+					output.add(decryptedData);
 
 				}
 			}
