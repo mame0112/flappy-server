@@ -625,7 +625,7 @@ public class LcomDatabaseManager {
 		}
 
 		CipherUtil util = new CipherUtil();
-		util.decryptLcomUserData(result);
+		result = util.decryptLcomUserData(result);
 
 		return result;
 	}

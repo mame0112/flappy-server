@@ -93,6 +93,7 @@ public class LcomNewInvitationServlet extends HttpServlet {
 				result = LcomConst.INVITATION_EXISTING_USER_RESULT_OK;
 				existingUserId = data.getUserId();
 				existingUsername = data.getUserName();
+				DbgUtil.showLog(TAG, "existingUsername: " + existingUsername);
 			}
 		} else {
 			// If some of parameter(s) is null
