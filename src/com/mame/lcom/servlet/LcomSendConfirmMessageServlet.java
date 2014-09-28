@@ -73,6 +73,7 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 		// not been registered
 		if (origin != null && userId != null && userName != null
 				&& mailAddress != null && message != null && apiLevel != null) {
+			DbgUtil.showLog(TAG, "message: " + message);
 			LcomDatabaseManager manager = LcomDatabaseManager.getInstance();
 
 			list.add(origin);
@@ -86,11 +87,6 @@ public class LcomSendConfirmMessageServlet extends HttpServlet {
 				if (targetUserName != null) {
 					DbgUtil.showLog(TAG, "targetUserName: " + targetUserName);
 				}
-
-				// LcomMail mail = new LcomMail();
-				// mail.sendInvitationMail(mailAddress, userName, message);
-
-				// TODO SEND Notification (Not e-mail)
 
 				long currentTime = TimeUtil.getCurrentDate();
 

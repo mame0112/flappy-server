@@ -272,18 +272,6 @@ public class CipherUtil {
 				DbgUtil.showLog(TAG, "size: " + input.size());
 
 				for (LcomFriendshipData data : input) {
-					// List<String> messages = decryptInputStringList(data
-					// .getLatestMessage());
-					// String name = decryptForInputString(data
-					// .getSecondUserName());
-					//
-					// data.setLatestMessage(messages);
-					// data.setSecondUserName(name);
-
-					// long userId, long friendUserId,
-					// String friendUserName, List<String> newMessage,
-					// List<Long> expireTime
-
 					LcomFriendshipData decryptedData = new LcomFriendshipData(
 							data.getFirstUserId(), data.getSecondUserId(),
 							decryptForInputString(data.getSecondUserName()),
