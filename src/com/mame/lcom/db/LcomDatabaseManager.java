@@ -262,11 +262,15 @@ public class LcomDatabaseManager {
 
 				Entity childEntity = new Entity(LcomConst.KIND_USER_DATA,
 						userId, ancKey);
-				childEntity.setProperty("mUserId", userId);
-				childEntity.setProperty("mUserName", data.getUserName());
-				childEntity.setProperty("mPassword", data.getPassword());
-				childEntity.setProperty("mMailAddress", data.getMailAddress());
-				childEntity.setProperty("mThumbnail", data.getThumbnail());
+				childEntity.setProperty(LcomConst.ENTITY_USER_ID, userId);
+				childEntity.setProperty(LcomConst.ENTITY_USER_NAME,
+						data.getUserName());
+				childEntity.setProperty(LcomConst.ENTITY_PASSWORD,
+						data.getPassword());
+				childEntity.setProperty(LcomConst.ENTITY_MAIL_ADDRESS,
+						data.getMailAddress());
+				childEntity.setProperty(LcomConst.ENTITY_THUMBNAIL,
+						data.getThumbnail());
 				ds.put(childEntity);
 				// LcomDatabaseManagerHelper.putUserDataToMemcache(
 				// childEntity.getKey(), childEntity);

@@ -782,4 +782,5 @@ public class LcomDatabaseManagerTest {
 		ds.delete(userKey);
 
 	}
+
 }
