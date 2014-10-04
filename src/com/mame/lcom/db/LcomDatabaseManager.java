@@ -189,13 +189,7 @@ public class LcomDatabaseManager {
 				// (Because we will add +1 below part)
 				DbgUtil.showLog(TAG,
 						"EntityNotFoundException: " + e.getMessage());
-				// entity = new Entity(LcomConst.KIND_ALL_USER_DATA,
-				// LcomConst.ENTITY_TOTAL_USER_NUM);
-				// entity.setProperty(LcomConst.ENTITY_TOTAL_USER_NUM, 0L);
-				// ds.put(entity);
 			}
-			// Key key = KeyFactory.createKey(ancKey, LcomConst.KIND_USER_DATA,
-			// LcomConst.ENTITY_TOTAL_USER_NUM);
 
 			if (entity != null) {
 				DbgUtil.showLog(TAG, "AllUserData entity is not null");
