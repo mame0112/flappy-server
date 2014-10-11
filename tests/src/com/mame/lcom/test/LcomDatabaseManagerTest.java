@@ -254,4 +254,81 @@ public class LcomDatabaseManagerTest {
 		}
 
 	}
+
+	/**
+	 * No user case
+	 */
+	@Test
+	public void testUpdateUserData1() {
+
+		long userId = 1;
+		String userName = "aaaa";
+		String password = "bbbb";
+		String mailAddress = "a@a";
+		Blob thumbnail = null;
+
+		mManager.updateUserData(userId, userName, password, mailAddress,
+				thumbnail);
+
+		Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
+		Entity e;
+		try {
+			e = ds.get(key);
+		} catch (EntityNotFoundException e1) {
+			assertTrue(true);
+		}
+	}
+
+	/**
+	 * User case exists case
+	 */
+	public void testUpdateUserData2() {
+
+		long userId = 1;
+		String userName = "aaaa";
+		String password = "bbbb";
+		String mailAddress = "a@a";
+		Blob thumbnail = null;
+
+		Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
+		Entity prepare = new Entity(key);
+		prepare.setProperty(LcomConst.ENTITY_USER_ID, userId);
+		prepare.setProperty(LcomConst.ENTITY_USER_NAME, userName);
+		prepare.setProperty(LcomConst.ENTITY_PASSWORD, password);
+		prepare.setProperty(LcomConst.ENTITY_MAIL_ADDRESS, mailAddress);
+		ds.put(prepare);
+
+		mManager.updateUserData(userId, userName, password, mailAddress,
+				thumbnail);
+
+		Key keyResult = LcomDatabaseManagerUtil.getUserDataKey(userId);
+		Entity e;
+		try {
+			e = ds.get(keyResult);
+			assertNotNull(e);
+
+			long idResult = (Long) e.getProperty(LcomConst.ENTITY_USER_ID);
+			assertEquals(userId, idResult);
+
+			String nameResult = (String) e
+					.getProperty(LcomConst.ENTITY_USER_NAME);
+			assertEquals(userName, nameResult);
+
+			String mailResult = (String) e
+					.getProperty(LcomConst.ENTITY_MAIL_ADDRESS);
+			assertEquals(mailAddress, mailResult);
+
+			String pwResult = (String) e.getProperty(LcomConst.ENTITY_PASSWORD);
+			assertEquals(password, pwResult);
+
+			Blob thumbResult = (Blob) e.getProperty(LcomConst.ENTITY_THUMBNAIL);
+			assertEquals(thumbnail, thumbResult);
+
+			ds.delete(keyResult);
+
+		} catch (EntityNotFoundException e1) {
+			assertTrue(false);
+		}
+
+	}
 }

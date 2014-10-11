@@ -316,11 +316,11 @@ public class CipherUtil {
 					DbgUtil.showLog(TAG,
 							"BadPaddingException: " + e.getMessage());
 				} catch (InvalidKeyException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					DbgUtil.showLog(TAG,
+							"InvalidKeyException: " + e.getMessage());
 				} catch (InvalidAlgorithmParameterException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					DbgUtil.showLog(TAG, "InvalidAlgorithmParameterException: "
+							+ e.getMessage());
 				}
 			}
 		} else {

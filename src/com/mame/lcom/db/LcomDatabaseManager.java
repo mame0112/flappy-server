@@ -97,8 +97,6 @@ public class LcomDatabaseManager {
 				CipherUtil util = new CipherUtil();
 				userNameInt = util.encryptForInputString(userName);
 				passwordInt = util.encryptForInputString(password);
-				DbgUtil.showLog(TAG, "userNameInt: " + userNameInt);
-				DbgUtil.showLog(TAG, "passwordInt: " + passwordInt);
 			} else {
 				userNameInt = userName;
 				passwordInt = password;
@@ -165,21 +163,26 @@ public class LcomDatabaseManager {
 	 * return user Id. Then, argument (data) user id should be No_user if no
 	 * user exist.
 	 * 
-	 * @param data
+	 * @param dataInt
 	 */
 	public synchronized long addNewUserData(LcomUserData data,
 			boolean isNeedEncryption) {
 		DbgUtil.showLog(TAG, "addNewUserData");
 		// int userId = LcomConst.NO_USER;
 
-		if (isNeedEncryption) {
+		LcomUserData dataInt = null;
+
+		if (isNeedEncryption == true && LcomConst.IS_ENCRYPT == true) {
 			CipherUtil util = new CipherUtil();
-			data = util.encryptForInputLcomUserData(data);
+			dataInt = util.encryptForInputLcomUserData(data);
+
+		} else {
+			dataInt = data;
 		}
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
-		long userId = data.getUserId();
+		long userId = dataInt.getUserId();
 
 		Transaction tx = ds.beginTransaction();
 
@@ -208,15 +211,15 @@ public class LcomDatabaseManager {
 					Entity childEntity = new Entity(LcomConst.KIND_USER_DATA,
 							userId, ancKey);
 					childEntity.setProperty(LcomConst.ENTITY_USER_ID,
-							data.getUserId());
+							dataInt.getUserId());
 					childEntity.setProperty(LcomConst.ENTITY_USER_NAME,
-							data.getUserName());
+							dataInt.getUserName());
 					childEntity.setProperty(LcomConst.ENTITY_PASSWORD,
-							data.getPassword());
+							dataInt.getPassword());
 					childEntity.setProperty(LcomConst.ENTITY_MAIL_ADDRESS,
-							data.getMailAddress());
+							dataInt.getMailAddress());
 					childEntity.setProperty(LcomConst.ENTITY_THUMBNAIL,
-							data.getThumbnail());
+							dataInt.getThumbnail());
 					ds.put(childEntity);
 					// LcomDatabaseManagerHelper.putUserDataToMemcache(
 					// childEntity.getKey(), childEntity);
@@ -241,13 +244,13 @@ public class LcomDatabaseManager {
 					childEntity
 							.setProperty(LcomConst.ENTITY_USER_ID, numOfUser);
 					childEntity.setProperty(LcomConst.ENTITY_USER_NAME,
-							data.getUserName());
+							dataInt.getUserName());
 					childEntity.setProperty(LcomConst.ENTITY_PASSWORD,
-							data.getPassword());
+							dataInt.getPassword());
 					childEntity.setProperty(LcomConst.ENTITY_MAIL_ADDRESS,
-							data.getMailAddress());
+							dataInt.getMailAddress());
 					childEntity.setProperty(LcomConst.ENTITY_THUMBNAIL,
-							data.getThumbnail());
+							dataInt.getThumbnail());
 					ds.put(childEntity);
 					// LcomDatabaseManagerHelper.putUserDataToMemcache(
 					// childEntity.getKey(), childEntity);
@@ -267,13 +270,13 @@ public class LcomDatabaseManager {
 						userId, ancKey);
 				childEntity.setProperty(LcomConst.ENTITY_USER_ID, userId);
 				childEntity.setProperty(LcomConst.ENTITY_USER_NAME,
-						data.getUserName());
+						dataInt.getUserName());
 				childEntity.setProperty(LcomConst.ENTITY_PASSWORD,
-						data.getPassword());
+						dataInt.getPassword());
 				childEntity.setProperty(LcomConst.ENTITY_MAIL_ADDRESS,
-						data.getMailAddress());
+						dataInt.getMailAddress());
 				childEntity.setProperty(LcomConst.ENTITY_THUMBNAIL,
-						data.getThumbnail());
+						dataInt.getThumbnail());
 				ds.put(childEntity);
 				// LcomDatabaseManagerHelper.putUserDataToMemcache(
 				// childEntity.getKey(), childEntity);
@@ -406,9 +409,9 @@ public class LcomDatabaseManager {
 
 		} catch (EntityNotFoundException e) {
 			DbgUtil.showLog(TAG, "EntityNotFoundException: " + e.getMessage());
-			LcomUserData data = new LcomUserData(userId, userNameInt,
-					passwordInt, mailAddressInt, thumbnailInt);
-			addNewUserData(data, false);
+			// LcomUserData data = new LcomUserData(userId, userNameInt,
+			// passwordInt, mailAddressInt, thumbnailInt);
+			// addNewUserData(data, false);
 		}
 	}
 
