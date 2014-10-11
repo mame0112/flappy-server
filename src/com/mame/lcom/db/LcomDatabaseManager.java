@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -95,7 +96,9 @@ public class LcomDatabaseManager {
 			if (LcomConst.IS_ENCRYPT) {
 				CipherUtil util = new CipherUtil();
 				userNameInt = util.encryptForInputString(userName);
-				// passwordInt = util.encryptForInputString(password);
+				passwordInt = util.encryptForInputString(password);
+				DbgUtil.showLog(TAG, "userNameInt: " + userNameInt);
+				DbgUtil.showLog(TAG, "passwordInt: " + passwordInt);
 			} else {
 				userNameInt = userName;
 				passwordInt = password;
@@ -105,11 +108,17 @@ public class LcomDatabaseManager {
 
 			Filter nameFilter = new FilterPredicate(LcomConst.ENTITY_USER_NAME,
 					FilterOperator.EQUAL, userNameInt);
+			Filter passwordFilter = new FilterPredicate(
+					LcomConst.ENTITY_PASSWORD, FilterOperator.EQUAL,
+					passwordInt);
+
+			Filter validFilter = CompositeFilterOperator.and(nameFilter,
+					passwordFilter);
 
 			Key ancKey = LcomDatabaseManagerUtil.getAllUserDataKey();
 			Query query = new Query(LcomConst.KIND_USER_DATA, ancKey);
 			query.setKeysOnly();
-			query.setFilter(nameFilter);
+			query.setFilter(validFilter);
 			PreparedQuery pQuery = ds.prepare(query);
 			Entity entity = pQuery.asSingleEntity();
 			userId = getIdFromEntity(entity);
