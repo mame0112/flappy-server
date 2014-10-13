@@ -100,7 +100,7 @@ public class LcomCreateAccountServlet extends HttpServlet {
 					manager.updateUserData(userIdByMail, userName, password,
 							mailAddress, thumbnail);
 
-					// Get user information
+					// Update user information on friendhsip kind
 					manager.updateUserNameInFriendhsiopTable(userIdByMail,
 							userName);
 

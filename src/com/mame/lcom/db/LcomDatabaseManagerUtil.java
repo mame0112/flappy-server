@@ -41,6 +41,12 @@ public class LcomDatabaseManagerUtil {
 		return key;
 	}
 
+	/**
+	 * 
+	 * @param keyUserId
+	 * @param ds
+	 * @return
+	 */
 	public boolean isEntityForKeyUserIdExist(long keyUserId, DatastoreService ds) {
 		DbgUtil.showLog(TAG, "isEntityForKeyUserIdExist");
 
@@ -519,11 +525,10 @@ public class LcomDatabaseManagerUtil {
 		return result;
 	}
 
-	public Entity getEntityForTargetUser(long userId, long targetUserId,
-			DatastoreService ds) {
+	public Entity getEntityForTargetUser(long userId, DatastoreService ds) {
 		DbgUtil.showLog(TAG, "getEntityForTargetUser");
 
-		if (userId != LcomConst.NO_USER && targetUserId != LcomConst.NO_USER) {
+		if (userId != LcomConst.NO_USER) {
 			Key userKey = LcomDatabaseManagerUtil.getUserDataKey(userId);
 			Key key = KeyFactory.createKey(userKey,
 					LcomConst.KIND_FRIENDSHIP_DATA, userId);

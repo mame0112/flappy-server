@@ -9,7 +9,7 @@ public class LcomConst {
 	// public final static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	public final static String DATE_PATTERN = "dd-MM-yy:HH:mm:SS";
 
-	public final static boolean IS_ENCRYPT = true;
+	public final static boolean IS_ENCRYPT = false;
 
 	public final static boolean IS_DEBUG = true;
 

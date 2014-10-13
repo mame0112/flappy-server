@@ -420,6 +420,7 @@ public class LcomDatabaseManager {
 	 * friend invited to this service (meaning user name was mail address)
 	 * 
 	 * @param userId
+	 *            . Meaning user id that needs to be updated.
 	 * @param userName
 	 */
 	public synchronized void updateUserNameInFriendhsiopTable(long userId,
@@ -469,12 +470,12 @@ public class LcomDatabaseManager {
 		int userNum = 0;
 
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-		Key key = KeyFactory.createKey(LcomAllUserData.class.getSimpleName(),
-				"mTotalUserNum");
+		Key key = KeyFactory.createKey(LcomConst.KIND_ALL_USER_DATA,
+				LcomConst.ENTITY_TOTAL_USER_NUM);
 		Entity entity;
 		try {
 			entity = ds.get(key);
-			userNum = (int) entity.getProperty("mTotalUserNum");
+			userNum = (int) entity.getProperty(LcomConst.ENTITY_TOTAL_USER_NUM);
 		} catch (EntityNotFoundException e) {
 			DbgUtil.showLog(TAG, "EntityNotFoundException: " + e.getMessage());
 		}
@@ -493,7 +494,7 @@ public class LcomDatabaseManager {
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
 		LcomDatabaseManagerUtil util = new LcomDatabaseManagerUtil();
-		Entity entity = util.getEntityForTargetUser(userId, friendUserId, ds);
+		Entity entity = util.getEntityForTargetUser(userId, ds);
 
 		if (entity != null) {
 			DbgUtil.showLog(TAG, "A");
@@ -518,6 +519,7 @@ public class LcomDatabaseManager {
 					&& messageTimeArray != null) {
 
 				int index = friendId.indexOf(friendUserId);
+				DbgUtil.showLog(TAG, "index: " + index);
 				if (index >= 0) {
 					// If the data is for the friendUserId
 					targetUserName = targetUserNameArray.get(index);
@@ -569,10 +571,11 @@ public class LcomDatabaseManager {
 					result.add(data);
 				}
 			}
-		}
 
-		CipherUtil cipherUtil = new CipherUtil();
-		result = cipherUtil.decryptForNewMessageData(result);
+			CipherUtil cipherUtil = new CipherUtil();
+			result = cipherUtil.decryptForNewMessageData(result);
+
+		}
 
 		return result;
 
