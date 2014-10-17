@@ -104,7 +104,9 @@
 								</script></li>
 							<li><a href="http://mame0112.hatenablog.com/"
 								data-localize="header.blog">Blog</a></li>
+						</ul>
 					</div>
+				</div>
 			</nav>
 			<div class="page-header">
 				<h1 data-localize="contact.title">Contact</h1>
