@@ -464,6 +464,9 @@ public class LcomDatabaseManagerUtil {
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 
 			if (friendIdArray != null && friendIdArray.size() != 0) {
+
+				long currentTime = TimeUtil.getCurrentDate();
+
 				for (int i = 0; i < friendIdArray.size(); i++) {
 					long friendId = friendIdArray.get(i);
 					String friendName = friendNameArray.get(i);
@@ -481,8 +484,6 @@ public class LcomDatabaseManagerUtil {
 						if (msgParsed != null && msgParsed.length != 0) {
 							List<String> validMessage = new ArrayList<String>();
 							List<Long> validExpireTime = new ArrayList<Long>();
-
-							long currentTime = TimeUtil.getCurrentDate();
 
 							// Old message should be removed when the user goes
 							// to Conversation activity
