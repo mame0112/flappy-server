@@ -551,17 +551,19 @@ public class LcomDatabaseManager {
 							messagePostedArray.set(index, null);
 						}
 					}
+
+					// Update entity
+					entity.setProperty(
+							LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+							messageArray);
+					entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+							messageTimeArray);
+					entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+							messagePostedArray);
+
+					ds.put(entity);
+
 				}
-
-				// Update entity
-				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-						messageArray);
-				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-						messageTimeArray);
-				entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-						messagePostedArray);
-
-				ds.put(entity);
 
 				if (validMessage != null && validMessage.size() != 0) {
 					DbgUtil.showLog(TAG, "validMessage: " + validMessage);

@@ -467,13 +467,17 @@ public class LcomDatabaseManagerTest {
 
 		// Preparation
 		Key key = LcomDatabaseManagerUtil.getUserDataKey(userId);
-		Entity prepare = new Entity(key);
-		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME, expire);
-		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID, friendId);
-		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME, friendName);
-		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME, posted);
+		Entity prepare = new Entity(LcomConst.KIND_FRIENDSHIP_DATA, userId, key);
+		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+				Arrays.asList(String.valueOf(expire)));
+		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
+				Arrays.asList(friendId));
+		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				Arrays.asList(friendName));
+		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
+				Arrays.asList(String.valueOf(posted)));
 		prepare.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-				message);
+				Arrays.asList(message));
 		ds.put(prepare);
 
 		long testFriendUserId = 3;
@@ -483,9 +487,19 @@ public class LcomDatabaseManagerTest {
 				.getNewMessagesWithTargetUser(userId, testFriendUserId,
 						currentTime);
 
-		if (result != null) {
-			assertEquals(result.size(), 0);
-		}
+		assertNotNull(result);
+		assertEquals(result.size(), 0);
+
+		Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, key);
+		PreparedQuery pQuery = ds.prepare(query);
+		Entity entity = pQuery.asSingleEntity();
+
+		assertNotNull(entity);
+
+		List<String> friendUserIds = (List<String>) entity
+				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+		int index = friendUserIds.indexOf(friendId);
+		assertSame(index, 0);
 
 		ds.delete(key);
 	}

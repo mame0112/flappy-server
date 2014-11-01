@@ -85,19 +85,12 @@ public class LcomDatabaseManagerUtil {
 		List<Long> friendUserIdArray = (List<Long>) entity
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
 
-		if (friendUserIdArray != null) {
+		if (friendUserIdArray != null && friendUserIdArray.size() >= 1) {
 			int index = friendUserIdArray.indexOf(friendUserId);
 			if (index >= 0) {
 				return true;
 			}
 		}
-
-		// for (long id : friendUserIdArray) {
-		// if (id == friendUserId) {
-		// return true;
-		// }
-		// }
-
 		return false;
 	}
 
@@ -269,7 +262,7 @@ public class LcomDatabaseManagerUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean addNewUserDataAndMessageToFriendship(Entity e,
+	public void addNewUserDataAndMessageToFriendship(Entity e,
 			long senderUserId, String senderName, long keyUserId,
 			String keyUserName, String lastMessage, long currentTime,
 			DatastoreService ds) {
@@ -314,20 +307,7 @@ public class LcomDatabaseManagerUtil {
 			putNewMessageInfoToEntity(e, senderUserId, senderName, lastMessage,
 					String.valueOf(currentTime), String.valueOf(expireDate));
 			ds.put(e);
-			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
-			// Arrays.asList(senderUserId));
-			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
-			// Arrays.asList(senderName));
-			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-			// Arrays.asList(lastMessage));
-			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-			// Arrays.asList(String.valueOf(currentTime)));
-			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
-			// Arrays.asList(String.valueOf(expireDate)));
-			// ds.put(e);
 		}
-
-		return true;
 	}
 
 	public boolean addNewEntiyInFriendshipTable(long senderUserId,
