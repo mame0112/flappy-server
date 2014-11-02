@@ -128,9 +128,9 @@ public class LcomMail {
 					+ "flappy.communication@gmail.com<br><br>" + "---<br>"
 					+ "2014 flappy<br><br><br>";
 
-			String msgJpn = "flappyにようこそ!<br><br>" + "あなたは" + fromUserName
-					+ " さんにこのサービスに招待されました。<br>"
-					+ "このサービスは、自然に消えるメッセージによるストレスフリーのコミュニケーションツールです。<br>"
+			String msgJpn = "flappy(フラッピー)にようこそ!<br><br>" + "あなたは" + fromUserName
+					+ " さんから、このサービスに招待されました。<br>"
+					+ "flappyは、自然に消えるメッセージによるストレスフリーのコミュニケーションサービスです。<br>"
 					+ "より詳細は、下記のリンクよりご確認ください。<br><br>"
 					+ "http://loosecommunication.appspot.com/<br><br>"
 					+ "また、もし何か疑問や不明点などございましたら、下記の連絡先へご連絡ください<br>"
