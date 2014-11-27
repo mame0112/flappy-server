@@ -730,8 +730,8 @@ public class LcomDatabaseManager {
 					// to this user
 					// Add new user data and message
 					util.addNewUserDataAndMessageToFriendship(entity,
-							senderUserId, senderNameInt, keyUserId,
-							keyUserNameInt, lastMessageInt, currentTime, ds);
+							senderUserId, senderNameInt, lastMessageInt,
+							currentTime, ds);
 				}
 			} else {
 				DbgUtil.showLog(TAG, "E");

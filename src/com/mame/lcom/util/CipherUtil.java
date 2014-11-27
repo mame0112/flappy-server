@@ -273,8 +273,8 @@ public class CipherUtil {
 
 				for (LcomFriendshipData data : input) {
 					LcomFriendshipData decryptedData = new LcomFriendshipData(
-							data.getFirstUserId(), data.getSecondUserId(),
-							decryptForInputString(data.getSecondUserName()),
+							data.getFirstUserId(), data.getFriendUserId(),
+							decryptForInputString(data.getFriendUserName()),
 							decryptInputStringList(data.getLatestMessage()),
 							data.getLastMessageExpireTime());
 

@@ -56,7 +56,7 @@ public class LcomFriendshipData {
 		return mUserId;
 	}
 
-	public long getSecondUserId() {
+	public long getFriendUserId() {
 		return mFriendUserId;
 	}
 
@@ -64,7 +64,7 @@ public class LcomFriendshipData {
 	// return mUserName;
 	// }
 
-	public String getSecondUserName() {
+	public String getFriendUserName() {
 		return mFriendUserName;
 	}
 

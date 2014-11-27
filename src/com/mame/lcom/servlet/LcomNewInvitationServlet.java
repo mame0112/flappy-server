@@ -40,6 +40,8 @@ public class LcomNewInvitationServlet extends HttpServlet {
 		DbgUtil.showLog(TAG, "doPost:" + TimeUtil.calcResponse());
 		String secretKey = req.getParameter(LcomConst.SERVLET_IDENTIFIER);
 
+		DbgUtil.showLog(TAG, "secretKey:" + secretKey);
+
 		String origin = CipherUtil.decrypt(
 				req.getParameter(LcomConst.SERVLET_ORIGIN), secretKey);
 		String userId = CipherUtil.decrypt(

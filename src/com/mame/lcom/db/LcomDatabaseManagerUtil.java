@@ -263,9 +263,8 @@ public class LcomDatabaseManagerUtil {
 
 	@SuppressWarnings("unchecked")
 	public void addNewUserDataAndMessageToFriendship(Entity e,
-			long senderUserId, String senderName, long keyUserId,
-			String keyUserName, String lastMessage, long currentTime,
-			DatastoreService ds) {
+			long senderUserId, String senderName, String lastMessage,
+			long currentTime, DatastoreService ds) {
 
 		DbgUtil.showLog(TAG, "addNewUserDataAndMessageToFriendship");
 
@@ -615,8 +614,25 @@ public class LcomDatabaseManagerUtil {
 		DbgUtil.showLog(TAG, "addNewUserDataToFriendshipKind");
 
 		if (userId != LcomConst.NO_USER && e != null) {
-			putNewMessageInfoToEntity(e, userId, userName, message,
-					String.valueOf(postTime), String.valueOf(expireTime));
+
+			List<Long> friendUserIdArray = (List<Long>) e
+					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
+
+			if (friendUserIdArray != null) {
+
+				int index = friendUserIdArray.indexOf(userId);
+
+				// If target user already exist
+				if (index != -1) {
+					putNewMessageInfoToEntity(e, userId, userName, message,
+							String.valueOf(postTime),
+							String.valueOf(expireTime));
+				} else {
+					// If target user doesn't exist (first time)
+					addNewUserDataAndMessageToFriendship(e, userId, userName,
+							message, postTime, ds);
+				}
+			}
 
 			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
 			// Arrays.asList(String.valueOf(expireTime)));

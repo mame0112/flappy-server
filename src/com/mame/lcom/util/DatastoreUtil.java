@@ -155,8 +155,8 @@ public class DatastoreUtil {
 		String parsed = null;
 		// int firstUserId = data.getFirstUserId();
 		// String firstUserName = data.getFirstUserName();
-		long secondUserId = data.getSecondUserId();
-		String secondUserName = data.getSecondUserName();
+		long secondUserId = data.getFriendUserId();
+		String secondUserName = data.getFriendUserName();
 		List<String> messages = data.getLatestMessage();
 		List<Long> expireDate = data.getLastMessageExpireTime();
 		// int numOfMessage = data.getNumOfNewMessage();
