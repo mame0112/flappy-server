@@ -296,9 +296,9 @@ public class LcomDatabaseManagerUtil {
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 					messageArray);
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
-					expireTimeArray);
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
 					postedTimeArray);
+			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
+					expireTimeArray);
 			ds.put(e);
 
 		} else {
