@@ -3,11 +3,9 @@ package com.mame.lcom.db;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -16,6 +14,7 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Text;
 import com.mame.lcom.constant.LcomConst;
 import com.mame.lcom.data.LcomFriendshipData;
 import com.mame.lcom.util.DbgUtil;
@@ -26,7 +25,7 @@ public class LcomDatabaseManagerUtil {
 	private final static Logger log = Logger
 			.getLogger(LcomDatabaseManagerUtil.class.getName());
 
-	private final String TAG = "LcomDatabaseManagerUtil";
+	private final static String TAG = "LcomDatabaseManagerUtil";
 
 	public static Key getAllUserDataKey() {
 		Key ancKey = KeyFactory.createKey(LcomConst.KIND_ALL_USER_DATA,
@@ -39,6 +38,103 @@ public class LcomDatabaseManagerUtil {
 		Key key = KeyFactory
 				.createKey(ancKey, LcomConst.KIND_USER_DATA, userId);
 		return key;
+	}
+
+	public static String getStoredStringValue(Entity e, String column) {
+		if (column != null) {
+
+			Text textValue = (Text) e.getProperty(column);
+			String output = null;
+
+			if (textValue != null) {
+				output = textValue.getValue();
+			}
+
+			return output;
+
+		}
+		return null;
+	}
+
+	public static List<Long> getStoredLongList(Entity e, String column) {
+		if (e != null && column != null) {
+
+			List<Text> textArray = (List<Text>) e.getProperty(column);
+			List<Long> output = new ArrayList<Long>();
+
+			for (Text t : textArray) {
+				if (t != null) {
+					output.add(Long.valueOf(t.getValue()));
+				}
+			}
+
+			return output;
+		}
+		return null;
+	}
+
+	public static void setLongListAsText(Entity e, String column,
+			List<Long> input) {
+		if (e != null && column != null && input != null) {
+
+			List<Text> output = new ArrayList<Text>();
+
+			for (Long value : input) {
+				output.add(new Text(String.valueOf(value)));
+			}
+
+			e.setProperty(column, input);
+
+		}
+	}
+
+	public static List<String> getStoredStringList(Entity e, String column) {
+		if (e != null && column != null) {
+
+			List<Text> textArray = (List<Text>) e.getProperty(column);
+			List<String> output = new ArrayList<String>();
+
+			for (Text t : textArray) {
+				if (t != null) {
+					String value = t.getValue();
+					if (value != null) {
+						output.add(t.getValue());
+					} else {
+						output.add(null);
+					}
+				} else {
+					output.add(null);
+				}
+
+			}
+
+			return output;
+		}
+		return null;
+	}
+
+	public static void setStringListAsText(Entity e, String column,
+			List<String> input) {
+		DbgUtil.showLog(TAG, "A");
+		if (e != null && column != null && input != null) {
+			DbgUtil.showLog(TAG, "B");
+			List<Text> output = new ArrayList<Text>();
+
+			DbgUtil.showLog(TAG, "C");
+			for (String value : input) {
+				DbgUtil.showLog(TAG, "D: " + value);
+				if (value != null) {
+					DbgUtil.showLog(TAG, "E");
+					output.add(new Text(value));
+				} else {
+					DbgUtil.showLog(TAG, "F");
+					output.add(null);
+				}
+			}
+
+			e.setProperty(column, output);
+
+		}
 	}
 
 	/**
@@ -94,28 +190,6 @@ public class LcomDatabaseManagerUtil {
 		return false;
 	}
 
-	// public boolean isFriendUserDataExist(long keyUserId, long friendUserId,
-	// DatastoreService ds) {
-	//
-	// Key userKey = getUserDataKey(keyUserId);
-	//
-	// Filter userIdFilter = new FilterPredicate(
-	// LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID, FilterOperator.EQUAL,
-	// friendUserId);
-	//
-	// Query query = new Query(LcomConst.KIND_FRIENDSHIP_DATA, userKey);
-	// query.setKeysOnly();
-	// query.setFilter(userIdFilter);
-	// PreparedQuery pQuery = ds.prepare(query);
-	// Entity entity = pQuery.asSingleEntity();
-	//
-	// if (entity != null) {
-	// return true;
-	// } else {
-	// return false;
-	// }
-	// }
-
 	/**
 	 * 
 	 * @param e
@@ -139,8 +213,10 @@ public class LcomDatabaseManagerUtil {
 
 			List<Long> friendUserIdArray = (List<Long>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-			List<String> messageArray = (List<String>) e
-					.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			// List<String> messageArray = (List<String>) e
+			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			List<String> messageArray = getStoredStringList(e,
+					LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
 			List<String> expireTimeArray = (List<String>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 			List<String> postedTimeArray = (List<String>) e
@@ -193,9 +269,13 @@ public class LcomDatabaseManagerUtil {
 							postedTimeArray.set(index, postedTime);
 
 							// Update entity
-							e.setProperty(
+							setStringListAsText(
+									e,
 									LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 									messageArray);
+							// e.setProperty(
+							// LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+							// messageArray);
 							e.setProperty(
 									LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
 									postedTimeArray);
@@ -252,11 +332,15 @@ public class LcomDatabaseManagerUtil {
 					Arrays.asList(expireTime));
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
 					Arrays.asList(senderUserId));
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+			// Arrays.asList(senderUserName));
+			setStringListAsText(e, LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
 					Arrays.asList(senderUserName));
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
 					Arrays.asList(postTime));
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// Arrays.asList(message));
+			setStringListAsText(e, LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 					Arrays.asList(message));
 		}
 	}
@@ -270,10 +354,15 @@ public class LcomDatabaseManagerUtil {
 
 		List<Long> friendUserIdArray = (List<Long>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-		List<String> friendUserNameArray = (List<String>) e
-				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
-		List<String> messageArray = (List<String>) e
-				.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		// List<String> friendUserNameArray = (List<String>) e
+		// .getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+		List<String> friendUserNameArray = getStoredStringList(e,
+				LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+		// List<String> messageArray = (List<String>) e
+		// .getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		List<String> messageArray = getStoredStringList(e,
+				LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+
 		List<String> expireTimeArray = (List<String>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 		List<String> postedTimeArray = (List<String>) e
@@ -291,9 +380,13 @@ public class LcomDatabaseManagerUtil {
 
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
 					friendUserIdArray);
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+			// friendUserNameArray);
+			setStringListAsText(e, LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
 					friendUserNameArray);
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// messageArray);
+			setStringListAsText(e, LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 					messageArray);
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
 					postedTimeArray);
@@ -366,10 +459,16 @@ public class LcomDatabaseManagerUtil {
 
 			List<Long> friendIdArray = (List<Long>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-			List<String> friendNameArray = (List<String>) e
-					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
-			List<String> messageArray = (List<String>) e
-					.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			// List<String> friendNameArray = (List<String>) e
+			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+			List<String> friendNameArray = getStoredStringList(e,
+					LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+
+			// List<String> messageArray = (List<String>) e
+			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			List<String> messageArray = getStoredStringList(e,
+					LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+
 			List<String> messageTimeArray = (List<String>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 
@@ -435,10 +534,15 @@ public class LcomDatabaseManagerUtil {
 		if (e != null) {
 			List<Long> friendIdArray = (List<Long>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-			List<String> friendNameArray = (List<String>) e
-					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
-			List<String> messageArray = (List<String>) e
-					.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			// List<String> friendNameArray = (List<String>) e
+			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+			List<String> friendNameArray = getStoredStringList(e,
+					LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+
+			// List<String> messageArray = (List<String>) e
+			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			List<String> messageArray = getStoredStringList(e,
+					LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
 			List<String> messageTimeArray = (List<String>) e
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 
@@ -657,8 +761,10 @@ public class LcomDatabaseManagerUtil {
 
 		List<Long> friendList = (List<Long>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-		List<String> messageList = (List<String>) e
-				.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		// List<String> messageList = (List<String>) e
+		// .getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+		List<String> messageList = getStoredStringList(e,
+				LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
 		List<String> postDateList = (List<String>) e
 				.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
 		List<String> expireDateList = (List<String>) e
@@ -751,7 +857,9 @@ public class LcomDatabaseManagerUtil {
 			}
 
 			// Update Entity
-			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+			// messageList);
+			setStringListAsText(e, LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 					messageList);
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME, postDateList);
 			e.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
@@ -776,11 +884,15 @@ public class LcomDatabaseManagerUtil {
 				Arrays.asList(String.valueOf(expireTime)));
 		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID,
 				Arrays.asList(userId));
-		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+		// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+		// Arrays.asList(userName));
+		setStringListAsText(e, LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
 				Arrays.asList(userName));
 		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
 				Arrays.asList(String.valueOf(postTime)));
-		e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+		// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+		// Arrays.asList(message));
+		setStringListAsText(e, LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 				Arrays.asList(message));
 
 		ds.put(e);

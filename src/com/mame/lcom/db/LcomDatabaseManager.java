@@ -1,6 +1,7 @@
 package com.mame.lcom.db;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
@@ -456,8 +457,12 @@ public class LcomDatabaseManager {
 
 			// Update all entites by using userName
 			for (Entity e : allEntities) {
-				e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
-						userNameInt);
+				// TODO Need to check behavior if this works correctly
+				// e.setProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+				// userNameInt);
+				LcomDatabaseManagerUtil.setStringListAsText(e,
+						LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME,
+						Arrays.asList(userNameInt));
 				ds.put(e);
 			}
 		} else {
@@ -500,14 +505,21 @@ public class LcomDatabaseManager {
 			DbgUtil.showLog(TAG, "A");
 			ArrayList<Long> friendId = (ArrayList<Long>) entity
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_ID);
-			ArrayList<String> messageArray = (ArrayList<String>) entity
-					.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			// ArrayList<String> messageArray = (ArrayList<String>) entity
+			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+			List<String> messageArray = LcomDatabaseManagerUtil
+					.getStoredStringList(entity,
+							LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
 			ArrayList<String> messageTimeArray = (ArrayList<String>) entity
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 			ArrayList<String> messagePostedArray = (ArrayList<String>) entity
 					.getProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME);
-			ArrayList<String> targetUserNameArray = (ArrayList<String>) entity
-					.getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+			// ArrayList<String> targetUserNameArray = (ArrayList<String>)
+			// entity
+			// .getProperty(LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
+			List<String> targetUserNameArray = LcomDatabaseManagerUtil
+					.getStoredStringList(entity,
+							LcomConst.ENTITY_FRIENDSHIP_FRIEND_NAME);
 
 			// Values for returning valid data to client side
 			List<String> validMessage = new ArrayList<String>();
@@ -553,9 +565,13 @@ public class LcomDatabaseManager {
 					}
 
 					// Update entity
-					entity.setProperty(
+					// entity.setProperty(
+					// LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+					// messageArray);
+					LcomDatabaseManagerUtil.setStringListAsText(entity,
 							LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
 							messageArray);
+
 					entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME,
 							messageTimeArray);
 					entity.setProperty(LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
@@ -1019,8 +1035,11 @@ public class LcomDatabaseManager {
 				Entity entity = pQueryFS.asSingleEntity();
 
 				if (entity != null) {
-					List<String> messageArray = (List<String>) entity
-							.getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+					// List<String> messageArray = (List<String>) entity
+					// .getProperty(LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
+					List<String> messageArray = LcomDatabaseManagerUtil
+							.getStoredStringList(e,
+									LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE);
 					List<String> expireTimeArray = (List<String>) entity
 							.getProperty(LcomConst.ENTITY_FRIENDSHIP_EXPIRE_TIME);
 					List<String> messagePostedArray = (List<String>) entity
@@ -1108,9 +1127,14 @@ public class LcomDatabaseManager {
 								}
 
 								// Set updated parameters to Entity
-								e.setProperty(
-										LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
-										validMessageArray);
+								// e.setProperty(
+								// LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+								// validMessageArray);
+								LcomDatabaseManagerUtil
+										.setStringListAsText(
+												e,
+												LcomConst.ENTITY_FRIENDSHIP_RECEIVE_MESSAGE,
+												validMessageArray);
 								e.setProperty(
 										LcomConst.ENTITY_FRIENDSHIP_POSTED_TIME,
 										validPostTimeArray);
