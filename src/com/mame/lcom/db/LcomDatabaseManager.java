@@ -539,6 +539,11 @@ public class LcomDatabaseManager {
 					String messageTimes = messageTimeArray.get(index);
 					String messagePostTimes = messagePostedArray.get(index);
 
+					DbgUtil.showLog(TAG, "messages: " + messages);
+					DbgUtil.showLog(TAG, "messageTimes: " + messageTimes);
+					DbgUtil.showLog(TAG, "messagePostTimes: "
+							+ messagePostTimes);
+
 					if (messages != null && messageTimes != null
 							&& messagePostTimes != null) {
 						String[] msg = messages.split(LcomConst.SEPARATOR);

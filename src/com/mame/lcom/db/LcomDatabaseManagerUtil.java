@@ -2,6 +2,7 @@ package com.mame.lcom.db;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -83,7 +84,11 @@ public class LcomDatabaseManagerUtil {
 				output.add(new Text(String.valueOf(value)));
 			}
 
-			e.setProperty(column, input);
+			// Initialize
+			e.setProperty(column, null);
+
+			// Put new data
+			e.setProperty(column, output);
 
 		}
 	}
@@ -91,7 +96,7 @@ public class LcomDatabaseManagerUtil {
 	public static List<String> getStoredStringList(Entity e, String column) {
 		if (e != null && column != null) {
 
-			List<Text> textArray = (List<Text>) e.getProperty(column);
+			ArrayList<Text> textArray = (ArrayList<Text>) e.getProperty(column);
 			List<String> output = new ArrayList<String>();
 
 			for (Text t : textArray) {
@@ -118,10 +123,11 @@ public class LcomDatabaseManagerUtil {
 		DbgUtil.showLog(TAG, "A");
 		if (e != null && column != null && input != null) {
 			DbgUtil.showLog(TAG, "B");
-			List<Text> output = new ArrayList<Text>();
+			ArrayList<Text> output = new ArrayList<Text>();
 
 			DbgUtil.showLog(TAG, "C");
 			for (String value : input) {
+
 				DbgUtil.showLog(TAG, "D: " + value);
 				if (value != null) {
 					DbgUtil.showLog(TAG, "E");
@@ -132,6 +138,10 @@ public class LcomDatabaseManagerUtil {
 				}
 			}
 
+			// Initialize
+			e.setProperty(column, null);
+
+			// Put new data
 			e.setProperty(column, output);
 
 		}
