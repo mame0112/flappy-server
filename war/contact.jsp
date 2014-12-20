@@ -123,7 +123,8 @@
 							case 0 : //result OK
 			%>
 			<div class="alert alert-success"
-				data-localize="contact.result_success">Success!</div>
+				data-localize="contact.result_success">Thank you for
+				submitting. Successfully sent out e-mail.</div>
 			<%
 				break;
 							case 1 :
