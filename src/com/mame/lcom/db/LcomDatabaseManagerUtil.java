@@ -84,11 +84,8 @@ public class LcomDatabaseManagerUtil {
 				output.add(new Text(String.valueOf(value)));
 			}
 
-			// Initialize
-			e.setProperty(column, null);
-
 			// Put new data
-			e.setProperty(column, output);
+			e.setUnindexedProperty(column, output);
 
 		}
 	}
@@ -123,7 +120,7 @@ public class LcomDatabaseManagerUtil {
 		DbgUtil.showLog(TAG, "A");
 		if (e != null && column != null && input != null) {
 			DbgUtil.showLog(TAG, "B");
-			ArrayList<Text> output = new ArrayList<Text>();
+			List<Text> output = new ArrayList<Text>();
 
 			DbgUtil.showLog(TAG, "C");
 			for (String value : input) {
@@ -138,11 +135,10 @@ public class LcomDatabaseManagerUtil {
 				}
 			}
 
-			// Initialize
-			e.setProperty(column, null);
-
 			// Put new data
-			e.setProperty(column, output);
+			// if we set "null", collection order change due to Property list
+			// specification. then, we have to use "setUnindexedProperty.
+			e.setUnindexedProperty(column, output);
 
 		}
 	}
