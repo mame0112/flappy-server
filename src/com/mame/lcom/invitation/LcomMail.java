@@ -38,7 +38,7 @@ public class LcomMail {
 			String msgEng = "Welcome to flappy!<br><br>"
 					+ "This service is a stress-less communication tool by to be disappeard message."
 					+ "For more details, please see below link:<br><br>"
-					+ "http://loosecommunication.appspot.com/<br><br>"
+					+ "http://flappy-communication.appspot.com/<br><br>"
 					+ "And if you have any comment or question on this service, please send an e-mail to us from below link.<br>"
 					+ "flappy.communication@gmail.com<br><br>" + "---<br>"
 					+ "2014 flappy<br><br><br>";
@@ -46,7 +46,7 @@ public class LcomMail {
 			String msgJpn = "flappy(フラッピー)にようこそ!<br><br>"
 					+ "このサービスは、「既読スルー」可能な、自然に消えるメッセージによる、ゆるふわコミュニケーションツールです。<br>"
 					+ "より詳細は、下記のリンクよりご確認ください。<br><br>"
-					+ "http://loosecommunication.appspot.com/<br><br>"
+					+ "http://flappy-communication.appspot.com/<br><br>"
 					+ "また、もし何か疑問や不明点などございましたら、下記の連絡先へご連絡ください<br>"
 					+ "flappy.communication@gmail.com<br><br>" + "---<br>"
 					+ "2014 flappy<br><br>";
@@ -128,8 +128,8 @@ public class LcomMail {
 					+ "flappy.communication@gmail.com<br><br>" + "---<br>"
 					+ "2014 flappy<br><br><br>";
 
-			String msgJpn = "flappy(フラッピー)にようこそ!<br><br>" + "あなたは" + fromUserName
-					+ " さんから、このサービスに招待されました。<br>"
+			String msgJpn = "flappy(フラッピー)にようこそ!<br><br>" + "あなたは"
+					+ fromUserName + " さんから、このサービスに招待されました。<br>"
 					+ "flappyは、自然に消えるメッセージによるストレスフリーのコミュニケーションサービスです。<br>"
 					+ "より詳細は、下記のリンクよりご確認ください。<br><br>"
 					+ "http://loosecommunication.appspot.com/<br><br>"

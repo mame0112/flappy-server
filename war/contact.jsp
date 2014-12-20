@@ -43,6 +43,11 @@
 </script>
 </head>
 <body>
+	<script type=htext/javascripth>
+	if (location.protocol == "http:") {
+		location.href="https://flappy-communication.appspot.com/contact.jsp";
+	}
+</script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script src="js/bootstrap.min.js"></script>
 	<script type="text/javascript">
@@ -81,7 +86,7 @@
 							<li><a href="tos.html" data-localize="header.tos">Terms
 									of use</a></li>
 							<li><a
-								href="https://1-dot-loosecommunication.appspot.com/contact.jsp"
+								href="https://flappy-communication.appspot.com/contact.jsp"
 								data-localize="header.contact">Contact</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
@@ -118,7 +123,13 @@
 				if (session.getAttribute("result") != null) {
 					String tmp = (String) session.getAttribute("result");
 					if (tmp != null && !tmp.equals("null")) {
-						int result = Integer.valueOf(tmp);
+						int result = 0;
+						try {
+							result = Integer.valueOf(tmp);
+						} catch (NumberFormatException e) {
+							result = 10;
+						}
+
 						switch (result) {
 							case 0 : //result OK
 			%>
@@ -128,13 +139,13 @@
 			<%
 				break;
 							case 1 :
+							default : // Default is used when cached data remains
 								//Nothing to show
 								break;
 							case 2 :
 							case 3 :
 							case 4 :
 							case 5 :
-							default :
 			%>
 			<div class="alert alert-danger" data-localize="contact.result_failed">Failed
 				to send inquery message</div>
@@ -214,7 +225,7 @@
 	<div id="footer">
 		<div class="container">
 			<ul class="nav nav-pills">
-				<li><a href="http://loosecommunication.appspot.com/"
+				<li><a href="http://flappy-communication.appspot.com/"
 					data-localize="footer.home">Home</a></li>
 				<li><a href="overview.html" data-localize="footer.about">About
 						flappy</a></li>
@@ -223,7 +234,7 @@
 				<li class="span4"><a href="tos.html" data-localize="footer.tos">Terms
 						of use</a></li>
 				<li class="span5"><a
-					href="https://1-dot-loosecommunication.appspot.com/contact.jsp"
+					href="https://flappy-communication.appspot.com/contact.jsp"
 					data-localize="footer.contact">Contact</a></li>
 				<li class="span6"><a href="http://mame0112.hatenablog.com/"
 					target="blank" data-localize="footer.blog">Blog</a></li>
