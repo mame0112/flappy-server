@@ -24,7 +24,7 @@ public class TimeUtil {
 	}
 
 	public static long getExpireDate(long date) {
-		long expireTime = date + LcomConst.MESSAGE_EXPIRE_PERIOD; // 3omin
+		long expireTime = date + LcomConst.MESSAGE_EXPIRE_PERIOD; // 1 hour
 		return expireTime;
 	}
 
