@@ -73,21 +73,27 @@
 								class="icon-bar"></span> <span class="icon-bar"></span> <span
 								class="icon-bar"></span>
 						</button>
-						<a class="navbar-brand" href="index.html">flappy</a>
+						<a class="navbar-brand" href="index.html"
+							onclick="ga('send', 'event', 'Contact', 'Header', 'Top');">flappy</a>
 					</div>
 
 					<div class="collapse navbar-collapse"
 						id="bs-example-navbar-collapse-1">
 						<ul class="nav navbar-nav">
-							<li><a href="overview.html" data-localize="header.about">About
+							<li><a href="overview.html" data-localize="header.about"
+								onclick="ga('send', 'event', 'Contact', 'Header', 'Overview');">About
 									flappy</a></li>
 							<li><a href="privacypolicy.html"
-								data-localize="header.privacy">Privacy policy</a></li>
-							<li><a href="tos.html" data-localize="header.tos">Terms
-									of use</a></li>
+								data-localize="header.privacy"
+								onclick="ga('send', 'event', 'Contact', 'Header', 'Privacy');">Privacy
+									policy</a></li>
+							<li><a href="tos.html" data-localize="header.tos"
+								onclick="ga('send', 'event', 'Contact', 'Header', 'TOS');">Terms of
+									use</a></li>
 							<li><a
 								href="https://flappy-communication.appspot.com/contact.jsp"
-								data-localize="header.contact">Contact</a></li>
+								data-localize="header.contact"
+								onclick="ga('send', 'event', 'Contact', 'Header', 'Contact');">Contact</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 							<li><a href="https://twitter.com/share"
@@ -108,7 +114,8 @@
 									}(document, 'script', 'twitter-wjs');
 								</script></li>
 							<li><a href="http://mame0112.hatenablog.com/"
-								data-localize="header.blog">Blog</a></li>
+								data-localize="header.blog"
+								onclick="ga('send', 'event', 'Contact', 'Header', 'Blog');">Blog</a></li>
 						</ul>
 					</div>
 				</div>
@@ -214,7 +221,8 @@
 				<div class="row">
 					<p>
 						<input type="submit" value="Submit" type="button"
-							class="btn btn-primary btn-lg" />
+							class="btn btn-primary btn-lg"
+							onclick="ga('send', 'event', 'Contact', 'Inquiry', 'SendButton');" />
 					</p>
 				</div>
 			</form>
@@ -226,18 +234,24 @@
 		<div class="container">
 			<ul class="nav nav-pills">
 				<li><a href="http://flappy-communication.appspot.com/"
-					data-localize="footer.home">Home</a></li>
-				<li><a href="overview.html" data-localize="footer.about">About
+					data-localize="footer.home"
+					onclick="ga('send', 'event', 'Contact', 'Footer', 'Top');">Home</a></li>
+				<li><a href="overview.html" data-localize="footer.about"
+					onclick="ga('send', 'event', 'Contact', 'Footer', 'Overview');">About
 						flappy</a></li>
 				<li class="span3"><a href="privacypolicy.html"
-					data-localize="footer.privacy">Privacy policy</a></li>
-				<li class="span4"><a href="tos.html" data-localize="footer.tos">Terms
-						of use</a></li>
+					data-localize="footer.privacy"
+					onclick="ga('send', 'event', 'Contact', 'Footer', 'Privacy');">Privacy
+						policy</a></li>
+				<li class="span4"><a href="tos.html" data-localize="footer.tos"
+					onclick="ga('send', 'event', 'Contact', 'Footer', 'TOS');">Terms of use</a></li>
 				<li class="span5"><a
 					href="https://flappy-communication.appspot.com/contact.jsp"
-					data-localize="footer.contact">Contact</a></li>
+					data-localize="footer.contact"
+					onclick="ga('send', 'event', 'Contact', 'Footer', 'Contact');">Contact</a></li>
 				<li class="span6"><a href="http://mame0112.hatenablog.com/"
-					target="blank" data-localize="footer.blog">Blog</a></li>
+					target="blank" data-localize="footer.blog"
+					onclick="ga('send', 'event', 'Contact', 'Footer', 'Blog');">Blog</a></li>
 			</ul>
 			<address>
 				<strong>flappy</strong> flappy.communication@gmail.com
