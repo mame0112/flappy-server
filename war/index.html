@@ -49,13 +49,23 @@
 <body>
 	<div id="fb-root"></div>
 	<script>
+		//		(function(d, s, id) {
+		//			var js, fjs = d.getElementsByTagName(s)[0];
+		//			if (d.getElementById(id))
+		//				return;
+		//			js = d.createElement(s);
+		//			js.id = id;
+		//			js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=478333052179762&version=v2.0";
+		//			fjs.parentNode.insertBefore(js, fjs);
+		//		}(document, 'script', 'facebook-jssdk'));
+
 		(function(d, s, id) {
 			var js, fjs = d.getElementsByTagName(s)[0];
 			if (d.getElementById(id))
 				return;
 			js = d.createElement(s);
 			js.id = id;
-			js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=478333052179762";
+			js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&appId=478333052179762&version=v2.0";
 			fjs.parentNode.insertBefore(js, fjs);
 		}(document, 'script', 'facebook-jssdk'));
 	</script>
@@ -86,30 +96,14 @@
 								onclick="ga('send', 'event', 'Index', 'Header', 'Privacy');">Privacy
 									policy</a></li>
 							<li><a href="tos.html" data-localize="header.tos"
-								onclick="ga('send', 'event', 'Index', 'Header', 'TOS');">Terms of use</a></li>
+								onclick="ga('send', 'event', 'Index', 'Header', 'TOS');">Terms
+									of use</a></li>
 							<li><a
 								href="https://flappy-communication.appspot.com/contact.jsp"
 								data-localize="header.contact"
 								onclick="ga('send', 'event', 'Index', 'Header', 'Contact');">Contact</a></li>
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
-							<li><a href="https://twitter.com/share"
-								class="twitter-share-button" data-via="flappy_comm"
-								data-size="large">Tweet</a> <script>
-									!function(d, s, id) {
-										var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/
-												.test(d.location) ? 'http'
-												: 'https';
-										if (!d.getElementById(id)) {
-											js = d.createElement(s);
-											js.id = id;
-											js.src = p
-													+ '://platform.twitter.com/widgets.js';
-											fjs.parentNode
-													.insertBefore(js, fjs);
-										}
-									}(document, 'script', 'twitter-wjs');
-								</script></li>
 							<li><a href="http://mame0112.hatenablog.com/"
 								data-localize="header.blog"
 								onclick="ga('send', 'event', 'Index', 'Header', 'Blog');">Blog</a></li>
@@ -129,6 +123,41 @@
 						src="image/googleplay.png" alt="google play"></a>
 				</p>
 			</div>
+			<div>
+				<div class="fb-like"
+					data-href="https://www.facebook.com/flappy.communication"
+					data-layout="box_count" data-action="like" data-show-faces="true"
+					data-share="false"></div>
+				<a
+					href="http://b.hatena.ne.jp/entry/http://flappy-communication.appspot.com/"
+					class="hatena-bookmark-button" data-hatena-bookmark-title="flappy"
+					data-hatena-bookmark-layout="vertical-balloon"
+					data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img
+					src="https://b.st-hatena.com/images/entry-button/button-only@2x.png"
+					alt="このエントリーをはてなブックマークに追加" width="20" height="20"
+					style="border: none;" /></a>
+				<script type="text/javascript"
+					src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8"
+					async="async"></script>
+
+				<a href="https://twitter.com/share" class="twitter-share-button"
+					data-via="flappy_comm" data-size="large">Tweet</a>
+				<script>
+					!function(d, s, id) {
+						var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/
+								.test(d.location) ? 'http' : 'https';
+						if (!d.getElementById(id)) {
+							js = d.createElement(s);
+							js.id = id;
+							js.src = p + '://platform.twitter.com/widgets.js';
+							fjs.parentNode.insertBefore(js, fjs);
+						}
+					}(document, 'script', 'twitter-wjs');
+				</script>
+			</div>
+			<script type="text/javascript"
+				src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8"
+				async="async"></script>
 
 			<h2 data-localize="index.service_target">This service is for...</h2>
 			<div class="row">
@@ -184,11 +213,13 @@
 					</p>
 				</div>
 				<div class="col-md-6">
+					<!-- 
 					<div class="fb-like-box"
 						data-href="https://www.facebook.com/flappy.communication"
 						data-width="320" data-height="320" data-colorscheme="light"
 						data-show-faces="true" data-header="true" data-stream="false"
 						data-show-border="true"></div>
+						 -->
 				</div>
 
 			</div>
@@ -211,7 +242,8 @@
 					onclick="ga('send', 'event', 'Index', 'Footer', 'Privacy');">Privacy
 						policy</a></li>
 				<li class="span4"><a href="tos.html" data-localize="footer.tos"
-					onclick="ga('send', 'event', 'Index', 'Footer', 'TOS');">Terms of use</a></li>
+					onclick="ga('send', 'event', 'Index', 'Footer', 'TOS');">Terms
+						of use</a></li>
 				<li class="span5"><a
 					href="https://flappy-communication.appspot.com/contact.jsp"
 					data-localize="footer.contact"
